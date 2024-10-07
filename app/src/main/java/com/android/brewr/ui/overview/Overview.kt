@@ -38,51 +38,18 @@ fun OverviewScreen() {
       modifier = Modifier.testTag("overviewScreen"),
       topBar = {
         TopAppBar(
-            title = { Text(text = "BrewR") },
+            title = { Text(text = "BrewR", modifier = Modifier.testTag("appTitle")) },
             actions = {
               Row {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {}, modifier = Modifier.testTag("addButton")) {
                   Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                IconButton(onClick = {}) {
-                  Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Add")
+                IconButton(onClick = {}, modifier = Modifier.testTag("accountButton")) {
+                  Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Account")
                 }
               }
             })
       },
       content = { pd -> pd })
-}
-
-// TODO: Refactor this to use a list of Journey ViewModels
-@Composable
-fun JourneyItem(journey: String, onClick: () -> Unit) {
-  Card(
-      modifier =
-          Modifier.testTag("todoListItem")
-              .fillMaxWidth()
-              .padding(vertical = 4.dp)
-              .clickable(onClick = onClick),
-  ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-      // Date and Grade Row
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = "Test", style = MaterialTheme.typography.bodySmall)
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = "Test", style = MaterialTheme.typography.bodySmall, color = Color.Blue)
-          Icon(
-              imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-        }
-      }
-
-      Spacer(modifier = Modifier.height(4.dp))
-
-      // Drink Name
-      Text(text = "Test", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-
-      // Coffee Shop Name
-      Text(text = "Test", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-    }
-  }
 }
