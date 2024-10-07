@@ -4,14 +4,15 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
     id("jacoco")
+    id("com.google.gms.google-services") // Ensure this is present
 }
 
 android {
-    namespace = "com.android.sample"
+    namespace = "com.android.brewr"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.sample"
+        applicationId = "com.android.brewr"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -51,12 +52,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     packaging {
@@ -112,11 +113,23 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
+    // Firebase BoM (Bill of Materials)
+    implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Add this for Firebase
+
+    // Firebase authentication
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Play Services Auth (for Google Sign-In)
+    implementation("com.google.android.gms:play-services-auth:20.5.0")
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
