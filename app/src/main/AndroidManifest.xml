@@ -13,11 +13,6 @@
         android:theme="@style/Theme.SampleApp"
         tools:targetApi="31">
         <activity
-            android:name="com.android.brewr.SecondActivity"
-            android:exported="false"
-            android:label="@string/title_activity_second"
-            android:theme="@style/Theme.SampleApp" />
-        <activity
             android:name="com.android.brewr.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
