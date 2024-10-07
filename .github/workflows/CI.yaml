@@ -13,6 +13,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -43,7 +48,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: /bin/bash -c "set -o pipefail && ./gradlew connectedCheck --parallel --stacktrace --build-cache
+          script: ./gradlew connectedCheck --stacktrace
 
       - name: Generate coverage
         run: |
