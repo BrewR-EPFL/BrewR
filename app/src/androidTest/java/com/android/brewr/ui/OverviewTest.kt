@@ -1,19 +1,15 @@
-package com.android.brewr
+package com.android.brewr.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.brewr.screen.MainScreen
+import com.android.brewr.MainActivity
+import com.android.brewr.ui.screens.OverviewScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest : TestCase() {
 
@@ -22,10 +18,21 @@ class MainActivityTest : TestCase() {
   @Test
   fun test() = run {
     step("Start Main Activity") {
-      ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
-        simpleText {
+      ComposeScreen.onComposeScreen<OverviewScreen>(composeTestRule) {
+        assertIsDisplayed()
+        appTitle {
           assertIsDisplayed()
-          assertTextEquals("Hello Android!")
+          assertTextEquals("BrewR")
+        }
+        addButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+          performClick()
+        }
+        accountButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+          performClick()
         }
       }
     }
