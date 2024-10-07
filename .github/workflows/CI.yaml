@@ -32,6 +32,23 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          avd-name: github
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: /bin/bash -c "set -o pipefail && ./gradlew connectedCheck --parallel --stacktrace --build-cache
+
+      - name: Generate coverage
+        run: |
+          ./gradlew jacocoTestReport
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
