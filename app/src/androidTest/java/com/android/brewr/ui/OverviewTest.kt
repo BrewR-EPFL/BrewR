@@ -13,24 +13,20 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest : TestCase() {
 
-    @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    @Test
-    fun test() = run {
-        step("Start Main Activity") {
-            ComposeScreen.onComposeScreen<OverviewScreen>(composeTestRule) {
-                assertIsDisplayed()
-                appTitle {
-                    assertIsDisplayed()
-                    assertTextEquals("BrewR")
-                }
-                addButton {
-                    performClick()
-                }
-                accountButton {
-                    performClick()
-                }
-            }
+  @Test
+  fun test() = run {
+    step("Start Main Activity") {
+      ComposeScreen.onComposeScreen<OverviewScreen>(composeTestRule) {
+        assertIsDisplayed()
+        appTitle {
+          assertIsDisplayed()
+          assertTextEquals("BrewR")
         }
+        addButton { performClick() }
+        accountButton { performClick() }
+      }
     }
+  }
 }
