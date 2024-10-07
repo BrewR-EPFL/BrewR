@@ -114,13 +114,13 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 
 dependencies {
     // Firebase BoM (Bill of Materials)
-    implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Add this for Firebase
+    implementation(platform(libs.firebase.bom.v3200)) // Add this for Firebase
 
     // Firebase authentication
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.google.firebase.auth.ktx)
 
     // Play Services Auth (for Google Sign-In)
-    implementation("com.google.android.gms:play-services-auth:20.5.0")
+    implementation(libs.play.services.auth.v2050)
 
 
     implementation(libs.androidx.core.ktx)
@@ -133,6 +133,9 @@ dependencies {
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
