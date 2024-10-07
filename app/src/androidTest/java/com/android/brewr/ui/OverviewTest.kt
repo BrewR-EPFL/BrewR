@@ -24,8 +24,16 @@ class MainActivityTest : TestCase() {
           assertIsDisplayed()
           assertTextEquals("BrewR")
         }
-        addButton { performClick() }
-        accountButton { performClick() }
+        addButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+          performClick()
+        }
+        accountButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+          performClick()
+        }
       }
     }
   }
