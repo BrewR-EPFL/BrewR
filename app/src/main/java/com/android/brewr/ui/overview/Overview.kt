@@ -51,9 +51,7 @@ fun OverviewScreen() {
               }
             })
       },
-      content = { pd ->
-        pd
-      })
+      content = { pd -> pd })
 }
 
 // TODO: Refactor this to use a list of Journey ViewModels
