@@ -1,6 +1,5 @@
 package com.android.brewr.model.journey
 
-import android.media.Image
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -97,7 +96,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
   private fun documentTojourney(document: DocumentSnapshot): Journey? {
     return try {
       val uid = document.id
-      val image = document.get("image") ?: return null
+      val imageUrl = document.getString("imageUrl") ?: return null
       val description = document.getString("description") ?: return null
       val coffeeShopName = document.getString("coffeeShopName") ?: return null
       val originString = document.getString("coffeeOrigin") ?: return null
@@ -111,7 +110,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       val location = document.getString("location") ?: return null
       Journey(
           uid = uid,
-          image = image as Image, // This is false, but I don't know how to fix it yet
+          imageUrl = imageUrl,
           description = description,
           coffeeShopName = coffeeShopName,
           coffeeOrigin = coffeeOrigin,

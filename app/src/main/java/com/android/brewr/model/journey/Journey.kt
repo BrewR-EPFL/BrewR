@@ -1,11 +1,10 @@
 package com.android.brewr.model.journey
 
-import android.media.Image
 import com.google.firebase.Timestamp
 
 data class Journey(
     val uid: String,
-    val image: Image,
+    val imageUrl: String,
     val description: String,
     val coffeeShopName: String,
     val coffeeOrigin: CoffeeOrigin,
