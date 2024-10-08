@@ -105,7 +105,8 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       val brewingMethod = BrewingMethod.valueOf(methodString)
       val tasteString = document.getString("coffeeTaste") ?: return null
       val coffeeTaste = CoffeeTaste.valueOf(tasteString)
-      val coffeeRate = document.getDouble("coffeeRate") ?: return null
+      val rateString = document.getString("coffeeRate") ?: return null
+      val coffeeRate = CoffeeRate.valueOf(rateString)
       val date = document.getTimestamp("date") ?: return null
       val location = document.getString("location") ?: return null
       Journey(

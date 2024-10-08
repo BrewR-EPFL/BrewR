@@ -10,7 +10,7 @@ data class Journey(
     val coffeeOrigin: CoffeeOrigin,
     val brewingMethod: BrewingMethod,
     val coffeeTaste: CoffeeTaste,
-    val coffeeRate: Double,
+    val coffeeRate: CoffeeRate,
     val date: Timestamp,
     val location: String, // Change to location once location is implemented
 )
@@ -57,4 +57,17 @@ enum class CoffeeTaste {
   SWEET,
   FRUITY,
   BITTER
+}
+
+/** Enum class representing various coffee rates. */
+enum class CoffeeRate {
+  ONE,
+  ONE_HALF,
+  TWO,
+  TWO_HALF,
+  THREE,
+  THREE_HALF,
+  FOUR,
+  FOUR_HALF,
+  FIVE
 }
