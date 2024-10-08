@@ -1,9 +1,10 @@
 package com.android.brewr.ui.overview
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Add
@@ -13,15 +14,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.theme.Purple80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun OverviewScreen() {
+fun OverviewScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
       topBar = {
@@ -39,5 +42,32 @@ fun OverviewScreen() {
               }
             })
       },
-      content = { pd -> pd })
+      content = { pd ->
+        Column(modifier = Modifier.padding(pd)) {
+          SubNavigationBar()
+          Spacer(modifier = Modifier.height(16.dp))
+        }
+      })
+}
+
+@Composable
+fun SubNavigationBar() {
+  Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    SubNavigationButton("Gallery") {}
+    Spacer(modifier = Modifier.width(10.dp))
+    SubNavigationButton("Explore") {}
+  }
+}
+
+@Composable
+fun SubNavigationButton(text: String, onClick: () -> Unit = {}) {
+
+  Text(
+      text = text,
+      modifier =
+          Modifier.padding(8.dp)
+              .clickable { onClick() }
+              .background(Purple80, RoundedCornerShape(8.dp))
+              .padding(12.dp)
+              .testTag(text))
 }

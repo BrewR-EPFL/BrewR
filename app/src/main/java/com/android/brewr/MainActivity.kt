@@ -63,7 +63,7 @@ fun BrewRApp() {
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.OVERVIEW) { OverviewScreen() }
+      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
     }
   }
 }
