@@ -25,7 +25,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
-import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.Purple80
 
 @OptIn(ExperimentalMaterial3Api::class)
