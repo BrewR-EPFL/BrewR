@@ -56,7 +56,7 @@ fun BrewRApp() {
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen() }
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
 
     navigation(
