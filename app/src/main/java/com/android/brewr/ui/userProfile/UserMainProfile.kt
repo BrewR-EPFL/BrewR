@@ -106,13 +106,13 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
                   icon = Icons.Default.MoreVert,
                   label = "anything",
                   onClick = { /* Handle notifications */},
-                  testTag = "aaa")
+                  testTag = "anything")
 
               ProfileMenuItem(
                   icon = Icons.Default.Clear,
                   label = "sign out",
                   onClick = { showDialog = true },
-                  testTag = "bbb")
+                  testTag = "sign out")
               if (showDialog) {
                 AlertDialog(
                     modifier = Modifier.testTag("Alter dialog"),
@@ -129,7 +129,7 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
                             Toast.makeText(context, "Signed out successfully", Toast.LENGTH_LONG)
                                 .show()
                             showDialog = false
-                            navigationActions.navigateTo(Route.AUTH) // 返回到上一个页面
+                            navigationActions.navigateTo(Route.AUTH)
                           }) {
                             Text("Yes")
                           }
