@@ -128,5 +128,3 @@ class OverviewScreenTest {
         .assertTextEquals("You have no Journey yet.")
   }
 }
-
-// Trigger CI
