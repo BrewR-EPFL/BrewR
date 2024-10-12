@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.resources.C
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
@@ -51,19 +53,22 @@ fun BrewRApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  val listJourneysViewModel: ListJourneysViewModel =
+      viewModel(factory = ListJourneysViewModel.Factory)
+
   NavHost(navController, Route.AUTH) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen() }
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
 
     navigation(
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
+      composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
     }
   }
 }
