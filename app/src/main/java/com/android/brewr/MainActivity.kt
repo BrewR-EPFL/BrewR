@@ -21,6 +21,7 @@ import com.android.brewr.resources.C
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.overview.AddJourneyScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.google.firebase.FirebaseApp
@@ -69,6 +70,13 @@ fun BrewRApp() {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.ADD_JOURNEY,
+        route = Route.ADD_JOURNEY,
+    ) {
+      composable(Screen.ADD_JOURNEY) { AddJourneyScreen(listJourneysViewModel, navigationActions) }
     }
   }
 }
