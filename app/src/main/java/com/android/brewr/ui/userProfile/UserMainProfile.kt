@@ -1,3 +1,5 @@
+package com.android.brewr.ui.userProfile
+
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -80,24 +82,40 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
                   verticalAlignment = Alignment.CenterVertically,
               ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(onClick = {}, Modifier.testTag("Preference button")) {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Preference")
-                  }
+                  IconButton(
+                      onClick = {
+                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
+                            .show()
+                      },
+                      Modifier.testTag("Preference button")) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite, contentDescription = "Preference")
+                      }
                   Text("Preference")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(onClick = {}, Modifier.testTag("Notification button")) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notification")
-                  }
-                  Text("Preference")
+                  IconButton(
+                      onClick = {
+                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
+                            .show()
+                      },
+                      Modifier.testTag("Notification button")) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notification")
+                      }
+                  Text("Notification")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(onClick = {}, Modifier.testTag("TBD button")) {
-                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "TBD")
-                  }
-                  Text("Preference")
+                  IconButton(
+                      onClick = {
+                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
+                            .show()
+                      },
+                      Modifier.testTag("TBD button")) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "TBD")
+                      }
+                  Text("TBD")
                 }
               }
 
@@ -105,7 +123,9 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
               ProfileMenuItem(
                   icon = Icons.Default.MoreVert,
                   label = "anything",
-                  onClick = { /* Handle notifications */},
+                  onClick = {
+                    Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT).show()
+                  },
                   testTag = "anything")
 
               ProfileMenuItem(
