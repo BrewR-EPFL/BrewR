@@ -1,5 +1,8 @@
 package com.android.brewr.ui.overview
 
+import android.app.DatePickerDialog
+import android.icu.util.GregorianCalendar
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,15 +18,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -55,6 +62,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,11 +72,15 @@ import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
+import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.Purple80
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -89,6 +101,13 @@ fun AddJourneyScreen(
   var date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
   var location by remember { mutableStateOf("") } // Will change to Location once it's implemented
   val context = LocalContext.current
+  // Convert the Timestamp to Date and format it
+  val formattedDate =
+      remember(date) {
+        val dateObject = date.toDate() // Convert Timestamp to Date
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Date format
+        formatter.format(dateObject) // Return formatted date
+      }
 
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
@@ -111,7 +130,8 @@ fun AddJourneyScreen(
             modifier =
                 Modifier.fillMaxWidth()
                     .padding(paddingValues)
-                    .padding(16.dp), // Add padding to the whole Column
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()), // Add padding to the whole Column
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
               Text(
                   text = "Your Journey",
@@ -140,23 +160,6 @@ fun AddJourneyScreen(
                                           contentDescription = "Add Photo")
                                     }
                               }
-                          /*
-                           Button(
-                               onClick = { /* Add Photo action */},
-                               modifier =
-                                   Modifier.align(Alignment.Center) // Center the button in the box
-                               ) {
-                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                   Icon(
-                                       imageVector = Icons.Default.Add,
-                                       contentDescription = "Add Photo",
-                                       tint = Color(0xFF181515) // Custom orange color
-                                       )
-                                   Text(text = "Add Photo", color = Color.Black)
-                                 }
-                               }
-
-                          */
                         }
 
                     // Description section on the right
@@ -170,40 +173,7 @@ fun AddJourneyScreen(
                             Modifier.fillMaxWidth()
                                 .height(150.dp)
                                 .testTag("inputJourneyDescription"))
-
-                    /*
-                     Column(
-                         modifier =
-                             Modifier.weight(1f) // Take the remaining space
-                                 .border(
-                                     1.dp, Color(0xFF854704)) // Orange border around the TextField
-                                 .padding(8.dp) // Padding inside the TextField
-                         ) {
-                           Text(
-                               text = "Description",
-                               color = Color(0xFF854704),
-                               style = MaterialTheme.typography.bodyMedium,
-                               textAlign = TextAlign.Center)
-
-                           Spacer(modifier = Modifier.height(8.dp))
-
-                           TextField(
-                               value = description,
-                               onValueChange = { description = it },
-                               placeholder = { Text("Capture your coffee experience") },
-                               modifier = Modifier.fillMaxWidth())
-                         }
-
-                    */
                   }
-
-              /*
-               Text(
-                   text = "Coffeeshop",
-                   style = MaterialTheme.typography.titleLarge,
-                   color = Color.Black)
-
-              */
 
               // CoffeeShop Dropdown Menu below the row
 
@@ -232,46 +202,16 @@ fun AddJourneyScreen(
                     modifier = Modifier.fillMaxWidth().testTag("inputCoffeeShopNameDescription"))
               }
 
-              /*
-               ExposedDropdownMenuBox(
-                   expanded = expanded,
-                   onExpandedChange = { expanded = !expanded } // Open/close the dropdown menu
-                   ) {
-                     TextField(
-                         value = coffeeShopName,
-                         onValueChange = {
-                           coffeeShopName = it
-                         }, // Optional for search implementation
-                         readOnly =
-                             true, // Prevent typing in the TextField, Will be changed for search
-                         label = { Text("Enter the CoffeeShop Name") },
-                         modifier =
-                             Modifier.menuAnchor().fillMaxWidth().clickable {
-                               expanded = true
-                             }, // Open dropdown when clicked
-                         trailingIcon = {
-                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                         },
-                         colors = ExposedDropdownMenuDefaults.textFieldColors())
-                     ExposedDropdownMenu(
-                         expanded = expanded, onDismissRequest = { expanded = false }) {
-                           coffeeShopOptions.forEach { option ->
-                             DropdownMenuItem(
-                                 text = { Text(option) },
-                                 onClick = {
-                                   coffeeShopName = option // Set the selected coffee shop name
-                                   expanded = false // Close the dropdown menu
-                                 })
-                           }
-                         }
-                   }
-              */
-
               // Coffee Origin Dropdown Menu
               val focusRequester = remember { FocusRequester() }
               var coffeeOriginExpand by remember { mutableStateOf(false) }
 
               // Wrap with ExposedDropdownMenuBox for the dropdown functionality
+              Text(
+                  text = "Origin",
+                  fontSize = 16.sp, // Adjust the font size for the title
+                  fontWeight = FontWeight.Bold, // Make the title bold
+              )
               ExposedDropdownMenuBox(
                   expanded = coffeeOriginExpand,
                   onExpandedChange = { coffeeOriginExpand = !coffeeOriginExpand }) {
@@ -280,7 +220,7 @@ fun AddJourneyScreen(
                         value = coffeeOrigin.name,
                         onValueChange = {},
                         readOnly = true, // Prevent typing in the TextField
-                        label = { Text("Coffee Origin") },
+                        // label = { Text("Coffee Origin") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
@@ -305,7 +245,7 @@ fun AddJourneyScreen(
                                     200.dp) // Limit height of the dropdown (set a fixed value)
                                 .focusRequester(focusRequester) // Attach the FocusRequester
                         ) {
-                          CoffeeOrigin.values().take(3).forEach { origin ->
+                          CoffeeOrigin.values().forEach { origin ->
                             DropdownMenuItem(
                                 text = { Text(origin.name) },
                                 onClick = {
@@ -317,55 +257,223 @@ fun AddJourneyScreen(
                         }
                   }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(2.dp) // Space between title and buttons
-            ) {
-                Text(
-                    text = "Brewing Method",
-                    fontSize = 16.sp, // Adjust the font size for the title
-                    fontWeight = FontWeight.Bold, // Make the title bold
-                )
+              Column(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalArrangement =
+                      Arrangement.spacedBy(2.dp) // Space between title and buttons
+                  ) {
+                    Text(
+                        text = "Brewing Method",
+                        fontSize = 16.sp, // Adjust the font size for the title
+                        fontWeight = FontWeight.Bold, // Make the title bold
+                    )
 
-                FlowRow(modifier = Modifier.padding(16.dp)) {
-                    BrewingMethod.values().forEach { method ->
+                    FlowRow(modifier = Modifier.padding(16.dp)) {
+                      BrewingMethod.values().forEach { method ->
                         // Determine if this method is the currently selected one
                         val isSelected = brewingMethod == method
 
                         // Use Button or OutlinedButton based on selection
                         if (isSelected) {
-                            Button(
-                                onClick = { brewingMethod = method },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.padding(4.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Purple80,
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Text(method.name.replace("_", " "),
+                          Button(
+                              onClick = { brewingMethod = method },
+                              shape = RoundedCornerShape(16.dp),
+                              modifier = Modifier.padding(4.dp),
+                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                              colors =
+                                  ButtonDefaults.buttonColors(
+                                      containerColor = Purple80, contentColor = Color.White)) {
+                                Text(
+                                    method.name.replace("_", " "),
                                     modifier = Modifier.padding(4.dp))
-                            }
+                              }
                         } else {
-                            OutlinedButton(
-                                onClick = { brewingMethod = method },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.padding(4.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color(0xFF000000),
-                                )
-                            ) {
-                                Text(method.name.replace("_", " "),
+                          OutlinedButton(
+                              onClick = { brewingMethod = method },
+                              shape = RoundedCornerShape(16.dp),
+                              modifier = Modifier.padding(4.dp),
+                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                              colors =
+                                  ButtonDefaults.outlinedButtonColors(
+                                      contentColor = Color(0xFF000000),
+                                  )) {
+                                Text(
+                                    method.name.replace("_", " "),
                                     modifier = Modifier.padding(4.dp))
-                            }
+                              }
+                        }
+                      }
+                    }
+                  }
+
+            //Taste
+              Column(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalArrangement =
+                      Arrangement.spacedBy(2.dp) // Space between title and buttons
+                  ) {
+                    Text(
+                        text = "Taste",
+                        fontSize = 16.sp, // Adjust the font size for the title
+                        fontWeight = FontWeight.Bold, // Make the title bold
+                    )
+
+                    FlowRow(modifier = Modifier.padding(16.dp)) {
+                      CoffeeTaste.values().forEach { taste ->
+                        // Determine if this method is the currently selected one
+                        val isSelected = coffeeTaste == taste
+
+                        // Use Button or OutlinedButton based on selection
+                        if (isSelected) {
+                          Button(
+                              onClick = { coffeeTaste = taste },
+                              shape = RoundedCornerShape(16.dp),
+                              modifier = Modifier.padding(4.dp),
+                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                              colors =
+                                  ButtonDefaults.buttonColors(
+                                      containerColor = Purple80, contentColor = Color.White)) {
+                                Text(
+                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
+                              }
+                        } else {
+                          OutlinedButton(
+                              onClick = { coffeeTaste = taste },
+                              shape = RoundedCornerShape(16.dp),
+                              modifier = Modifier.padding(4.dp),
+                              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                              colors =
+                                  ButtonDefaults.outlinedButtonColors(
+                                      contentColor = Color(0xFF000000),
+                                  )) {
+                                Text(
+                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
+                              }
+                        }
+                      }
+                    }
+                  }
+
+            //Rate
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement =
+                Arrangement.spacedBy(2.dp) // Space between title and buttons
+            ) {
+                Text(
+                    text = "Rate",
+                    fontSize = 16.sp, // Adjust the font size for the title
+                    fontWeight = FontWeight.Bold, // Make the title bold
+                )
+
+                // Map CoffeeRate to the number of stars
+                val starCount = coffeeRate.ordinal + 1 // ordinal gives you 0-based index, so add 1
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center // Center the star icons
+                )  {
+                    for (i in 1..5) {
+                        if (i <= starCount) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = "Filled Star $i",
+                                tint = Color(0xFFFFD700), // Gold color for filled star
+                                modifier = Modifier.size(40.dp)
+                                    .clickable {
+                                    // Update the coffeeRate when the star is clicked
+                                    coffeeRate = CoffeeRate.values()[i - 1]
+                                }
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Outlined.Star,
+                                contentDescription = "Outlined Star $i",
+                                tint = Color(0xFF312F2F), // Same gold color for consistency
+                                modifier = Modifier.size(40.dp)
+                                    .clickable {
+                                    // Update the coffeeRate when the star is clicked
+                                    coffeeRate = CoffeeRate.values()[i - 1]
+                                }
+                            )
                         }
                     }
                 }
             }
 
+              // DatePickerDialog initialization logic
+              val datePickerDialog = remember {
+                DatePickerDialog(
+                    context,
+                    { _, year, month, dayOfMonth ->
+                      // Update the date state when a new date is selected
+                      val calendar = Calendar.getInstance()
+                      calendar.set(year, month, dayOfMonth)
+                      date = Timestamp(calendar.time) // Convert Date to Timestamp
+                    },
+                    // Initialize the dialog with the current date values
+                    Calendar.getInstance()
+                        .apply {
+                          time = date.toDate() // Use the current timestamp's Date
+                        }
+                        .get(Calendar.YEAR),
+                    Calendar.getInstance().apply { time = date.toDate() }.get(Calendar.MONTH),
+                    Calendar.getInstance()
+                        .apply { time = date.toDate() }
+                        .get(Calendar.DAY_OF_MONTH))
+              }
+
+            //Date
+              Column(modifier = Modifier.padding(16.dp)) {
+                // Label Text
+                Text(
+                    text = "Date",
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+
+                // OutlinedTextField displaying the formatted date
+                OutlinedTextField(
+                    value = formattedDate, // Display the formatted date
+                    onValueChange = {}, // Read-only field, no direct input
+                    readOnly = true, // To prevent manual edits
+                    textStyle =
+                        androidx.compose.ui.text.TextStyle(
+                            textAlign = TextAlign.Center), // Center align the text
+                    modifier =
+                        Modifier.padding(8.dp).clickable {
+                          // Show DatePickerDialog when clicked
+                          datePickerDialog.show()
+                        })
+              }
+
+
+
+
+            Button(
+                onClick = {
+                            listJourneysViewModel.addJourney(
+                                Journey(
+                                    uid = uid,
+                                    imageUrl = imageUrl,
+                                    description = description,
+                                    coffeeShopName = coffeeShopName,
+                                    coffeeOrigin = coffeeOrigin,
+                                    brewingMethod = brewingMethod,
+                                    coffeeTaste = coffeeTaste,
+                                    coffeeRate = coffeeRate,
+                                    date = date,
+                                    location = location)
+                            )
+
+                            navigationActions.goBack()
+                            Toast.makeText(
+                                context, "Saved!", Toast.LENGTH_SHORT)
+                                .show()
+                            return@Button
+                },
+                modifier = Modifier.fillMaxWidth().testTag("AddRecordSave")) {
+                Text("Save")
+            }
             }
       })
 }

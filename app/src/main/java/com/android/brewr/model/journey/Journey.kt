@@ -62,12 +62,12 @@ enum class CoffeeTaste {
 /** Enum class representing various coffee rates. */
 enum class CoffeeRate {
   ONE,
-  ONE_HALF,
+  //ONE_HALF,
   TWO,
-  TWO_HALF,
+ // TWO_HALF,
   THREE,
-  THREE_HALF,
+ // THREE_HALF,
   FOUR,
-  FOUR_HALF,
+ // FOUR_HALF,
   FIVE
 }
