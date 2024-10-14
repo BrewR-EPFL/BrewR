@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.brewr.MainActivity
 import com.android.brewr.ui.navigation.NavigationActions
@@ -40,6 +39,6 @@ class SignInScreenTest {
   fun testLoginButtonStartsSignInProcess() {
     // Click the login button
     composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
-    //composeTestRule.onNodeWithTag("loginButton").performClick()
+    // composeTestRule.onNodeWithTag("loginButton").performClick()
   }
 }
