@@ -446,6 +446,24 @@ fun AddJourneyScreen(
                         })
               }
 
+            //Location
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Label Text
+                Text(
+                    text = "Location",
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { description = it },
+                    placeholder = { Text("Enter the location") },
+                    modifier =
+                    Modifier.fillMaxWidth()
+                        .testTag("location"))
+            }
+
 
 
 
