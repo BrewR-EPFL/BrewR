@@ -34,10 +34,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {
@@ -57,46 +55,36 @@ fun SignInScreen(navigationActions: NavigationActions) {
       rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
           result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
-          coroutineScope.launch {
-            try {
-              val credential = oneTapClient?.getSignInCredentialFromIntent(result.data)
-              val idToken = credential?.googleIdToken
-              when {
-                idToken != null -> {
-                  val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                  auth?.signInWithCredential(firebaseCredential)?.addOnCompleteListener { task ->
-                    coroutineScope.launch {
-                      if (task.isSuccessful) {
-                        Log.d("SignInScreen", "signInWithCredential:success")
-                        user = auth?.currentUser
-                        // Toast is only usable in main so we have to use
-                        // withContext(Dispatcers.main)
-                        withContext(Dispatchers.Main) {
-                          Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-                        } // Added navigation action to go to the Overview screen after login
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      } else {
-                        Log.w("SignInScreen", "signInWithCredential:failure", task.exception)
-                        withContext(Dispatchers.Main) {
-                          Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
-                        }
-                      }
-                    }
-                  }
-                }
-                else -> {
-                  Log.d("SignInScreen", "No ID token!")
-                  withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Login failed: No ID token!", Toast.LENGTH_LONG).show()
+          try {
+            val credential = oneTapClient?.getSignInCredentialFromIntent(result.data)
+            val idToken = credential?.googleIdToken
+            when {
+              idToken != null -> {
+                val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+                auth?.signInWithCredential(firebaseCredential)?.addOnCompleteListener { task ->
+                  if (task.isSuccessful) {
+                    Log.d("SignInScreen", "signInWithCredential:success")
+                    user = auth?.currentUser
+                    Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+                    // Added navigation action to go to the Overview screen after login
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } else {
+                    Log.w("SignInScreen", "signInWithCredential:failure", task.exception)
+
+                    Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
                   }
                 }
               }
-            } catch (e: Exception) {
-              Log.e("SignInScreen", "Error getting credential: ", e)
-              withContext(Dispatchers.Main) {
-                Toast.makeText(context, "Login error: ${e.message}", Toast.LENGTH_LONG).show()
+              else -> {
+                Log.d("SignInScreen", "No ID token!")
+
+                Toast.makeText(context, "Login failed: No ID token!", Toast.LENGTH_LONG).show()
               }
             }
+          } catch (e: Exception) {
+            Log.e("SignInScreen", "Error getting credential: ", e)
+
+            Toast.makeText(context, "Login error: ${e.message}", Toast.LENGTH_LONG).show()
           }
         }
       }
