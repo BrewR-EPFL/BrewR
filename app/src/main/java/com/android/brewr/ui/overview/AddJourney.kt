@@ -2,6 +2,7 @@ package com.android.brewr.ui.overview
 
 import android.app.DatePickerDialog
 import android.icu.util.GregorianCalendar
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,6 +50,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,14 +103,6 @@ fun AddJourneyScreen(
   var date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
   var location by remember { mutableStateOf("") } // Will change to Location once it's implemented
   val context = LocalContext.current
-  // Convert the Timestamp to Date and format it
-  val formattedDate =
-      remember(date) {
-        val dateObject = date.toDate() // Convert Timestamp to Date
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Date format
-        formatter.format(dateObject) // Return formatted date
-      }
-
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
 
@@ -400,30 +394,10 @@ fun AddJourneyScreen(
                 }
             }
 
-              // DatePickerDialog initialization logic
-              val datePickerDialog = remember {
-                DatePickerDialog(
-                    context,
-                    { _, year, month, dayOfMonth ->
-                      // Update the date state when a new date is selected
-                      val calendar = Calendar.getInstance()
-                      calendar.set(year, month, dayOfMonth)
-                      date = Timestamp(calendar.time) // Convert Date to Timestamp
-                    },
-                    // Initialize the dialog with the current date values
-                    Calendar.getInstance()
-                        .apply {
-                          time = date.toDate() // Use the current timestamp's Date
-                        }
-                        .get(Calendar.YEAR),
-                    Calendar.getInstance().apply { time = date.toDate() }.get(Calendar.MONTH),
-                    Calendar.getInstance()
-                        .apply { time = date.toDate() }
-                        .get(Calendar.DAY_OF_MONTH))
-              }
-
             //Date
-              Column(modifier = Modifier.padding(16.dp)) {
+
+            var selectedDate by remember { mutableStateOf(formatTimestampToDate(date))}
+            Column() {
                 // Label Text
                 Text(
                     text = "Date",
@@ -431,23 +405,17 @@ fun AddJourneyScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold)
 
-                // OutlinedTextField displaying the formatted date
-                OutlinedTextField(
-                    value = formattedDate, // Display the formatted date
-                    onValueChange = {}, // Read-only field, no direct input
-                    readOnly = true, // To prevent manual edits
-                    textStyle =
-                        androidx.compose.ui.text.TextStyle(
-                            textAlign = TextAlign.Center), // Center align the text
-                    modifier =
-                        Modifier.padding(8.dp).clickable {
-                          // Show DatePickerDialog when clicked
-                          datePickerDialog.show()
-                        })
-              }
+                // Date Text
+                TextField(
+                    value = selectedDate,
+                    onValueChange = { selectedDate = it },
+                    label = { Text("DD/MM/YYYY") },
+                    placeholder = { Text(selectedDate) },
+                    modifier = Modifier.fillMaxWidth().testTag("inputTodoDate"))
 
+            }
             //Location
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column() {
                 // Label Text
                 Text(
                     text = "Location",
@@ -457,7 +425,7 @@ fun AddJourneyScreen(
 
                 OutlinedTextField(
                     value = location,
-                    onValueChange = { description = it },
+                    onValueChange = { location = it },
                     placeholder = { Text("Enter the location") },
                     modifier =
                     Modifier.fillMaxWidth()
@@ -465,10 +433,21 @@ fun AddJourneyScreen(
             }
 
 
-
-
             Button(
                 onClick = {
+                    val calendar = GregorianCalendar()
+                    val parts = selectedDate.split("/")
+                    if (parts.size == 3) {
+                        try {
+                            calendar.set(
+                                parts[2].toInt(),
+                                parts[1].toInt() - 1, // Months are 0-based
+                                parts[0].toInt(),
+                                0,
+                                0,
+                                0)
+
+
                             listJourneysViewModel.addJourney(
                                 Journey(
                                     uid = uid,
@@ -480,21 +459,28 @@ fun AddJourneyScreen(
                                     coffeeTaste = coffeeTaste,
                                     coffeeRate = coffeeRate,
                                     date = date,
-                                    location = location)
-                            )
-
+                                    location = location))
                             navigationActions.goBack()
-                            Toast.makeText(
-                                context, "Saved!", Toast.LENGTH_SHORT)
-                                .show()
+
                             return@Button
+                        } catch (_: NumberFormatException) {}
+                    }
+
+                    Toast.makeText(
+                        context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT
+                    )
+                        .show()
                 },
-                modifier = Modifier.fillMaxWidth().testTag("AddRecordSave")) {
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("journeySave")) {
                 Text("Save")
             }
+
             }
       })
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -504,4 +490,9 @@ fun AddJourneyScreenPreview() {
   AddJourneyScreen(
       listJourneysViewModel = viewModel(factory = ListJourneysViewModel.Factory),
       navigationActions = navigationActions)
+}
+fun formatTimestampToDate(timestamp: Timestamp): String {
+    val date = timestamp.toDate() // Convert Timestamp to Date
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Define the date format
+    return sdf.format(date) // Format the date and return it as a String
 }
