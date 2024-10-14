@@ -110,7 +110,8 @@ fun AddJourneyScreen(
       topBar = {
         TopAppBar(
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
+              IconButton(onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("backButton")) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
@@ -130,7 +131,9 @@ fun AddJourneyScreen(
               Text(
                   text = "Your Journey",
                   style = MaterialTheme.typography.titleLarge,
-                  color = Color.Black)
+                  color = Color.Black,
+                  modifier = Modifier.fillMaxWidth().testTag("YourJourneyTitle"),)
+
 
               // Row for the Add Photo and description box
               Row(
@@ -142,6 +145,7 @@ fun AddJourneyScreen(
                         modifier =
                             Modifier.size(150.dp) // Size for the box, can adjust as needed
                                 .border(2.dp, Color.Black) // Black border around the box
+                                .testTag("addPhotoBox") // Add a test tag for testing
                         ) {
                           Column(
                               horizontalAlignment = Alignment.CenterHorizontally,
@@ -174,7 +178,8 @@ fun AddJourneyScreen(
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier =
-                      Modifier.clickable {
+                      Modifier.testTag("atCoffeeShopRow") // Add a test tag for testing
+                          .clickable {
                         isYesSelected = !isYesSelected
                         expanded = isYesSelected // Show text field when ticked
                       }) {
@@ -222,6 +227,7 @@ fun AddJourneyScreen(
                             Modifier.menuAnchor()
                                 .fillMaxWidth() // Set the width of the text field to fill the
                                 // parent width
+                                .testTag("inputCoffeeOrigin") // Add a test tag for testing
                                 .focusRequester(focusRequester) // Attach the FocusRequester
                                 .clickable {
                                   expanded = true // Trigger dropdown when clicked
@@ -238,6 +244,7 @@ fun AddJourneyScreen(
                             Modifier.height(
                                     200.dp) // Limit height of the dropdown (set a fixed value)
                                 .focusRequester(focusRequester) // Attach the FocusRequester
+                                .testTag("dropdownMenuCoffeeOrigin") // Add a test tag for testing
                         ) {
                           CoffeeOrigin.values().forEach { origin ->
                             DropdownMenuItem(
@@ -246,7 +253,8 @@ fun AddJourneyScreen(
                                   coffeeOrigin = origin // Set the selected coffee origin
                                   expanded = false // Close the dropdown
                                 },
-                                modifier = Modifier.padding(8.dp))
+                                modifier = Modifier.padding(8.dp)
+                                    .testTag("YourJourneyTitle"))
                           }
                         }
                   }
@@ -279,7 +287,8 @@ fun AddJourneyScreen(
                                       containerColor = Purple80, contentColor = Color.White)) {
                                 Text(
                                     method.name.replace("_", " "),
-                                    modifier = Modifier.padding(4.dp))
+                                    modifier = Modifier.padding(4.dp)
+                                        .testTag("Button:${method.name}"))
                               }
                         } else {
                           OutlinedButton(
@@ -293,7 +302,8 @@ fun AddJourneyScreen(
                                   )) {
                                 Text(
                                     method.name.replace("_", " "),
-                                    modifier = Modifier.padding(4.dp))
+                                    modifier = Modifier.padding(4.dp)
+                                        .testTag("Button:${method.name}"))
                               }
                         }
                       }
@@ -328,7 +338,8 @@ fun AddJourneyScreen(
                                   ButtonDefaults.buttonColors(
                                       containerColor = Purple80, contentColor = Color.White)) {
                                 Text(
-                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
+                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp)
+                                        .testTag("Button:${taste.name}"))
                               }
                         } else {
                           OutlinedButton(
@@ -341,7 +352,8 @@ fun AddJourneyScreen(
                                       contentColor = Color(0xFF000000),
                                   )) {
                                 Text(
-                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
+                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp)
+                                        .testTag("Button:${taste.name}"))
                               }
                         }
                       }
@@ -363,7 +375,8 @@ fun AddJourneyScreen(
                 // Map CoffeeRate to the number of stars
                 val starCount = coffeeRate.ordinal + 1 // ordinal gives you 0-based index, so add 1
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("rateRow"), // Add a test tag for testing
                     horizontalArrangement = Arrangement.Center // Center the star icons
                 )  {
                     for (i in 1..5) {
@@ -411,7 +424,7 @@ fun AddJourneyScreen(
                     onValueChange = { selectedDate = it },
                     label = { Text("DD/MM/YYYY") },
                     placeholder = { Text(selectedDate) },
-                    modifier = Modifier.fillMaxWidth().testTag("inputTodoDate"))
+                    modifier = Modifier.fillMaxWidth().testTag("inputDate"))
 
             }
             //Location
