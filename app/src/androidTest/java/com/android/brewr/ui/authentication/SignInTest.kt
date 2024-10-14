@@ -9,22 +9,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.brewr.MainActivity
-import com.android.brewr.ui.navigation.NavigationActions
 import org.junit.*
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 
 @RunWith(AndroidJUnit4::class)
 class SignInScreenTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-
-  private lateinit var navigationActions: NavigationActions
-
-  @Before
-  fun setup() {
-    navigationActions = mock()
-  }
 
   @Test
   fun signInScreen_displaysCorrectly() {
