@@ -1,3 +1,5 @@
+package com.android.brewr.ui.authentication
+
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -114,6 +117,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
       // Welcome Text
       Text(
+          modifier = Modifier.testTag("loginTitle"),
           text = "BrewR",
           style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
           fontWeight = FontWeight.Bold,
@@ -153,7 +157,11 @@ fun SignInScreen(navigationActions: NavigationActions) {
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(8.dp).height(48.dp).padding(horizontal = 40.dp)) {
+            modifier =
+                Modifier.padding(8.dp)
+                    .height(48.dp)
+                    .padding(horizontal = 40.dp)
+                    .testTag("loginButton")) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Center,
@@ -168,23 +176,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium)
                   }
-            }
-      } else {
-        // Sign out Button
-        Button(
-            onClick = {
-              Firebase.auth.signOut()
-              user = null
-              Toast.makeText(context, "Signed out successfully", Toast.LENGTH_LONG).show()
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-            shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(8.dp).height(48.dp)) {
-              Text(
-                  text = "Sign out",
-                  color = Color.White,
-                  fontSize = 16.sp,
-                  fontWeight = FontWeight.Medium)
             }
       }
     }
