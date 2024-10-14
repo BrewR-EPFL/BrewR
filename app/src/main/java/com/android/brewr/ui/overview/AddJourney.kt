@@ -1,8 +1,6 @@
 package com.android.brewr.ui.overview
 
-import android.app.DatePickerDialog
 import android.icu.util.GregorianCalendar
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,10 +23,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Star
@@ -50,7 +46,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +59,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,10 +73,6 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.Purple80
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -91,16 +81,15 @@ fun AddJourneyScreen(
         viewModel(factory = ListJourneysViewModel.Factory),
     navigationActions: NavigationActions
 ) {
-  //val currentUser = FirebaseAuth.getInstance().currentUser
   val uid = listJourneysViewModel.getNewUid()
-  var imageUrl by remember { mutableStateOf("") }
+  val imageUrl by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var coffeeShopName by remember { mutableStateOf("") }
-  var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.BRAZIL) }
-  var brewingMethod by remember { mutableStateOf(BrewingMethod.ESPRESSO_MACHINE) }
-  var coffeeTaste by remember { mutableStateOf(CoffeeTaste.NUTTY) }
-  var coffeeRate by remember { mutableStateOf(CoffeeRate.ONE) }
-  var date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
+  var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
+  var brewingMethod by remember { mutableStateOf(BrewingMethod.DEFAULT) }
+  var coffeeTaste by remember { mutableStateOf(CoffeeTaste.DEFAULT) }
+  var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
+  val date by remember { mutableStateOf("") } // Using Firebase Timestamp for now
   var location by remember { mutableStateOf("") } // Will change to Location once it's implemented
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
@@ -110,13 +99,14 @@ fun AddJourneyScreen(
       topBar = {
         TopAppBar(
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() },
+              IconButton(
+                  onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("backButton")) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.Black)
-              }
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Black)
+                  }
             },
             title = { /* No title, just a back button */})
       },
@@ -132,8 +122,8 @@ fun AddJourneyScreen(
                   text = "Your Journey",
                   style = MaterialTheme.typography.titleLarge,
                   color = Color.Black,
-                  modifier = Modifier.fillMaxWidth().testTag("YourJourneyTitle"),)
-
+                  modifier = Modifier.fillMaxWidth().testTag("YourJourneyTitle"),
+              )
 
               // Row for the Add Photo and description box
               Row(
@@ -180,9 +170,9 @@ fun AddJourneyScreen(
                   modifier =
                       Modifier.testTag("atCoffeeShopRow") // Add a test tag for testing
                           .clickable {
-                        isYesSelected = !isYesSelected
-                        expanded = isYesSelected // Show text field when ticked
-                      }) {
+                            isYesSelected = !isYesSelected
+                            expanded = isYesSelected // Show text field when ticked
+                          }) {
                     Icon(
                         imageVector =
                             if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Close,
@@ -216,10 +206,9 @@ fun AddJourneyScreen(
                   onExpandedChange = { coffeeOriginExpand = !coffeeOriginExpand }) {
                     // TextField displaying the selected coffee origin
                     TextField(
-                        value = coffeeOrigin.name,
+                        value = coffeeOrigin.name.replace("DEFAULT", "Select the origin"),
                         onValueChange = {},
                         readOnly = true, // Prevent typing in the TextField
-                        // label = { Text("Coffee Origin") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
@@ -246,15 +235,14 @@ fun AddJourneyScreen(
                                 .focusRequester(focusRequester) // Attach the FocusRequester
                                 .testTag("dropdownMenuCoffeeOrigin") // Add a test tag for testing
                         ) {
-                          CoffeeOrigin.values().forEach { origin ->
+                          CoffeeOrigin.values().drop(1).forEach { origin ->
                             DropdownMenuItem(
                                 text = { Text(origin.name) },
                                 onClick = {
                                   coffeeOrigin = origin // Set the selected coffee origin
                                   expanded = false // Close the dropdown
                                 },
-                                modifier = Modifier.padding(8.dp)
-                                    .testTag("YourJourneyTitle"))
+                                modifier = Modifier.padding(8.dp).testTag("YourJourneyTitle"))
                           }
                         }
                   }
@@ -271,7 +259,7 @@ fun AddJourneyScreen(
                     )
 
                     FlowRow(modifier = Modifier.padding(16.dp)) {
-                      BrewingMethod.values().forEach { method ->
+                      BrewingMethod.values().drop(1).forEach { method ->
                         // Determine if this method is the currently selected one
                         val isSelected = brewingMethod == method
 
@@ -287,8 +275,8 @@ fun AddJourneyScreen(
                                       containerColor = Purple80, contentColor = Color.White)) {
                                 Text(
                                     method.name.replace("_", " "),
-                                    modifier = Modifier.padding(4.dp)
-                                        .testTag("Button:${method.name}"))
+                                    modifier =
+                                        Modifier.padding(4.dp).testTag("Button:${method.name}"))
                               }
                         } else {
                           OutlinedButton(
@@ -302,15 +290,15 @@ fun AddJourneyScreen(
                                   )) {
                                 Text(
                                     method.name.replace("_", " "),
-                                    modifier = Modifier.padding(4.dp)
-                                        .testTag("Button:${method.name}"))
+                                    modifier =
+                                        Modifier.padding(4.dp).testTag("Button:${method.name}"))
                               }
                         }
                       }
                     }
                   }
 
-            //Taste
+              // Taste
               Column(
                   modifier = Modifier.fillMaxWidth(),
                   verticalArrangement =
@@ -323,7 +311,7 @@ fun AddJourneyScreen(
                     )
 
                     FlowRow(modifier = Modifier.padding(16.dp)) {
-                      CoffeeTaste.values().forEach { taste ->
+                      CoffeeTaste.values().drop(1).forEach { taste ->
                         // Determine if this method is the currently selected one
                         val isSelected = coffeeTaste == taste
 
@@ -338,8 +326,9 @@ fun AddJourneyScreen(
                                   ButtonDefaults.buttonColors(
                                       containerColor = Purple80, contentColor = Color.White)) {
                                 Text(
-                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp)
-                                        .testTag("Button:${taste.name}"))
+                                    taste.name.replace("_", " "),
+                                    modifier =
+                                        Modifier.padding(4.dp).testTag("Button:${taste.name}"))
                               }
                         } else {
                           OutlinedButton(
@@ -352,65 +341,68 @@ fun AddJourneyScreen(
                                       contentColor = Color(0xFF000000),
                                   )) {
                                 Text(
-                                    taste.name.replace("_", " "), modifier = Modifier.padding(4.dp)
-                                        .testTag("Button:${taste.name}"))
+                                    taste.name.replace("_", " "),
+                                    modifier =
+                                        Modifier.padding(4.dp).testTag("Button:${taste.name}"))
                               }
                         }
                       }
                     }
                   }
 
-            //Rate
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement =
-                Arrangement.spacedBy(2.dp) // Space between title and buttons
-            ) {
-                Text(
-                    text = "Rate",
-                    fontSize = 16.sp, // Adjust the font size for the title
-                    fontWeight = FontWeight.Bold, // Make the title bold
-                )
+              // Rate
+              Column(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalArrangement =
+                      Arrangement.spacedBy(2.dp) // Space between title and buttons
+                  ) {
+                    Text(
+                        text = "Rate",
+                        fontSize = 16.sp, // Adjust the font size for the title
+                        fontWeight = FontWeight.Bold, // Make the title bold
+                    )
 
-                // Map CoffeeRate to the number of stars
-                val starCount = coffeeRate.ordinal + 1 // ordinal gives you 0-based index, so add 1
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("rateRow"), // Add a test tag for testing
-                    horizontalArrangement = Arrangement.Center // Center the star icons
-                )  {
-                    for (i in 1..5) {
-                        if (i <= starCount) {
-                            Icon(
-                                imageVector = Icons.Filled.Star,
-                                contentDescription = "Filled Star $i",
-                                tint = Color(0xFFFFD700), // Gold color for filled star
-                                modifier = Modifier.size(40.dp)
-                                    .clickable {
-                                    // Update the coffeeRate when the star is clicked
-                                    coffeeRate = CoffeeRate.values()[i - 1]
-                                }
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Outlined.Star,
-                                contentDescription = "Outlined Star $i",
-                                tint = Color(0xFF312F2F), // Same gold color for consistency
-                                modifier = Modifier.size(40.dp)
-                                    .clickable {
-                                    // Update the coffeeRate when the star is clicked
-                                    coffeeRate = CoffeeRate.values()[i - 1]
-                                }
-                            )
+                    // Map CoffeeRate to the number of stars
+                    val starCount =
+                        coffeeRate
+                            .ordinal // ordinal gives you 0-based index, so we don't add 1 due to
+                                     // the default parameter
+                    Row(
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .testTag("rateRow"), // Add a test tag for testing
+                        horizontalArrangement = Arrangement.Center // Center the star icons
+                        ) {
+                          for (i in 1..5) {
+                            if (i <= starCount) {
+                              Icon(
+                                  imageVector = Icons.Filled.Star,
+                                  contentDescription = "Filled Star $i",
+                                  tint = Color(0xFFFFD700), // Gold color for filled star
+                                  modifier =
+                                      Modifier.size(40.dp).clickable {
+                                        // Update the coffeeRate when the star is clicked
+                                        coffeeRate = CoffeeRate.values()[i - 1]
+                                      })
+                            } else {
+                              Icon(
+                                  imageVector = Icons.Outlined.Star,
+                                  contentDescription = "Outlined Star $i",
+                                  tint = Color(0xFF312F2F), // Same gold color for consistency
+                                  modifier =
+                                      Modifier.size(40.dp).clickable {
+                                        // Update the coffeeRate when the star is clicked
+                                        coffeeRate = CoffeeRate.values()[i - 1]
+                                      })
+                            }
+                          }
                         }
-                    }
-                }
-            }
+                  }
 
-            //Date
+              // Date
 
-            var selectedDate by remember { mutableStateOf(formatTimestampToDate(date))}
-            Column() {
+              var selectedDate by remember { mutableStateOf(date) }
+              Column() {
                 // Label Text
                 Text(
                     text = "Date",
@@ -425,10 +417,9 @@ fun AddJourneyScreen(
                     label = { Text("DD/MM/YYYY") },
                     placeholder = { Text(selectedDate) },
                     modifier = Modifier.fillMaxWidth().testTag("inputDate"))
-
-            }
-            //Location
-            Column() {
+              }
+              // Location
+              Column() {
                 // Label Text
                 Text(
                     text = "Location",
@@ -440,60 +431,51 @@ fun AddJourneyScreen(
                     value = location,
                     onValueChange = { location = it },
                     placeholder = { Text("Enter the location") },
-                    modifier =
-                    Modifier.fillMaxWidth()
-                        .testTag("location"))
-            }
+                    modifier = Modifier.fillMaxWidth().testTag("location"))
+              }
 
-
-            Button(
-                onClick = {
+              Button(
+                  onClick = {
                     val calendar = GregorianCalendar()
                     val parts = selectedDate.split("/")
                     if (parts.size == 3) {
-                        try {
-                            calendar.set(
-                                parts[2].toInt(),
-                                parts[1].toInt() - 1, // Months are 0-based
-                                parts[0].toInt(),
-                                0,
-                                0,
-                                0)
+                      try {
+                        calendar.set(
+                            parts[2].toInt(),
+                            parts[1].toInt() - 1, // Months are 0-based
+                            parts[0].toInt(),
+                            0,
+                            0,
+                            0)
 
+                        listJourneysViewModel.addJourney(
+                            Journey(
+                                uid = uid,
+                                imageUrl = imageUrl,
+                                description = description,
+                                coffeeShopName = coffeeShopName,
+                                coffeeOrigin = coffeeOrigin,
+                                brewingMethod = brewingMethod,
+                                coffeeTaste = coffeeTaste,
+                                coffeeRate = coffeeRate,
+                                date = Timestamp(calendar.time),
+                                location = location))
+                        navigationActions.goBack()
 
-                            listJourneysViewModel.addJourney(
-                                Journey(
-                                    uid = uid,
-                                    imageUrl = imageUrl,
-                                    description = description,
-                                    coffeeShopName = coffeeShopName,
-                                    coffeeOrigin = coffeeOrigin,
-                                    brewingMethod = brewingMethod,
-                                    coffeeTaste = coffeeTaste,
-                                    coffeeRate = coffeeRate,
-                                    date = date,
-                                    location = location))
-                            navigationActions.goBack()
-
-                            return@Button
-                        } catch (_: NumberFormatException) {}
+                        return@Button
+                      } catch (_: NumberFormatException) {}
                     }
 
                     Toast.makeText(
-                        context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT
-                    )
+                            context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
                         .show()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("journeySave")) {
-                Text("Save")
-            }
-
+                  },
+                  modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
+                    Text("Save")
+                  }
             }
       })
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -503,9 +485,4 @@ fun AddJourneyScreenPreview() {
   AddJourneyScreen(
       listJourneysViewModel = viewModel(factory = ListJourneysViewModel.Factory),
       navigationActions = navigationActions)
-}
-fun formatTimestampToDate(timestamp: Timestamp): String {
-    val date = timestamp.toDate() // Convert Timestamp to Date
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Define the date format
-    return sdf.format(date) // Format the date and return it as a String
 }
