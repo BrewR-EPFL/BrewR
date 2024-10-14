@@ -89,8 +89,8 @@ fun AddJourneyScreen(
         viewModel(factory = ListJourneysViewModel.Factory),
     navigationActions: NavigationActions
 ) {
-  val currentUser = FirebaseAuth.getInstance().currentUser
-  val uid = currentUser?.uid ?: ""
+  //val currentUser = FirebaseAuth.getInstance().currentUser
+  val uid = listJourneysViewModel.getNewUid()
   var imageUrl by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var coffeeShopName by remember { mutableStateOf("") }
