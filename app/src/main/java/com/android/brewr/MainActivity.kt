@@ -69,11 +69,6 @@ fun BrewRApp() {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-    }
-    navigation(
-        startDestination = Screen.USERPROFILE,
-        route = Route.USERPROFILE,
-    ) {
       composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
     }
   }

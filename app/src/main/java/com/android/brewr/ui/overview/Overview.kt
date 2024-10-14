@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.Purple80
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,9 +50,13 @@ fun OverviewScreen(
                     Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
                   }
                   Spacer(modifier = Modifier.width(16.dp))
-                  IconButton(onClick = {}, modifier = Modifier.testTag("accountButton")) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Account")
-                  }
+                  IconButton(
+                      onClick = { navigationActions.navigateTo(Screen.USERPROFILE) },
+                      modifier = Modifier.testTag("accountButton")) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Account")
+                      }
                 }
               })
           Box(
