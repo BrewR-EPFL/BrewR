@@ -34,8 +34,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {
@@ -151,8 +153,12 @@ fun SignInScreen(navigationActions: NavigationActions) {
                   }
                 } catch (e: Exception) {
                   Log.e("SignInScreen", "Error starting sign-in: ", e)
-                  Toast.makeText(context, "Error starting sign-in: ${e.message}", Toast.LENGTH_LONG)
-                      .show()
+                  // Toast can only be called in the main thread
+                  withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                            context, "Error starting sign-in: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
+                  }
                 }
               }
             },
