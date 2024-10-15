@@ -122,6 +122,8 @@ dependencies {
     // Play Services Auth (for Google Sign-In)
     implementation(libs.play.services.auth.v2050)
 
+    implementation(libs.coil.compose)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -131,6 +133,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)

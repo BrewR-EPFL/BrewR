@@ -1,7 +1,12 @@
 package com.android.brewr.ui.overview
 
 import android.icu.util.GregorianCalendar
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +28,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -64,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -73,6 +78,8 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.Purple80
 import com.google.firebase.Timestamp
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -82,7 +89,7 @@ fun AddJourneyScreen(
     navigationActions: NavigationActions
 ) {
   val uid = listJourneysViewModel.getNewUid()
-  val imageUrl by remember { mutableStateOf("") }
+  var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf("") }
   var coffeeShopName by remember { mutableStateOf("") }
   var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
@@ -95,6 +102,10 @@ fun AddJourneyScreen(
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
 
+  val getImageLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
+
   Scaffold(
       topBar = {
         TopAppBar(
@@ -103,7 +114,7 @@ fun AddJourneyScreen(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("backButton")) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = Color.Black)
                   }
@@ -133,20 +144,22 @@ fun AddJourneyScreen(
                     // Box on the left for "Add Photo"
                     Box(
                         modifier =
-                            Modifier.size(150.dp) // Size for the box, can adjust as needed
-                                .border(2.dp, Color.Black) // Black border around the box
-                                .testTag("addPhotoBox") // Add a test tag for testing
-                        ) {
+                            Modifier.size(150.dp).border(2.dp, Color.Black).clickable {
+                              // Open the gallery to pick an image
+                              getImageLauncher.launch("image/*")
+                            }) {
                           Column(
                               horizontalAlignment = Alignment.CenterHorizontally,
                               modifier = Modifier.align(Alignment.Center)) {
-                                Text(text = "Add Photo", color = Color.Black)
-                                IconButton(
-                                    onClick = {}, modifier = Modifier.testTag("addPhotoButton")) {
-                                      Icon(
-                                          imageVector = Icons.Rounded.Add,
-                                          contentDescription = "Add Photo")
-                                    }
+                                Text("Add Photo", color = Color.Black)
+
+                                if (imageUri != null) {
+                                  // If an image is selected, show a preview
+                                  Image(
+                                      painter = rememberAsyncImagePainter(imageUri),
+                                      contentDescription = "Selected Image",
+                                      modifier = Modifier.size(120.dp))
+                                }
                               }
                         }
 
@@ -366,7 +379,7 @@ fun AddJourneyScreen(
                     val starCount =
                         coffeeRate
                             .ordinal // ordinal gives you 0-based index, so we don't add 1 due to
-                                     // the default parameter
+                    // the default parameter
                     Row(
                         modifier =
                             Modifier.fillMaxWidth()
@@ -382,7 +395,7 @@ fun AddJourneyScreen(
                                   modifier =
                                       Modifier.size(40.dp).clickable {
                                         // Update the coffeeRate when the star is clicked
-                                        coffeeRate = CoffeeRate.values()[i - 1]
+                                        coffeeRate = CoffeeRate.values()[i]
                                       })
                             } else {
                               Icon(
@@ -392,7 +405,7 @@ fun AddJourneyScreen(
                                   modifier =
                                       Modifier.size(40.dp).clickable {
                                         // Update the coffeeRate when the star is clicked
-                                        coffeeRate = CoffeeRate.values()[i - 1]
+                                        coffeeRate = CoffeeRate.values()[i]
                                       })
                             }
                           }
@@ -402,7 +415,7 @@ fun AddJourneyScreen(
               // Date
 
               var selectedDate by remember { mutableStateOf(date) }
-              Column() {
+              Column {
                 // Label Text
                 Text(
                     text = "Date",
@@ -419,7 +432,7 @@ fun AddJourneyScreen(
                     modifier = Modifier.fillMaxWidth().testTag("inputDate"))
               }
               // Location
-              Column() {
+              Column {
                 // Label Text
                 Text(
                     text = "Location",
@@ -436,45 +449,69 @@ fun AddJourneyScreen(
 
               Button(
                   onClick = {
-                    val calendar = GregorianCalendar()
-                    val parts = selectedDate.split("/")
-                    if (parts.size == 3) {
-                      try {
-                        calendar.set(
-                            parts[2].toInt(),
-                            parts[1].toInt() - 1, // Months are 0-based
-                            parts[0].toInt(),
-                            0,
-                            0,
-                            0)
+                    if (imageUri != null) {
+                      uploadPicture(imageUri!!) { imageUrl ->
+                        val calendar = GregorianCalendar()
+                        val parts = selectedDate.split("/")
+                        if (parts.size == 3) {
+                          try {
+                            calendar.set(
+                                parts[2].toInt(),
+                                parts[1].toInt() - 1, // Months are 0-based
+                                parts[0].toInt(),
+                                0,
+                                0,
+                                0)
 
-                        listJourneysViewModel.addJourney(
-                            Journey(
-                                uid = uid,
-                                imageUrl = imageUrl,
-                                description = description,
-                                coffeeShopName = coffeeShopName,
-                                coffeeOrigin = coffeeOrigin,
-                                brewingMethod = brewingMethod,
-                                coffeeTaste = coffeeTaste,
-                                coffeeRate = coffeeRate,
-                                date = Timestamp(calendar.time),
-                                location = location))
-                        navigationActions.goBack()
-
-                        return@Button
-                      } catch (_: NumberFormatException) {}
+                            // Create a new journey with the uploaded image URL
+                            val newJourney =
+                                Journey(
+                                    uid = uid,
+                                    imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                    description = description,
+                                    coffeeShopName = coffeeShopName,
+                                    coffeeOrigin = coffeeOrigin,
+                                    brewingMethod = brewingMethod,
+                                    coffeeTaste = coffeeTaste,
+                                    coffeeRate = coffeeRate,
+                                    date = Timestamp(calendar.time),
+                                    location = location)
+                            listJourneysViewModel.addJourney(newJourney)
+                            navigationActions.goBack()
+                            return@uploadPicture
+                          } catch (_: NumberFormatException) {}
+                          Toast.makeText(
+                                  context,
+                                  "Invalid format, date must be DD/MM/YYYY.",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        }
+                      }
+                    } else {
+                      Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
                     }
-
-                    Toast.makeText(
-                            context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
-                        .show()
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
                     Text("Save")
                   }
             }
       })
+}
+
+/**
+ * Uploads an image to Firebase Storage and returns the download URL.
+ *
+ * @param imageUri The URI of the image to be uploaded.
+ * @param onSuccess Callback function to be invoked with the download URL upon successful upload.
+ */
+private fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
+    val imgPath = "images/" + UUID.randomUUID().toString()
+    val imgRef = FirebaseStorage.getInstance().getReference().child(imgPath)
+
+    imgRef
+        .putFile(imageUri)
+        .addOnSuccessListener { imgRef.downloadUrl.addOnSuccessListener { onSuccess(it.toString()) } }
+        .addOnFailureListener { Log.e("AddJourneyScreen", "Failed to upload image", it) }
 }
 
 @Preview(showBackground = true)

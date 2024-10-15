@@ -66,12 +66,8 @@ enum class CoffeeTaste {
 enum class CoffeeRate {
   DEFAULT,
   ONE,
-  // ONE_HALF,
   TWO,
-  // TWO_HALF,
   THREE,
-  // THREE_HALF,
   FOUR,
-  // FOUR_HALF,
   FIVE
 }
