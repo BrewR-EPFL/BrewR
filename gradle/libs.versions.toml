@@ -1,6 +1,7 @@
 [versions]
-agp = "8.7.0"
+agp = "8.7.1"
 biometric = "1.2.0"
+coilCompose = "2.1.0"
 coreKtxVersion = "1.13.1"
 credentials = "1.5.0-alpha05"
 credentialsPlayServicesAuth = "1.0.0"
@@ -36,6 +37,7 @@ espressoIntents = "3.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-bom-v3200 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
@@ -116,21 +114,6 @@ fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -
                   RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
-}
-
-@Composable
-fun JourneyItem(journey: Journey, onClick: () -> Unit) {
-  Card(
-      modifier =
-          Modifier.testTag("journeyListItem")
-              .fillMaxWidth()
-              .padding(vertical = 4.dp)
-              .clickable(onClick = onClick),
-  ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-      Text(text = journey.coffeeShopName) // Placeholder for coffee shop name
-    }
-  }
 }
 
 @Preview(showBackground = true)
