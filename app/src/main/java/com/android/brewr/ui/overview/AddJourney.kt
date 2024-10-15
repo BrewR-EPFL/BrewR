@@ -144,7 +144,9 @@ fun AddJourneyScreen(
                     // Box on the left for "Add Photo"
                     Box(
                         modifier =
-                            Modifier.size(150.dp).border(2.dp, Color.Black).clickable {
+                            Modifier.size(150.dp).border(2.dp, Color.Black)
+                                .testTag("addPhotoBox") // Add a test tag for testing
+                                .clickable {
                               // Open the gallery to pick an image
                               getImageLauncher.launch("image/*")
                             }) {
@@ -158,7 +160,8 @@ fun AddJourneyScreen(
                                   Image(
                                       painter = rememberAsyncImagePainter(imageUri),
                                       contentDescription = "Selected Image",
-                                      modifier = Modifier.size(120.dp))
+                                      modifier = Modifier.size(120.dp)
+                                          .testTag("selectedImagePreview"))
                                 }
                               }
                         }
@@ -181,7 +184,7 @@ fun AddJourneyScreen(
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier =
-                      Modifier.testTag("atCoffeeShopRow") // Add a test tag for testing
+                      Modifier.testTag("coffeeShopCheckRow") // Add a test tag for testing
                           .clickable {
                             isYesSelected = !isYesSelected
                             expanded = isYesSelected // Show text field when ticked
@@ -201,7 +204,7 @@ fun AddJourneyScreen(
                     onValueChange = { coffeeShopName = it },
                     label = { Text("Coffee Shop Name") },
                     placeholder = { Text("Enter the name") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputCoffeeShopNameDescription"))
+                    modifier = Modifier.fillMaxWidth().testTag("coffeeShopNameField"))
               }
 
               // Coffee Origin Dropdown Menu
@@ -281,7 +284,8 @@ fun AddJourneyScreen(
                           Button(
                               onClick = { brewingMethod = method },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp),
+                              modifier = Modifier.padding(4.dp)
+                                  .testTag("Button:${method.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.buttonColors(
@@ -289,13 +293,14 @@ fun AddJourneyScreen(
                                 Text(
                                     method.name.replace("_", " "),
                                     modifier =
-                                        Modifier.padding(4.dp).testTag("Button:${method.name}"))
+                                        Modifier.padding(4.dp))
                               }
                         } else {
                           OutlinedButton(
                               onClick = { brewingMethod = method },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp),
+                              modifier = Modifier.padding(4.dp)
+                                  .testTag("Button:${method.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.outlinedButtonColors(
@@ -304,7 +309,7 @@ fun AddJourneyScreen(
                                 Text(
                                     method.name.replace("_", " "),
                                     modifier =
-                                        Modifier.padding(4.dp).testTag("Button:${method.name}"))
+                                        Modifier.padding(4.dp))
                               }
                         }
                       }
@@ -333,7 +338,8 @@ fun AddJourneyScreen(
                           Button(
                               onClick = { coffeeTaste = taste },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp),
+                              modifier = Modifier.padding(4.dp)
+                                  .testTag("Button:${taste.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.buttonColors(
@@ -341,13 +347,14 @@ fun AddJourneyScreen(
                                 Text(
                                     taste.name.replace("_", " "),
                                     modifier =
-                                        Modifier.padding(4.dp).testTag("Button:${taste.name}"))
+                                        Modifier.padding(4.dp))
                               }
                         } else {
                           OutlinedButton(
                               onClick = { coffeeTaste = taste },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp),
+                              modifier = Modifier.padding(4.dp)
+                                  .testTag("Button:${taste.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.outlinedButtonColors(
@@ -393,7 +400,9 @@ fun AddJourneyScreen(
                                   contentDescription = "Filled Star $i",
                                   tint = Color(0xFFFFD700), // Gold color for filled star
                                   modifier =
-                                      Modifier.size(40.dp).clickable {
+                                      Modifier.size(40.dp)
+                                          .testTag("FilledStar$i")
+                                          .clickable {
                                         // Update the coffeeRate when the star is clicked
                                         coffeeRate = CoffeeRate.values()[i]
                                       })
@@ -403,7 +412,9 @@ fun AddJourneyScreen(
                                   contentDescription = "Outlined Star $i",
                                   tint = Color(0xFF312F2F), // Same gold color for consistency
                                   modifier =
-                                      Modifier.size(40.dp).clickable {
+                                      Modifier.size(40.dp)
+                                          .testTag("OutlinedStar$i")
+                                          .clickable {
                                         // Update the coffeeRate when the star is clicked
                                         coffeeRate = CoffeeRate.values()[i]
                                       })
@@ -514,12 +525,3 @@ private fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
       .addOnFailureListener { Log.e("AddJourneyScreen", "Failed to upload image", it) }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AddJourneyScreenPreview() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  AddJourneyScreen(
-      listJourneysViewModel = viewModel(factory = ListJourneysViewModel.Factory),
-      navigationActions = navigationActions)
-}
