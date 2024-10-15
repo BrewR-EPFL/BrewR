@@ -505,13 +505,13 @@ fun AddJourneyScreen(
  * @param onSuccess Callback function to be invoked with the download URL upon successful upload.
  */
 private fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
-    val imgPath = "images/" + UUID.randomUUID().toString()
-    val imgRef = FirebaseStorage.getInstance().getReference().child(imgPath)
+  val imgPath = "images/" + UUID.randomUUID().toString()
+  val imgRef = FirebaseStorage.getInstance().getReference().child(imgPath)
 
-    imgRef
-        .putFile(imageUri)
-        .addOnSuccessListener { imgRef.downloadUrl.addOnSuccessListener { onSuccess(it.toString()) } }
-        .addOnFailureListener { Log.e("AddJourneyScreen", "Failed to upload image", it) }
+  imgRef
+      .putFile(imageUri)
+      .addOnSuccessListener { imgRef.downloadUrl.addOnSuccessListener { onSuccess(it.toString()) } }
+      .addOnFailureListener { Log.e("AddJourneyScreen", "Failed to upload image", it) }
 }
 
 @Preview(showBackground = true)
