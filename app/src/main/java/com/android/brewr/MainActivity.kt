@@ -1,5 +1,6 @@
 package com.android.brewr
 
+import SignInScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.resources.C
 import com.android.brewr.ui.authentication.SignInScreen
 import com.android.brewr.ui.navigation.NavigationActions
@@ -59,20 +61,21 @@ fun BrewRApp() {
 
   val listJourneysViewModel: ListJourneysViewModel =
       viewModel(factory = ListJourneysViewModel.Factory)
+  val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 
   NavHost(navController, Route.AUTH) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+      composable(Screen.AUTH) { SignInScreen(userViewModel, navigationActions) }
     }
     navigation(
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-      composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+      composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
       composable(Screen.JOURNEY_RECORD) {
         JourneyRecordScreen(listJourneysViewModel, navigationActions)
       }
