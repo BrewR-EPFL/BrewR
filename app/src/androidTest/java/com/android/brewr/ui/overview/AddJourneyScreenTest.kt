@@ -77,12 +77,14 @@ class AddJourneyScreenTest {
     // Test brewing method button selection
     composeTestRule
         .onNodeWithTag("Button:${BrewingMethod.POUR_OVER.name}")
+        .performScrollTo()
         .assertIsDisplayed()
         .performClick()
 
     // Test taste button selection
     composeTestRule
         .onNodeWithTag("Button:${CoffeeTaste.BITTER.name}")
+        .performScrollTo()
         .assertIsDisplayed()
         .performClick()
 
