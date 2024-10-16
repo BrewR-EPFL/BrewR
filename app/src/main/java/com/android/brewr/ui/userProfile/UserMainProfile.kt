@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.google.firebase.auth.ktx.auth
@@ -45,8 +47,13 @@ import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserMainProfileScreen(navigationActions: NavigationActions) {
+fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
+
+  // Collect username and userEmail from ViewModel
+  val username by userViewModel.username.collectAsState()
+  val userEmail by userViewModel.userEmail.collectAsState()
+
   var showDialog by remember { mutableStateOf(false) }
 
   Scaffold(
@@ -69,10 +76,10 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
-                  "Username",
+                  text = username ?: "Username",
                   style = MaterialTheme.typography.headlineMedium,
                   modifier = Modifier.testTag("Username"))
-              Text("Username@gmail.com", modifier = Modifier.testTag("User Email"))
+              Text(text = userEmail ?: "User Email", modifier = Modifier.testTag("User Email"))
               Spacer(Modifier.height(40.dp))
 
               // Top part with horizontally aligned icon buttons

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.brewr.R
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
+fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
@@ -63,6 +64,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                     if (task.isSuccessful) {
                       Log.d("SignInScreen", "signInWithCredential:success")
                       user = auth?.currentUser
+                      userViewModel.updateUserInfo()
                       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
                       // Added navigation action to go to the Overview screen after login
                       navigationActions.navigateTo(Screen.OVERVIEW)
