@@ -47,7 +47,7 @@ fun OverviewScreen(
               actions = {
                 Row {
                   IconButton(
-                      onClick = { navigationActions.navigateTo(Screen.JOURNEY_RECORD) },
+                      onClick = {  },
                       modifier = Modifier.testTag("addButton")) {
                         Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
                       }
@@ -75,6 +75,7 @@ fun OverviewScreen(
                 items(journeys.value.size) { index ->
                   JourneyItem(journey = journeys.value[index]) {
                     listJourneysViewModel.selectJourney(journeys.value[index])
+                      navigationActions.navigateTo(Screen.JOURNEY_RECORD)
                   }
                 }
               }
