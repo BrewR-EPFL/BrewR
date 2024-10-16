@@ -52,9 +52,13 @@ fun OverviewScreen(
                         Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
                       }
                   Spacer(modifier = Modifier.width(16.dp))
-                  IconButton(onClick = {}, modifier = Modifier.testTag("accountButton")) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Account")
-                  }
+                  IconButton(
+                      onClick = { navigationActions.navigateTo(Screen.USERPROFILE) },
+                      modifier = Modifier.testTag("accountButton")) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Account")
+                      }
                 }
               })
           Box(
