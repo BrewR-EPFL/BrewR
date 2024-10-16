@@ -60,7 +60,6 @@ fun JourneyRecordScreen(
 
     // Display the selected journey details
     Scaffold(
-        modifier = Modifier.testTag("journeyRecodeScreen"),
         topBar = {
             TopAppBar(
                 title = { Text("Journey Record") },
@@ -71,7 +70,8 @@ fun JourneyRecordScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                modifier = Modifier.testTag("journeyRecordScreen")
             )
         },
         content = { paddingValues ->
@@ -85,7 +85,7 @@ fun JourneyRecordScreen(
                 // Display the journey details
 
                 // Coffee Shop Name
-                Text(text = "Coffee Shop: ${journey?.coffeeShopName}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("coffeShopName"))
+                Text(text = "Coffee Shop: ${journey?.coffeeShopName}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("coffeeShopName"))
 
                 // Image placeholder
                 Box(
