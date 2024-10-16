@@ -19,10 +19,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
@@ -114,14 +112,4 @@ fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -
                   RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OverviewScreenPreview() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  OverviewScreen(
-      listJourneysViewModel = viewModel(factory = ListJourneysViewModel.Factory),
-      navigationActions = navigationActions)
 }

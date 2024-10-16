@@ -81,7 +81,7 @@ fun JourneyItem(journey: Journey, onClick: () -> Unit) {
                               })
                       .build()),
           contentDescription = "Selected Image",
-          modifier = Modifier.size(120.dp))
+          modifier = Modifier.testTag("journeyImage").size(120.dp))
     }
   }
 }
