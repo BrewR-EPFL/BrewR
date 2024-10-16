@@ -114,7 +114,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           modifier =
               Modifier.size(220.dp)
                   .clip(RoundedCornerShape(30.dp))
-                  .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp)))
+                  .border(3.dp, Color.DarkGray, RoundedCornerShape(30.dp)))
 
       Spacer(modifier = Modifier.height(16.dp))
 
