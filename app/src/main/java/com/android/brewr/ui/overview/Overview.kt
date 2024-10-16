@@ -1,7 +1,6 @@
 package com.android.brewr.ui.overview
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,8 +32,6 @@ fun OverviewScreen(
         viewModel(factory = ListJourneysViewModel.Factory),
     navigationActions: NavigationActions
 ) {
-  val context = LocalContext.current
-
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
 
