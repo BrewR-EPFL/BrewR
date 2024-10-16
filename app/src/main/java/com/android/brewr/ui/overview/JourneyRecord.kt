@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.BrewingMethod
@@ -59,6 +60,7 @@ fun JourneyRecordScreen(
 
     // Display the selected journey details
     Scaffold(
+        modifier = Modifier.testTag("journeyRecodeScreen"),
         topBar = {
             TopAppBar(
                 title = { Text("Journey Record") },
@@ -83,7 +85,7 @@ fun JourneyRecordScreen(
                 // Display the journey details
 
                 // Coffee Shop Name
-                Text(text = "Coffee Shop: ${journey?.coffeeShopName}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Coffee Shop: ${journey?.coffeeShopName}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("coffeShopName"))
 
                 // Image placeholder
                 Box(
@@ -105,26 +107,26 @@ fun JourneyRecordScreen(
                 }
 
                 // Description
-                Text(text = "Description: ${journey?.description}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Description: ${journey?.description}", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.testTag("description"))
 
                 // Coffee Origin
-                Text(text = "Origin: ${journey?.coffeeOrigin?.name}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Origin: ${journey?.coffeeOrigin?.name}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("origin"))
 
                 // Brewing Method
-                Text(text = "Brewing Method: ${journey?.brewingMethod?.name}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Brewing Method: ${journey?.brewingMethod?.name}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("brewingMethod"))
 
                 // Taste
-                Text(text = "Taste: ${journey?.coffeeTaste?.name}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Taste: ${journey?.coffeeTaste?.name}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("taste"))
 
                 // Coffee Rating
-                Text(text = "Rating: ${journey?.coffeeRate?.name}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Rating: ${journey?.coffeeRate?.name}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("rating"))
 
                 // Date
-                Text(text = "Date: ${journey?.date?.toDate()}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Date: ${journey?.date?.toDate()}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("date"))
 
                 // Location
                 if (journey?.location?.isNotEmpty() == true) {
-                    Text(text = "Location: ${journey?.location}", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = "Location: ${journey?.location}", style = MaterialTheme.typography.bodyLarge,modifier = Modifier.testTag("location"))
                 }
             }
         }
