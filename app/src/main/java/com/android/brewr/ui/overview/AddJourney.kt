@@ -144,7 +144,7 @@ fun AddJourneyScreen(
                         modifier =
                             Modifier.size(150.dp)
                                 .border(2.dp, Color.Black)
-                                .testTag("addPhotoBox") // Add a test tag for testing
+                                .testTag("addImageBox") // Add a test tag for testing
                                 .clickable {
                                   // Open the gallery to pick an image
                                   getImageLauncher.launch("image/*")
@@ -502,7 +502,7 @@ fun AddJourneyScreen(
  * @param imageUri The URI of the image to be uploaded.
  * @param onSuccess Callback function to be invoked with the download URL upon successful upload.
  */
-private fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
+fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
   val imgPath = "images/" + UUID.randomUUID().toString()
   val imgRef = FirebaseStorage.getInstance().getReference().child(imgPath)
 

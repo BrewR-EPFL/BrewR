@@ -50,7 +50,7 @@ class AddJourneyScreenTest {
     composeTestRule.onNodeWithTag("YourJourneyTitle").assertIsDisplayed()
 
     // Test Add Photo functionality (simulate photo click)
-    composeTestRule.onNodeWithTag("addPhotoBox").assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onNodeWithTag("addImageBox").assertIsDisplayed().assertHasClickAction()
 
     // Check if the description text field is displayed and type text into it
     composeTestRule
@@ -141,5 +141,27 @@ class AddJourneyScreenTest {
 
     // Verify that the function to add the journey was NOT called due to invalid date
     verify(repositoryMock, never()).addJourney(any(), any(), any())
+  }
+
+  @Test
+  fun doesNotDisplayImagePreviewWithoutImage() {
+    composeTestRule.setContent {
+      AddJourneyScreen(
+          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("addImageBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("selectedImagePreview").assertIsNotDisplayed()
+  }
+
+  @Test
+  fun navigatesBackToOverviewOnBackButtonClick() {
+    composeTestRule.setContent {
+      AddJourneyScreen(
+          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("backButton").performClick()
+    verify(navigationActions).goBack()
   }
 }
