@@ -42,7 +42,7 @@ class EditJourneyScreenTest {
   private lateinit var listJourneysViewModel: ListJourneysViewModel
   private lateinit var navigationActions: NavigationActions
 
-  private val journey =
+  private val journey1 =
       Journey(
           uid = "journey1",
           imageUrl =
@@ -66,7 +66,7 @@ class EditJourneyScreenTest {
 
   @Test
   fun testEditJourneyScreenDisplaysAndInteractsCorrectly() {
-    listJourneysViewModel.selectJourney(journey)
+    listJourneysViewModel.selectJourney(journey1)
     composeTestRule.setContent {
       EditJourneyScreen(
           listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
@@ -181,7 +181,7 @@ class EditJourneyScreenTest {
 
   @Test
   fun doesNotSubmitWithInvalidDate() {
-    listJourneysViewModel.selectJourney(journey)
+    listJourneysViewModel.selectJourney(journey1)
     composeTestRule.setContent {
       EditJourneyScreen(
           listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
@@ -195,12 +195,58 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("journeySave").performClick()
 
     // Verify that the function to add the journey was NOT called due to invalid date
-    verify(repositoryMock, never()).addJourney(any(), any(), any())
+    verify(repositoryMock, never()).updateJourney(any(), any(), any())
+  }
+
+  @Test
+  fun submitWithEverythingNewExceptPhoto() {
+    listJourneysViewModel.selectJourney(journey1)
+    composeTestRule.setContent {
+      EditJourneyScreen(
+          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
+    }
+
+    // Description
+    composeTestRule.onNodeWithTag("inputJourneyDescription").performTextClearance()
+    composeTestRule
+        .onNodeWithTag("inputJourneyDescription")
+        .performTextInput("Another wonderful coffee journey.")
+    // Coffee Shop Name
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").performClick()
+    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextClearance()
+    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextInput("Pablo's Coffee")
+    // Coffee Origin
+    composeTestRule
+        .onNodeWithTag("outlinedButton:${BrewingMethod.FRENCH_PRESS.name}")
+        .performScrollTo()
+        .performClick()
+    // Brewing Method
+    composeTestRule
+        .onNodeWithTag("outlinedButton:${BrewingMethod.COLD_BREW.name}")
+        .performScrollTo()
+        .performClick()
+    // Coffee Taste
+    composeTestRule
+        .onNodeWithTag("outlinedButton:${CoffeeTaste.FRUITY.name}")
+        .performScrollTo()
+        .performClick()
+    // Coffee Rate
+    composeTestRule.onNodeWithTag("OutlinedStar5").performScrollTo().performClick()
+
+    composeTestRule.waitForIdle()
+
+    // Click the save button
+    composeTestRule.onNodeWithTag("journeySave").performScrollTo().performClick()
+
+    composeTestRule.waitForIdle()
+
+    verify(repositoryMock).updateJourney(any(), any(), any())
+    verify(navigationActions).goBack()
   }
 
   @Test
   fun navigatesBackToOverviewOnBackButtonClick() {
-    listJourneysViewModel.selectJourney(journey)
+    listJourneysViewModel.selectJourney(journey1)
     composeTestRule.setContent {
       AddJourneyScreen(
           listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
