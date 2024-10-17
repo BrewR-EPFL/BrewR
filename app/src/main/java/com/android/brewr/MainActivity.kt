@@ -22,6 +22,7 @@ import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.overview.AddJourneyScreen
+import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
@@ -29,55 +30,66 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
-  private lateinit var auth: FirebaseAuth
+    private lateinit var auth: FirebaseAuth
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    FirebaseApp.initializeApp(this)
+        FirebaseApp.initializeApp(this)
 
-    auth = FirebaseAuth.getInstance()
-    auth.currentUser?.let { auth.signOut() }
-    setContent {
-      BrewRAppTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-            color = MaterialTheme.colorScheme.background) {
-              BrewRApp()
+        auth = FirebaseAuth.getInstance()
+        auth.currentUser?.let { auth.signOut() }
+        setContent {
+            BrewRAppTheme {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics { testTag = C.Tag.main_screen_container },
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    BrewRApp()
+                }
             }
-      }
+        }
     }
-  }
 }
 
 @Composable
 fun BrewRApp() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
 
-  val listJourneysViewModel: ListJourneysViewModel =
-      viewModel(factory = ListJourneysViewModel.Factory)
+    val listJourneysViewModel: ListJourneysViewModel =
+        viewModel(factory = ListJourneysViewModel.Factory)
 
-  NavHost(navController, Route.AUTH) {
-    navigation(
-        startDestination = Screen.AUTH,
-        route = Route.AUTH,
-    ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
-    }
-    navigation(
-        startDestination = Screen.OVERVIEW,
-        route = Route.OVERVIEW,
-    ) {
-      composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-      composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
-    }
+    NavHost(navController, Route.AUTH) {
+        navigation(
+            startDestination = Screen.AUTH,
+            route = Route.AUTH,
+        ) {
+            composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        }
+        navigation(
+            startDestination = Screen.OVERVIEW,
+            route = Route.OVERVIEW,
+        ) {
+            composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
+            composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+            composable(Screen.JOURNEY_RECORD) {
+                JourneyRecordScreen(listJourneysViewModel, navigationActions)
+            }
+        }
 
-    navigation(
-        startDestination = Screen.ADD_JOURNEY,
-        route = Route.ADD_JOURNEY,
-    ) {
-      composable(Screen.ADD_JOURNEY) { AddJourneyScreen(listJourneysViewModel, navigationActions) }
+        navigation(
+            startDestination = Screen.ADD_JOURNEY,
+            route = Route.ADD_JOURNEY,
+        ) {
+            composable(Screen.ADD_JOURNEY) {
+                AddJourneyScreen(
+                    listJourneysViewModel,
+                    navigationActions
+                )
+            }
+        }
     }
-  }
 }
