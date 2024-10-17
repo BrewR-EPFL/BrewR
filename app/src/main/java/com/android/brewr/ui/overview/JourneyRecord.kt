@@ -1,22 +1,27 @@
 package com.android.brewr.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,13 +46,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.android.brewr.model.journey.BrewingMethod
+import com.android.brewr.model.journey.CoffeeOrigin
+import com.android.brewr.model.journey.CoffeeRate
+import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -55,287 +64,287 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JourneyRecordScreen(
-    listJourneysViewModel: ListJourneysViewModel = viewModel(factory = ListJourneysViewModel.Factory),
+    listJourneysViewModel: ListJourneysViewModel =
+        viewModel(factory = ListJourneysViewModel.Factory),
     navigationActions: NavigationActions
 ) {
-    val journey = listJourneysViewModel.selectedJourney.collectAsState().value
-    var showDeleteDialog by remember { mutableStateOf(false) } // State to control dialog visibility
+  val journey = listJourneysViewModel.selectedJourney.collectAsState().value
+  var showDeleteDialog by remember { mutableStateOf(false) } // State to control dialog visibility
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Journey Record", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navigationActions.goBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
-                    // Delete Button at the top-right corner with text and icon
-                    TextButton(onClick = { showDeleteDialog = true }) {
-                        Text(text = "Delete", color = Color.Red)
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete Journey",
-                            tint = Color.Red
-                        )
-                    }
-                },
-                modifier = Modifier.testTag("journeyRecordScreen")
-            )
-        },
-        floatingActionButton = {
-            // Floating action button for edit with text and icon
-            FloatingActionButton(
-                onClick = { navigationActions.navigateTo(Screen.EDIT_JOURNEY) },
-                shape = RoundedCornerShape(50),
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+  Scaffold(
+      modifier = Modifier.testTag("journeyRecordScreen"),
+      topBar = {
+        TopAppBar(
+            title = { Text("Journey Record", fontWeight = FontWeight.Bold) },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("backButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            },
+            actions = {
+              // Delete Button at the top-right corner with text and icon
+              TextButton(
+                  onClick = { showDeleteDialog = true },
+                  modifier = Modifier.testTag("deleteButton")) {
+                    Text(text = "Delete", color = Color.Red)
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete Journey",
+                        tint = Color.Red)
+                  }
+            },
+        )
+      },
+      floatingActionButton = {
+        // Floating action button for edit with text and icon
+        FloatingActionButton(
+            onClick = { navigationActions.navigateTo(Screen.EDIT_JOURNEY) },
+            shape = RoundedCornerShape(50),
+            containerColor = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.testTag("editButton")) {
+              Row(
+                  modifier = Modifier.padding(horizontal = 16.dp),
+                  verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Edit",
                         color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                        style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "Edit Journey",
-                        tint = Color.White
-                    )
-                }
+                        tint = Color.White)
+                  }
             }
-        }
-        ,
-        content = { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+      },
+      content = { paddingValues ->
+        Column(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(paddingValues)
                     .padding(16.dp)
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                item {
-                    // Coffee Shop Name
-                    Text(
-                        text = "Coffee Shop: ${journey?.coffeeShopName}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("coffeeShopName")
-                    )
-                }
+                    .verticalScroll(rememberScrollState()), // Add padding to the whole Column
+            verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Image placeholder or uploaded image
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .border(1.dp, Color.Gray)
+              // Coffee Shop Name
+              if (journey!!.coffeeShopName.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
                     ) {
-                        if (journey?.imageUrl?.isNotEmpty() == true) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(journey.imageUrl) // Load the image from the URL
-                                        .apply {
-                                            crossfade(true)
-                                        }
-                                        .build()
-                                ),
-                                contentDescription = "Uploaded Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .align(Alignment.Center)
-                            )
-                        } else {
-                            Text("No photo added.", modifier = Modifier.align(Alignment.Center), color = Color.Gray)
-                        }
+                      Text(
+                          text = "CoffeeShop Name",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.coffeeShopName,
+                          fontSize = 14.sp, // Adjust the font size for the title
+                          modifier = Modifier.fillMaxWidth().testTag("coffeeShopName"))
                     }
-                }
+              }
 
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
+              // Image placeholder or uploaded image
+              Box(modifier = Modifier.fillMaxWidth().height(200.dp).border(1.dp, Color.Gray)) {
+                Image(
+                    painter =
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(journey.imageUrl) // Load the image from the URL
+                                .apply { crossfade(true) }
+                                .build()),
+                    contentDescription = "Uploaded Image",
+                    modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.Center))
+              }
 
-                    // Description
+              // Description
+              if (journey.description.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
+                    ) {
+                      Text(
+                          text = "Description",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.description,
+                          fontSize = 14.sp, // Adjust the font size for the title
+                          modifier = Modifier.fillMaxWidth().testTag("journeyDescription"))
+                    }
+              }
+
+              // Coffee Origin
+              if (journey.coffeeOrigin != CoffeeOrigin.DEFAULT) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
+                    ) {
+                      Text(
+                          text = "Coffee Origin",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.coffeeOrigin.name.replace("_", " "),
+                          fontSize = 14.sp, // Adjust the font size for the title
+                          modifier = Modifier.fillMaxWidth().testTag("CoffeeOrigin"))
+                    }
+              }
+
+              // Brewing Method
+              if (journey.brewingMethod != BrewingMethod.DEFAULT) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
+                    ) {
+                      Text(
+                          text = "Brewing Method",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.brewingMethod.name.replace("_", " "),
+                          fontSize = 14.sp, // Adjust the font size for the title
+                          modifier = Modifier.fillMaxWidth().testTag("brewingMethod"))
+                    }
+              }
+
+              // Taste
+              if (journey.coffeeTaste != CoffeeTaste.DEFAULT) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
+                    ) {
+                      Text(
+                          text = "Coffee Taste",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.coffeeTaste.name,
+                          fontSize = 14.sp, // Adjust the font size for the title
+                          modifier = Modifier.fillMaxWidth().testTag("coffeeTaste"))
+                    }
+              }
+
+              // Coffee Rating
+              if (journey.coffeeRate != CoffeeRate.DEFAULT) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement =
+                        Arrangement.spacedBy(2.dp) // Space between title and buttons
+                    ) {
+                      Text(
+                          text = "Rate",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+
+                      // Map CoffeeRate to the number of stars
+                      val starCount =
+                          journey.coffeeRate
+                              .ordinal // ordinal gives you 0-based index, so we don't add 1 due to
+                      // the default parameter
+                      Row(
+                          modifier =
+                              Modifier.fillMaxWidth()
+                                  .testTag("rateRow"), // Add a test tag for testing
+                          horizontalArrangement = Arrangement.Center // Center the star icons
+                          ) {
+                            for (i in 1..5) {
+                              if (i <= starCount) {
+                                Icon(
+                                    imageVector = Icons.Filled.Star,
+                                    contentDescription = "Filled Star $i",
+                                    tint = Color(0xFFFFD700), // Gold color for filled star
+                                    modifier = Modifier.size(40.dp).testTag("FilledStar$i"))
+                              } else {
+                                Icon(
+                                    imageVector = Icons.Outlined.Star,
+                                    contentDescription = "Outlined Star $i",
+                                    tint = Color(0xFF312F2F), // Same gold color for consistency
+                                    modifier = Modifier.size(40.dp).testTag("OutlinedStar$i"))
+                              }
+                            }
+                          }
+                    }
+              }
+
+              Column(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalArrangement =
+                      Arrangement.spacedBy(2.dp) // Space between title and buttons
+                  ) {
+                    // Label Text
                     Text(
-                        text = "Description: \n${journey?.description}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("description")
-                    )
-                }
+                        text = "Date",
+                        modifier = Modifier.padding(bottom = 20.dp),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold)
 
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Coffee Origin
-                    Text(
-                        text = "Origin: \n${journey?.coffeeOrigin?.name}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("origin")
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Brewing Method
-                    Text(
-                        text = "Brewing Method: \n${journey?.brewingMethod?.name}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("brewingMethod")
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Taste
-                    Text(
-                        text = "Taste: \n${journey?.coffeeTaste?.name}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("taste")
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Coffee Rating
-                    Text(
-                        text = "Rating: \n${journey?.coffeeRate?.name}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("rating")
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Date
+                    // Date Text
                     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val formattedDate = journey?.date?.toDate()?.let { dateFormat.format(it) } ?: "Unknown Date"
+                    val formattedDate = dateFormat.format(journey.date.toDate())
                     Text(
-                        text = "Date: \n$formattedDate",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("date")
-                    )
-                }
+                        text = formattedDate,
+                        fontSize = 14.sp, // Adjust the font size for the title
+                        modifier = Modifier.fillMaxWidth().testTag("date"))
+                  }
 
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Location
-                    if (journey?.location?.isNotEmpty() == true) {
-                        Text(
-                            text = "Location: \n${journey.location}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.testTag("location")
-                        )
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-
-            // Confirmation dialog for deleting the journey
-            if (showDeleteDialog) {
+              // Confirmation dialog for deleting the journey
+              if (showDeleteDialog) {
                 AlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
                     title = { Text("Delete Journey") },
                     text = { Text("Are you sure you want to delete this journey and its image?") },
                     confirmButton = {
-                        Button(
-                            onClick = {
-                                deleteJourney(journey?.uid, journey?.imageUrl, navigationActions, listJourneysViewModel)
-                                showDeleteDialog = false // Close the dialog
+                      Button(
+                          onClick = {
+                            deletePicture(journey.imageUrl) {
+                              // Once the image is deleted, delete the journey record from
+                              // Firestore
+                              listJourneysViewModel.deleteJourneyById(journey.uid)
+                              navigationActions.goBack()
                             }
-                        ) {
+                            showDeleteDialog = false // Close the dialog
+                          }) {
                             Text("Yes, Delete")
-                        }
+                          }
                     },
                     dismissButton = {
-                        Button(onClick = { showDeleteDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
+                      Button(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                    })
+              }
             }
-        }
-    )
+      })
 }
-
-
-
-// Function to delete the journey and its image
-fun deleteJourney(
-    journeyId: String?,
-    imageUrl: String?,
-    navigationActions: NavigationActions,
-    listJourneysViewModel: ListJourneysViewModel // Pass the view model as a parameter
-) {
-    if (journeyId != null && imageUrl != null) {
-        // Delete the image from Firebase Storage
-        deletePicture(imageUrl) {
-            // Once the image is deleted, delete the journey record from Firestore
-            deleteJourneyFromDatabase(journeyId) {
-                // Refresh the journeys and navigate back when both deletions are complete
-                listJourneysViewModel.getJourneys()  // Call getJourneys to refresh the list
-                navigationActions.goBack()
-            }
-        }
-    }
-}
-
-
-
 
 // Function to delete the image from Firebase Storage
 fun deletePicture(imageUrl: String, onSuccess: () -> Unit) {
-    val storagePath = "images/${imageUrl.substringAfter("%2F").substringBefore("?alt")}"
-    val storageRef = FirebaseStorage.getInstance().getReference()
-    val imgRefToDelete = storageRef.child(storagePath)
+  val storagePath = "images/${imageUrl.substringAfter("%2F").substringBefore("?alt")}"
+  val storageRef = FirebaseStorage.getInstance().getReference()
+  val imgRefToDelete = storageRef.child(storagePath)
 
-    imgRefToDelete.delete().addOnSuccessListener {
+  imgRefToDelete
+      .delete()
+      .addOnSuccessListener {
         // Call onSuccess once the image is deleted
         onSuccess()
-    }.addOnFailureListener {
+      }
+      .addOnFailureListener {
         // Log error if the deletion fails
-        it.printStackTrace()
-    }
-}
-
-
-// Function to delete the journey record from Firestore
-fun deleteJourneyFromDatabase(journeyId: String, onSuccess: () -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-    db.collection("journeys").document(journeyId)
-        .delete()
-        .addOnSuccessListener {
-            // Call onSuccess once the journey is deleted
-            onSuccess()
-        }
-        .addOnFailureListener { e ->
-            // Log error if the journey deletion fails
-            e.printStackTrace()
-        }
+        Log.e("JourneyRecord", "Error deleting image: $it")
+      }
 }
