@@ -71,7 +71,7 @@ fun OverviewScreen(
       },
       content = { pd ->
         if (currentSection == "Gallery") {
-          GalleryScreen(listJourneysViewModel, pd)
+          GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
           ExploreScreen()
         }
