@@ -71,10 +71,11 @@ class EditJourneyScreenTest {
       EditJourneyScreen(
           listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
     }
-      // Check if the Scaffold with the tag "editJourneyScreen" is displayed
-      composeTestRule.onNodeWithTag("editJourneyScreen")
-          .assertExists() // Ensures that the Scaffold exists in the composition
-          .assertIsDisplayed() // Ensures that the Scaffold is visible on the screen
+    // Check if the Scaffold with the tag "editJourneyScreen" is displayed
+    composeTestRule
+        .onNodeWithTag("editJourneyScreen")
+        .assertExists() // Ensures that the Scaffold exists in the composition
+        .assertIsDisplayed() // Ensures that the Scaffold is visible on the screen
 
     // Check if the back button is displayed
     composeTestRule.onNodeWithTag("backButton").assertIsDisplayed()
@@ -131,22 +132,20 @@ class EditJourneyScreenTest {
         .performScrollTo()
         .assertIsDisplayed()
 
-      // Test brewing method button selection
-      composeTestRule
-          .onNodeWithTag("outlinedButton:${BrewingMethod.FRENCH_PRESS.name}")
-          .performScrollTo()
-          .assertIsDisplayed()
-          .performClick()
+    // Test brewing method button selection
+    composeTestRule
+        .onNodeWithTag("outlinedButton:${BrewingMethod.FRENCH_PRESS.name}")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performClick()
 
+    // Test taste method button selection
+    composeTestRule
+        .onNodeWithTag("filledButton:${CoffeeTaste.NUTTY.name}")
+        .performScrollTo()
+        .assertIsDisplayed()
 
-      // Test taste method button selection
-      composeTestRule
-          .onNodeWithTag("filledButton:${CoffeeTaste.NUTTY.name}")
-          .performScrollTo()
-          .assertIsDisplayed()
-
-
-      // Test taste button selection
+    // Test taste button selection
     composeTestRule
         .onNodeWithTag("outlinedButton:${CoffeeTaste.SPICY.name}")
         .performScrollTo()

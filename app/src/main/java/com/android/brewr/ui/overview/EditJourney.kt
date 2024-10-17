@@ -299,7 +299,8 @@ fun EditJourneyScreen(
                           Button(
                               onClick = { brewingMethod = method },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp).testTag("filledButton:${method.name}"),
+                              modifier =
+                                  Modifier.padding(4.dp).testTag("filledButton:${method.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.buttonColors(
@@ -312,7 +313,8 @@ fun EditJourneyScreen(
                           OutlinedButton(
                               onClick = { brewingMethod = method },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp).testTag("outlinedButton:${method.name}"),
+                              modifier =
+                                  Modifier.padding(4.dp).testTag("outlinedButton:${method.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.outlinedButtonColors(
@@ -349,7 +351,8 @@ fun EditJourneyScreen(
                           Button(
                               onClick = { coffeeTaste = taste },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp).testTag("filledButton:${taste.name}"),
+                              modifier =
+                                  Modifier.padding(4.dp).testTag("filledButton:${taste.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.buttonColors(
@@ -361,7 +364,8 @@ fun EditJourneyScreen(
                           OutlinedButton(
                               onClick = { coffeeTaste = taste },
                               shape = RoundedCornerShape(16.dp),
-                              modifier = Modifier.padding(4.dp).testTag("outlinedButton:${taste.name}"),
+                              modifier =
+                                  Modifier.padding(4.dp).testTag("outlinedButton:${taste.name}"),
                               contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                               colors =
                                   ButtonDefaults.outlinedButtonColors(
