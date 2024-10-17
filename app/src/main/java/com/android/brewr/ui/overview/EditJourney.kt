@@ -113,9 +113,7 @@ fun EditJourneyScreen(
                 }"
         })
   }
-  var location by remember {
-    mutableStateOf(task.location)
-  } // Will change to Location once it's implemented
+
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
@@ -447,21 +445,7 @@ fun EditJourneyScreen(
                     placeholder = { Text(selectedDate) },
                     modifier = Modifier.fillMaxWidth().testTag("inputDate"))
               }
-              // Location
-              Column {
-                // Label Text
-                Text(
-                    text = "Location",
-                    modifier = Modifier.padding(bottom = 20.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold)
 
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    placeholder = { Text("Enter the location") },
-                    modifier = Modifier.fillMaxWidth().testTag("location"))
-              }
 
               Button(
                   onClick = {
@@ -490,8 +474,7 @@ fun EditJourneyScreen(
                                     brewingMethod = brewingMethod,
                                     coffeeTaste = coffeeTaste,
                                     coffeeRate = coffeeRate,
-                                    date = Timestamp(calendar.time),
-                                    location = location)
+                                    date = Timestamp(calendar.time))
                             listJourneysViewModel.updateJourney(updatedJourney)
                             navigationActions.goBack()
                           } catch (_: NumberFormatException) {
@@ -524,8 +507,7 @@ fun EditJourneyScreen(
                                 brewingMethod = brewingMethod,
                                 coffeeTaste = coffeeTaste,
                                 coffeeRate = coffeeRate,
-                                date = Timestamp(calendar.time),
-                                location = location)
+                                date = Timestamp(calendar.time))
                         listJourneysViewModel.updateJourney(updatedJourney)
                         navigationActions.goBack()
                       } catch (_: NumberFormatException) {
