@@ -446,7 +446,6 @@ fun EditJourneyScreen(
                     modifier = Modifier.fillMaxWidth().testTag("inputDate"))
               }
 
-
               Button(
                   onClick = {
                     val calendar = GregorianCalendar()
