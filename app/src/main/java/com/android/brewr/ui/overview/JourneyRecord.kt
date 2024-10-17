@@ -311,6 +311,7 @@ fun JourneyRecordScreen(
                     text = { Text("Are you sure you want to delete this journey and its image?") },
                     confirmButton = {
                       Button(
+                          modifier = Modifier.testTag("button Yes"),
                           onClick = {
                             deletePicture(journey.imageUrl) {
                               // Once the image is deleted, delete the journey record from
@@ -323,8 +324,13 @@ fun JourneyRecordScreen(
                             Text("Yes, Delete")
                           }
                     },
+                    modifier = Modifier.testTag("Alter dialog"),
                     dismissButton = {
-                      Button(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                      Button(
+                          modifier = Modifier.testTag("button No"),
+                          onClick = { showDeleteDialog = false }) {
+                            Text("Cancel")
+                          }
                     })
               }
             }
