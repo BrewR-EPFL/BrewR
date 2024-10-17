@@ -9,12 +9,14 @@ import androidx.navigation.NavHostController
 object Route {
   const val OVERVIEW = "Overview"
   const val AUTH = "Auth"
+  const val ADD_JOURNEY = "Add Journey"
 }
 
 object Screen {
   const val AUTH = "Auth Screen"
   const val OVERVIEW = "Overview Screen"
-  const val JOURNEY_RECORD = "Journey Screen"
+  const val ADD_JOURNEY = "Add Journey Screen"
+  const val USERPROFILE = "User Profile Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)

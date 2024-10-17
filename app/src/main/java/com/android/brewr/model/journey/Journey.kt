@@ -17,6 +17,7 @@ data class Journey(
 
 /** Enum class representing various coffee origins. */
 enum class CoffeeOrigin {
+  DEFAULT,
   BRAZIL,
   VIETNAM,
   COLOMBIA,
@@ -41,6 +42,7 @@ enum class CoffeeOrigin {
 
 /** Enum class representing various brewing methods. */
 enum class BrewingMethod {
+  DEFAULT,
   ESPRESSO_MACHINE,
   POUR_OVER,
   FRENCH_PRESS,
@@ -50,6 +52,7 @@ enum class BrewingMethod {
 
 /** Enum class representing various taste profiles. */
 enum class CoffeeTaste {
+  DEFAULT,
   FLORAL,
   CHOCOLATE,
   NUTTY,
@@ -61,13 +64,10 @@ enum class CoffeeTaste {
 
 /** Enum class representing various coffee rates. */
 enum class CoffeeRate {
+  DEFAULT,
   ONE,
-  ONE_HALF,
   TWO,
-  TWO_HALF,
   THREE,
-  THREE_HALF,
   FOUR,
-  FOUR_HALF,
   FIVE
 }
