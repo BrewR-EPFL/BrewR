@@ -1,5 +1,6 @@
 package com.android.brewr.model.user
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -22,7 +23,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       onSuccess(user.email)
     } else {
       Log.e("UserRepository", "User not found")
-      onFailure(Exception("User not logged in"))
+      onFailure(Exception("User is not logged in"))
     }
   }
 
@@ -58,7 +59,17 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       onSuccess(user.displayName)
     } else {
       Log.e("UserRepository", "User not found")
-      onFailure(Exception("User not logged in"))
+      onFailure(Exception("User is not logged in"))
+    }
+  }
+
+  override fun getProfilePicture(onSuccess: (Uri?) -> Unit, onFailure: (Exception) -> Unit) {
+    val user: FirebaseUser? = firebaseAuth.currentUser
+    if (user != null) {
+      onSuccess(user.photoUrl)
+    } else {
+      Log.e("UserRepository", "User not found")
+      onFailure(Exception("User is not logged in"))
     }
   }
 }
