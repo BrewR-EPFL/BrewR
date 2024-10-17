@@ -43,8 +43,7 @@ class JourneyRecordScreenTest {
           brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
           coffeeTaste = CoffeeTaste.SWEET,
           coffeeRate = CoffeeRate.THREE,
-          date = Timestamp.now(),
-          location = "Home")
+          date = Timestamp.now())
 
   @Before
   fun setUp() {
@@ -150,8 +149,7 @@ class JourneyRecordScreenTest {
             brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
             coffeeTaste = CoffeeTaste.SWEET,
             coffeeRate = CoffeeRate.FIVE,
-            date = Timestamp.now(),
-            location = "")
+            date = Timestamp.now())
 
     composeTestRule.setContent {
       listJourneysViewModel.selectJourney(invalidJourney)
