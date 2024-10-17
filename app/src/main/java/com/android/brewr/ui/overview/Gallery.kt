@@ -1,6 +1,5 @@
 package com.android.brewr.ui.overview
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +27,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 
 @Composable
 fun GalleryScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
     padding: PaddingValues,
+    navigationActions: NavigationActions
 ) {
   val journeys = listJourneysViewModel.journeys.collectAsState().value
   val context = LocalContext.current
@@ -48,7 +50,8 @@ fun GalleryScreen(
     ) {
       items(journeys) { journey ->
         JourneyItem(journey = journey) {
-          Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT).show()
+          listJourneysViewModel.selectJourney(journey)
+          navigationActions.navigateTo(Screen.JOURNEY_RECORD)
         }
       }
     }
