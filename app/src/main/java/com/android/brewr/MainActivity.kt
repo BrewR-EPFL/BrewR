@@ -21,6 +21,7 @@ import com.android.brewr.ui.authentication.SignInScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.overview.AddJourneyScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
@@ -70,6 +71,13 @@ fun BrewRApp() {
     ) {
       composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
       composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.ADD_JOURNEY,
+        route = Route.ADD_JOURNEY,
+    ) {
+      composable(Screen.ADD_JOURNEY) { AddJourneyScreen(listJourneysViewModel, navigationActions) }
     }
   }
 }
