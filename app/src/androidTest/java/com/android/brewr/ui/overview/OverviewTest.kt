@@ -37,8 +37,7 @@ class OverviewScreenTest {
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
-          date = Timestamp.now(),
-          location = "Lausanne")
+          date = Timestamp.now())
 
   // Setup Compose Test Rule
   @get:Rule val composeTestRule = createComposeRule()

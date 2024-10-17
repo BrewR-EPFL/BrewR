@@ -9,11 +9,13 @@ import androidx.navigation.NavHostController
 object Route {
   const val OVERVIEW = "Overview"
   const val AUTH = "Auth"
+  const val ADD_JOURNEY = "Add Journey"
 }
 
 object Screen {
   const val AUTH = "Auth Screen"
   const val OVERVIEW = "Overview Screen"
+  const val ADD_JOURNEY = "Add Journey Screen"
   const val USERPROFILE = "User Profile Screen"
   const val EDIT_JOURNEY = "Edit Journey Screen"
 }
