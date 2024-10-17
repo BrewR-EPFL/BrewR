@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
@@ -50,9 +51,12 @@ import com.google.firebase.ktx.Firebase
 fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
 
-  // Collect username and userEmail from ViewModel
+  // Collect username, userEmail, and user profile picture url from ViewModel
   val username by userViewModel.username.collectAsState()
   val userEmail by userViewModel.userEmail.collectAsState()
+  val userProfilePicture by userViewModel.userProfilePicture.collectAsState()
+
+
 
   var showDialog by remember { mutableStateOf(false) }
 
@@ -75,10 +79,19 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              Text(
-                  text = username ?: "Username",
-                  style = MaterialTheme.typography.headlineMedium,
-                  modifier = Modifier.testTag("Username"))
+            Row (
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = username ?: "Username",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.testTag("Username"))
+                Spacer(Modifier.width(280.dp))
+                AsyncImage(userProfilePicture, "profilePicture")
+
+            }
+
               Text(text = userEmail ?: "User Email", modifier = Modifier.testTag("User Email"))
               Spacer(Modifier.height(40.dp))
 
