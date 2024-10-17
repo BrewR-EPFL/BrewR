@@ -2,7 +2,6 @@ package com.android.brewr.ui.overview
 
 import android.icu.util.GregorianCalendar
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -76,10 +75,9 @@ import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.Purple80
+import com.android.brewr.utils.updatePicture
 import com.google.firebase.Timestamp
-import com.google.firebase.storage.FirebaseStorage
 import java.util.Calendar
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -115,7 +113,9 @@ fun EditJourneyScreen(
   }
 
   val context = LocalContext.current
-  var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
+  var expanded by remember {
+    mutableStateOf(coffeeShopName.isNotEmpty())
+  } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
 
   val getImageLauncher =
@@ -527,33 +527,4 @@ fun EditJourneyScreen(
                   }
             }
       })
-}
-
-/**
- * Updates the picture in Firebase Storage.
- *
- * @param imageUri The URI of the new image to upload.
- * @param oldImageUrl The URL of the old image to delete.
- * @param onSuccess Callback function to be invoked with the new image URL upon successful upload.
- */
-fun updatePicture(imageUri: Uri, oldImageUrl: String, onSuccess: (String) -> Unit) {
-  val storagePath = "images/${oldImageUrl.substringAfter("%2F").substringBefore("?alt")}"
-  Log.d("EditJourneyScreen", "Deleting image with path $storagePath")
-
-  val storageRef = FirebaseStorage.getInstance().getReference()
-  val imgRefToDelete = storageRef.child(storagePath)
-
-  imgRefToDelete.delete().addOnFailureListener {
-    Log.e("EditJourneyScreen", "Failed to delete image", it)
-  }
-
-  val newImagePath = "images/${UUID.randomUUID()}"
-  val newImageRef = storageRef.child(newImagePath)
-
-  newImageRef
-      .putFile(imageUri)
-      .addOnSuccessListener {
-        newImageRef.downloadUrl.addOnSuccessListener { uri -> onSuccess(uri.toString()) }
-      }
-      .addOnFailureListener { Log.e("EditJourneyScreen", "Failed to upload image", it) }
 }
