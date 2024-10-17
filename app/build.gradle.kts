@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.sonar)
     id("jacoco")
     id("com.google.gms.google-services") // Ensure this is present
+    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -170,6 +172,10 @@ dependencies {
 
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
 
 tasks.withType<Test> {
