@@ -1,15 +1,14 @@
 package com.android.brewr.ui.overview
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,12 +16,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
@@ -36,7 +34,10 @@ fun OverviewScreen(
         viewModel(factory = ListJourneysViewModel.Factory),
     navigationActions: NavigationActions
 ) {
-  val journeys = listJourneysViewModel.journeys.collectAsState()
+  val context = LocalContext.current
+
+  // State to track whether we're in "Gallery" or "Explore" mode
+  var currentSection by remember { mutableStateOf("Gallery") }
 
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
@@ -46,9 +47,14 @@ fun OverviewScreen(
               title = { Text(text = "BrewR", modifier = Modifier.testTag("appTitle")) },
               actions = {
                 Row {
-                  IconButton(onClick = {}, modifier = Modifier.testTag("addButton")) {
-                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
-                  }
+                  IconButton(
+                      onClick = {
+                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
+                            .show()
+                      },
+                      modifier = Modifier.testTag("addButton")) {
+                        Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add")
+                      }
                   Spacer(modifier = Modifier.width(16.dp))
                   IconButton(
                       onClick = { navigationActions.navigateTo(Screen.USERPROFILE) },
@@ -65,63 +71,45 @@ fun OverviewScreen(
                       .height(1.dp)
                       .background(androidx.compose.ui.graphics.Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
-          SubNavigationBar()
+          SubNavigationBar(
+              currentSection = currentSection,
+              onSectionChange = { section -> currentSection = section })
         }
       },
       content = { pd ->
-        Column(modifier = Modifier.padding(pd)) { Spacer(modifier = Modifier.height(16.dp)) }
-        if (journeys.value.isNotEmpty()) {
-          LazyColumn(
-              contentPadding = PaddingValues(vertical = 8.dp),
-              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
-                items(journeys.value.size) { index ->
-                  JourneyItem(journey = journeys.value[index]) {
-                    listJourneysViewModel.selectJourney(journeys.value[index])
-                  }
-                }
-              }
+        if (currentSection == "Gallery") {
+          GalleryScreen(listJourneysViewModel, pd)
         } else {
-          Box(modifier = Modifier.fillMaxSize().padding(pd), contentAlignment = Alignment.Center) {
-            Text(
-                modifier = Modifier.testTag("emptyJourneyPrompt"),
-                text = "You have no Journey yet.")
-          }
+          ExploreScreen()
         }
       })
 }
 
 @Composable
-fun JourneyItem(journey: Journey, onClick: () -> Unit) {
-  Card(
-      modifier =
-          Modifier.testTag("journeyListItem")
-              .fillMaxWidth()
-              .padding(vertical = 4.dp)
-              .clickable(onClick = onClick),
-  ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-      Text(text = journey.coffeeShopName) // Change with image later
-    }
-  }
-}
-
-@Composable
-fun SubNavigationBar() {
+fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) {
   Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp)) {
-    SubNavigationButton("Gallery") {}
+    SubNavigationButton(
+        text = "Gallery",
+        isSelected = currentSection == "Gallery",
+        onClick = { onSectionChange("Gallery") })
     Spacer(modifier = Modifier.width(6.dp))
-    SubNavigationButton("Explore") {}
+    SubNavigationButton(
+        text = "Explore",
+        isSelected = currentSection == "Explore",
+        onClick = { onSectionChange("Explore") })
   }
 }
 
 @Composable
-fun SubNavigationButton(text: String, onClick: () -> Unit = {}) {
+fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
   Text(
       text = text,
       modifier =
           Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
               .clickable { onClick() }
-              .background(Purple80, RoundedCornerShape(8.dp))
+              .background(
+                  if (isSelected) Purple80 else androidx.compose.ui.graphics.Color.Gray,
+                  RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
 }
