@@ -26,8 +26,7 @@ class ListJourneysViewModelTest {
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
-          date = Timestamp.now(),
-          location = "Lausanne")
+          date = Timestamp.now())
 
   @Before
   fun setUp() {

@@ -89,13 +89,14 @@ fun AddJourneyScreen(
   val uid = listJourneysViewModel.getNewUid()
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf("") }
-  var coffeeShopName by remember { mutableStateOf("") }
+  var coffeeShopName by remember {
+    mutableStateOf("")
+  } // Will change to Location once it's implemented
   var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
   var brewingMethod by remember { mutableStateOf(BrewingMethod.DEFAULT) }
   var coffeeTaste by remember { mutableStateOf(CoffeeTaste.DEFAULT) }
   var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
   val date by remember { mutableStateOf("") } // Using Firebase Timestamp for now
-  var location by remember { mutableStateOf("") } // Will change to Location once it's implemented
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
@@ -105,6 +106,7 @@ fun AddJourneyScreen(
           contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
 
   Scaffold(
+      modifier = Modifier.testTag("addJourneyScreen"),
       topBar = {
         TopAppBar(
             navigationIcon = {
@@ -429,21 +431,6 @@ fun AddJourneyScreen(
                     placeholder = { Text(selectedDate) },
                     modifier = Modifier.fillMaxWidth().testTag("inputDate"))
               }
-              // Location
-              Column {
-                // Label Text
-                Text(
-                    text = "Location",
-                    modifier = Modifier.padding(bottom = 20.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold)
-
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    placeholder = { Text("Enter the location") },
-                    modifier = Modifier.fillMaxWidth().testTag("location"))
-              }
 
               Button(
                   onClick = {
@@ -472,8 +459,7 @@ fun AddJourneyScreen(
                                     brewingMethod = brewingMethod,
                                     coffeeTaste = coffeeTaste,
                                     coffeeRate = coffeeRate,
-                                    date = Timestamp(calendar.time),
-                                    location = location)
+                                    date = Timestamp(calendar.time))
                             listJourneysViewModel.addJourney(newJourney)
                             navigationActions.goBack()
                             return@uploadPicture

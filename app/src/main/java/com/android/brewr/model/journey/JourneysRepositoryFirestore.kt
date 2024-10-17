@@ -108,7 +108,6 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       val rateString = document.getString("coffeeRate") ?: return null
       val coffeeRate = CoffeeRate.valueOf(rateString)
       val date = document.getTimestamp("date") ?: return null
-      val location = document.getString("location") ?: return null
       Journey(
           uid = uid,
           imageUrl = imageUrl,
@@ -118,8 +117,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
           brewingMethod = brewingMethod,
           coffeeTaste = coffeeTaste,
           coffeeRate = coffeeRate,
-          date = date,
-          location = location)
+          date = date)
     } catch (e: Exception) {
       Log.e("JourneysRepositoryFirestore", "Error converting document to Journey", e)
       null
