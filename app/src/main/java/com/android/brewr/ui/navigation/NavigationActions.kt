@@ -17,6 +17,7 @@ object Screen {
   const val OVERVIEW = "Overview Screen"
   const val ADD_JOURNEY = "Add Journey Screen"
   const val USERPROFILE = "User Profile Screen"
+  const val JOURNEY_RECORD = "Journey Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
