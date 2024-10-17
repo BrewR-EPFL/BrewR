@@ -47,8 +47,7 @@ class JourneysRepositoryFirestoreTest {
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
-          date = Timestamp.now(),
-          location = "Lausanne")
+          date = Timestamp.now())
 
   @Before
   fun setUp() {
@@ -144,7 +143,6 @@ class JourneysRepositoryFirestoreTest {
     whenever(documentSnapshot.getString("coffeeTaste")).thenReturn("BITTER")
     whenever(documentSnapshot.getString("coffeeRate")).thenReturn("ONE")
     whenever(documentSnapshot.getTimestamp("date")).thenReturn(mock())
-    whenever(documentSnapshot.getString("location")).thenReturn("City1")
 
     // Access the private method using reflection
     val method =
@@ -165,7 +163,6 @@ class JourneysRepositoryFirestoreTest {
     assertEquals(CoffeeTaste.BITTER, journey.coffeeTaste)
     assertEquals(CoffeeRate.ONE, journey.coffeeRate)
     assertNotNull(journey.date)
-    assertEquals("City1", journey.location)
   }
 
   @Test
