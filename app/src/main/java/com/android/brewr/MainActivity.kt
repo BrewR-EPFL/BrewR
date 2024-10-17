@@ -19,7 +19,6 @@ import androidx.navigation.navigation
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.resources.C
-import com.android.brewr.ui.authentication.SignInScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen

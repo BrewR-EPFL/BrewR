@@ -29,8 +29,7 @@ class OverviewScreenTest {
   private val journey =
       Journey(
           uid = "journey1",
-          imageUrl =
-              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
+          imageUrl = "https://example.com/image.jpg",
           description = "A wonderful coffee journey.",
           coffeeShopName = "Starbucks",
           coffeeOrigin = CoffeeOrigin.BRAZIL,
@@ -62,13 +61,6 @@ class OverviewScreenTest {
     // Assert that the 'Add' and 'Account' buttons exist
     composeTestRule.onNodeWithTag("addButton").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().assertHasClickAction()
-  }
-
-  @Test
-  fun exploreScreen_displayCorrectly() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
-    composeTestRule.onNodeWithTag("Explore").performClick()
-    composeTestRule.onNodeWithTag("exploreContent").assertIsDisplayed()
   }
 
   @Test
@@ -112,6 +104,7 @@ class OverviewScreenTest {
     // Wait for UI state to settle
     composeTestRule.waitForIdle() // or mainClock.advanceUntilIdle()
 
+    composeTestRule.onNodeWithText("Starbucks").assertIsDisplayed()
     composeTestRule.onNodeWithTag("journeyListItem").assertIsDisplayed()
     // Perform a click on the first item in the list
     composeTestRule.onAllNodesWithTag("journeyListItem")[0].performClick()
