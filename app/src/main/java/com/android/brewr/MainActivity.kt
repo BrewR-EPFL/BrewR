@@ -22,6 +22,7 @@ import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.overview.AddJourneyScreen
+import com.android.brewr.ui.overview.EditJourneyScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
@@ -82,6 +83,9 @@ fun BrewRApp() {
         route = Route.ADD_JOURNEY,
     ) {
       composable(Screen.ADD_JOURNEY) { AddJourneyScreen(listJourneysViewModel, navigationActions) }
+      composable(Screen.EDIT_JOURNEY) {
+        EditJourneyScreen(listJourneysViewModel, navigationActions)
+      }
     }
   }
 }

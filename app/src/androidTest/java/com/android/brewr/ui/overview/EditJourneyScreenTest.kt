@@ -128,26 +128,26 @@ class EditJourneyScreenTest {
 
     // Test brewing method button selection
     composeTestRule
-        .onNodeWithTag("filledButton:${BrewingMethod.POUR_OVER.name}")
+        .onNodeWithTag("Button:${BrewingMethod.POUR_OVER.name}")
         .performScrollTo()
         .assertIsDisplayed()
 
     // Test brewing method button selection
     composeTestRule
-        .onNodeWithTag("outlinedButton:${BrewingMethod.FRENCH_PRESS.name}")
+        .onNodeWithTag("Button:${BrewingMethod.FRENCH_PRESS.name}")
         .performScrollTo()
         .assertIsDisplayed()
         .performClick()
 
     // Test taste method button selection
     composeTestRule
-        .onNodeWithTag("filledButton:${CoffeeTaste.NUTTY.name}")
+        .onNodeWithTag("Button:${CoffeeTaste.NUTTY.name}")
         .performScrollTo()
         .assertIsDisplayed()
 
     // Test taste button selection
     composeTestRule
-        .onNodeWithTag("outlinedButton:${CoffeeTaste.SPICY.name}")
+        .onNodeWithTag("Button:${CoffeeTaste.SPICY.name}")
         .performScrollTo()
         .assertIsDisplayed()
         .performClick()
@@ -217,17 +217,17 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("coffeeShopNameField").performTextInput("Pablo's Coffee")
     // Coffee Origin
     composeTestRule
-        .onNodeWithTag("outlinedButton:${BrewingMethod.FRENCH_PRESS.name}")
+        .onNodeWithTag("Button:${BrewingMethod.FRENCH_PRESS.name}")
         .performScrollTo()
         .performClick()
     // Brewing Method
     composeTestRule
-        .onNodeWithTag("outlinedButton:${BrewingMethod.COLD_BREW.name}")
+        .onNodeWithTag("Button:${BrewingMethod.COLD_BREW.name}")
         .performScrollTo()
         .performClick()
     // Coffee Taste
     composeTestRule
-        .onNodeWithTag("outlinedButton:${CoffeeTaste.FRUITY.name}")
+        .onNodeWithTag("Button:${CoffeeTaste.FRUITY.name}")
         .performScrollTo()
         .performClick()
     // Coffee Rate
