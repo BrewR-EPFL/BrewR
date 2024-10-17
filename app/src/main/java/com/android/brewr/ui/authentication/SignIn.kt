@@ -1,3 +1,5 @@
+package com.android.brewr.ui.authentication
+
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,8 +35,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
@@ -53,36 +58,37 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
       rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
           result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
-          coroutineScope.launch {
-            try {
-              val credential = oneTapClient?.getSignInCredentialFromIntent(result.data)
-              val idToken = credential?.googleIdToken
-              when {
-                idToken != null -> {
-                  val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                  auth?.signInWithCredential(firebaseCredential)?.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                      Log.d("SignInScreen", "signInWithCredential:success")
-                      user = auth?.currentUser
-                      userViewModel.updateUserInfo()
-                      Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-                      // Added navigation action to go to the Overview screen after login
-                      navigationActions.navigateTo(Screen.OVERVIEW)
-                    } else {
-                      Log.w("SignInScreen", "signInWithCredential:failure", task.exception)
-                      Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
-                    }
+          try {
+            val credential = oneTapClient?.getSignInCredentialFromIntent(result.data)
+            val idToken = credential?.googleIdToken
+            when {
+              idToken != null -> {
+                val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+                auth?.signInWithCredential(firebaseCredential)?.addOnCompleteListener { task ->
+                  if (task.isSuccessful) {
+                    Log.d("SignInScreen", "signInWithCredential:success")
+                    user = auth?.currentUser
+                    userViewModel.updateUserInfo()
+                    Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+                    // Added navigation action to go to the Overview screen after login
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } else {
+                    Log.w("SignInScreen", "signInWithCredential:failure", task.exception)
+
+                    Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
                   }
                 }
-                else -> {
-                  Log.d("SignInScreen", "No ID token!")
-                  Toast.makeText(context, "Login failed: No ID token!", Toast.LENGTH_LONG).show()
-                }
               }
-            } catch (e: Exception) {
-              Log.e("SignInScreen", "Error getting credential: ", e)
-              Toast.makeText(context, "Login error: ${e.message}", Toast.LENGTH_LONG).show()
+              else -> {
+                Log.d("SignInScreen", "No ID token!")
+
+                Toast.makeText(context, "Login failed: No ID token!", Toast.LENGTH_LONG).show()
+              }
             }
+          } catch (e: Exception) {
+            Log.e("SignInScreen", "Error getting credential: ", e)
+
+            Toast.makeText(context, "Login error: ${e.message}", Toast.LENGTH_LONG).show()
           }
         }
       }
@@ -110,12 +116,13 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
           modifier =
               Modifier.size(220.dp)
                   .clip(RoundedCornerShape(30.dp))
-                  .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp)))
+                  .border(3.dp, Color.DarkGray, RoundedCornerShape(30.dp)))
 
       Spacer(modifier = Modifier.height(16.dp))
 
       // Welcome Text
       Text(
+          modifier = Modifier.testTag("loginTitle"),
           text = "BrewR",
           style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
           fontWeight = FontWeight.Bold,
@@ -148,14 +155,22 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
                   }
                 } catch (e: Exception) {
                   Log.e("SignInScreen", "Error starting sign-in: ", e)
-                  Toast.makeText(context, "Error starting sign-in: ${e.message}", Toast.LENGTH_LONG)
-                      .show()
+                  // Toast can only be called in the main thread
+                  withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                            context, "Error starting sign-in: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
+                  }
                 }
               }
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(8.dp).height(48.dp).padding(horizontal = 40.dp)) {
+            modifier =
+                Modifier.padding(8.dp)
+                    .height(48.dp)
+                    .padding(horizontal = 40.dp)
+                    .testTag("loginButton")) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Center,
@@ -170,23 +185,6 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium)
                   }
-            }
-      } else {
-        // Sign out Button
-        Button(
-            onClick = {
-              Firebase.auth.signOut()
-              user = null
-              Toast.makeText(context, "Signed out successfully", Toast.LENGTH_LONG).show()
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-            shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(8.dp).height(48.dp)) {
-              Text(
-                  text = "Sign out",
-                  color = Color.White,
-                  fontSize = 16.sp,
-                  fontWeight = FontWeight.Medium)
             }
       }
     }

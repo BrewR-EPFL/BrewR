@@ -1,6 +1,5 @@
 package com.android.brewr
 
-import SignInScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,12 +18,13 @@ import androidx.navigation.navigation
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.resources.C
+import com.android.brewr.ui.authentication.SignInScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.overview.OverviewScreen
-import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
+import com.android.brewr.ui.theme.BrewRAppTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -59,7 +59,7 @@ fun BrewRApp() {
       viewModel(factory = ListJourneysViewModel.Factory)
   val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 
-  NavHost(navController, Route.AUTH) {
+  NavHost(navController, Route.OVERVIEW) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
@@ -71,7 +71,7 @@ fun BrewRApp() {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-      composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
+      composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel,navigationActions)  }
     }
   }
 }
