@@ -1,5 +1,6 @@
 package com.android.brewr.model.user
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,10 +17,14 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
   private val userEmail_ = MutableStateFlow<String?>(null)
   val userEmail: StateFlow<String?> = userEmail_.asStateFlow()
 
+  private val userProfilePicture_ = MutableStateFlow<Uri?>(null)
+  val userProfilePicture: StateFlow<Uri?> = userProfilePicture_.asStateFlow()
+
   init {
     Log.d("ViewModelInit", "it is initiated")
     fetchUserGmail()
     fetchUsername()
+    fetchProfilePicture()
   }
 
   /** Fetches the user's Gmail from the repository and updates the userEmail_ state. */
@@ -30,6 +35,13 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
   /** Fetches the current username from the repository and updates the username_ state. */
   private fun fetchUsername() {
     repository.getUsername(onSuccess = { username_.value = it }, onFailure = {})
+  }
+
+  /** Fetches the current profile picture from the repository and updates the userProfilePicture
+   * state. */
+
+  private fun fetchProfilePicture() {
+    repository.getProfilePicture(onSuccess = {userProfilePicture_.value = it}, onFailure = {})
   }
 
   /**
@@ -52,7 +64,8 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun updateUserInfo() {
     fetchUserGmail()
     fetchUsername()
-    Log.d("ViewModelUpdated", "it is updated")
+    fetchProfilePicture()
+    Log.d("ViewModelUpdated", "it is updated") // TODO change msg wording?
   }
 
   companion object {
