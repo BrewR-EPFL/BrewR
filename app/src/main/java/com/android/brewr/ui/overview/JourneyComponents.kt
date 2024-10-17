@@ -69,7 +69,7 @@ fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit,
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.Center)) {
-              Text("Edit Photo", color = Color.Black)
+              Text("Add Photo", color = Color.Black)
               Image(
                   painter = rememberAsyncImagePainter(imageUri ?: imageUrl),
                   contentDescription = "Selected Image",
