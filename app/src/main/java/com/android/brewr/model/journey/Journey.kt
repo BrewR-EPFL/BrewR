@@ -12,7 +12,7 @@ data class Journey(
     val coffeeTaste: CoffeeTaste,
     val coffeeRate: CoffeeRate,
     val date: Timestamp,
-    val location: String, // Change to location once location is implemented
+    val location: String // Change to location once location is implemented
 )
 
 /** Enum class representing various coffee origins. */
