@@ -124,8 +124,6 @@ dependencies {
     // Play Services Auth (for Google Sign-In)
     implementation(libs.play.services.auth.v2050)
 
-    implementation(libs.coil.compose)
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
