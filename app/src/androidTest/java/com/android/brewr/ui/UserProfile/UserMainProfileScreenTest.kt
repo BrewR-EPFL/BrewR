@@ -6,7 +6,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
 import org.junit.Before
@@ -28,7 +30,10 @@ class UserMainProfileScreenTest {
     navigationActions = mock(NavigationActions::class.java)
 
     // Set up the screen before each test
-    composeTestRule.setContent { UserMainProfileScreen(navigationActions) }
+    composeTestRule.setContent {
+      val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+      UserMainProfileScreen(userViewModel, navigationActions)
+    }
   }
 
   @Test
