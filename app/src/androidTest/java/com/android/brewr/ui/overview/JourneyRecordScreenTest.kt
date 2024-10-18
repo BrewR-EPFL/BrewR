@@ -89,20 +89,6 @@ class JourneyRecordScreenTest {
   }
 
   @Test
-  fun editButtonClicked() {
-    composeTestRule.setContent {
-      listJourneysViewModel.selectJourney(mockJourney)
-      JourneyRecordScreen(
-          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
-    }
-    // Perform a click on the edit button
-    composeTestRule.onNodeWithTag("editButton").performClick()
-
-    // Verify that the navigation to the "Edit Screen" is triggered
-    verify(navigationActions).navigateTo(Screen.EDIT_JOURNEY)
-  }
-
-  @Test
   fun deleteButtonClickedYes() {
     composeTestRule.setContent {
       listJourneysViewModel.selectJourney(mockJourney)
@@ -117,6 +103,20 @@ class JourneyRecordScreenTest {
     composeTestRule.onNodeWithText("Delete Journey").assertIsDisplayed()
     // Test confirming delete
     composeTestRule.onNodeWithTag("button Yes").performClick()
+  }
+
+  @Test
+  fun editButtonClicked() {
+    composeTestRule.setContent {
+      listJourneysViewModel.selectJourney(mockJourney)
+      JourneyRecordScreen(
+          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
+    }
+    // Perform a click on the edit button
+    composeTestRule.onNodeWithTag("editButton").performClick()
+
+    // Verify that the navigation to the "Edit Screen" is triggered
+    verify(navigationActions).navigateTo(Screen.EDIT_JOURNEY)
   }
 
   @Test
