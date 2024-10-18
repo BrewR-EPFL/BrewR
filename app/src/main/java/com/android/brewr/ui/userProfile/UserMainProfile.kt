@@ -56,8 +56,6 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
   val userEmail by userViewModel.userEmail.collectAsState()
   val userProfilePicture by userViewModel.userProfilePicture.collectAsState()
 
-
-
   var showDialog by remember { mutableStateOf(false) }
 
   Scaffold(
@@ -79,20 +77,22 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row (
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = username ?: "Username",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.testTag("Username"))
-                Spacer(Modifier.width(280.dp))
-                AsyncImage(userProfilePicture, "profilePicture")
+              Row(
+                  horizontalArrangement = Arrangement.SpaceAround,
+                  verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = username ?: "Username",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.testTag("Username"))
+                    Spacer(Modifier.width(280.dp))
+                    if (userProfilePicture != null) {
+                      AsyncImage(userProfilePicture, "profilePicture")
+                    }
+                  }
 
-            }
-
-              Text(text = userEmail ?: "User Email", modifier = Modifier.testTag("User Email"))
+              Text(
+                  text = userEmail ?: "Username@gmail.com",
+                  modifier = Modifier.testTag("User Email"))
               Spacer(Modifier.height(40.dp))
 
               // Top part with horizontally aligned icon buttons
