@@ -37,11 +37,12 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     repository.getUsername(onSuccess = { username_.value = it }, onFailure = {})
   }
 
-  /** Fetches the current profile picture from the repository and updates the userProfilePicture
-   * state. */
-
+  /**
+   * Fetches the current profile picture from the repository and updates the userProfilePicture
+   * state.
+   */
   private fun fetchProfilePicture() {
-    repository.getProfilePicture(onSuccess = {userProfilePicture_.value = it}, onFailure = {})
+    repository.getProfilePicture(onSuccess = { userProfilePicture_.value = it }, onFailure = {})
   }
 
   /**
@@ -65,7 +66,7 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     fetchUserGmail()
     fetchUsername()
     fetchProfilePicture()
-    Log.d("ViewModelUpdated", "it is updated") // TODO change msg wording?
+    Log.d("ViewModelUpdated", "it is updated")
   }
 
   companion object {
