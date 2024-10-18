@@ -11,10 +11,6 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
 
   private val collectionPath = "journeys"
 
-  override fun getNewUid(): String {
-    return db.collection(collectionPath).document().id
-  }
-
   // Clearly ask TODO it
   override fun init(onSuccess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
@@ -22,6 +18,15 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
         onSuccess()
       }
     }
+  }
+
+  override fun getNewUid(): String {
+    return db.collection(collectionPath).document().id
+  }
+
+  override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    performFirestoreOperation(
+        db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
   }
 
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
@@ -40,9 +45,13 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
     }
   }
 
-  override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  override fun deleteJourneyById(
+      id: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     performFirestoreOperation(
-        db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
+        db.collection(collectionPath).document(id).delete(), onSuccess, onFailure)
   }
 
   override fun updateJourney(
@@ -54,15 +63,43 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
   }
 
-  override fun deleteJourneyById(
-      id: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    performFirestoreOperation(
-        db.collection(collectionPath).document(id).delete(), onSuccess, onFailure)
-  }
+  /**
+   * Converts a Firestore document to a Journey object.
+   *
+   * @param document The Firestore document to convert.
+   * @return The Journey object.
+   */
+  private fun documentTojourney(document: DocumentSnapshot): Journey? {
+    return try {
+      val uid = document.id
+      val description = document.getString("description") ?: return null
+      val imageUrl = document.getString("imageUrl") ?: return null
+      val originString = document.getString("coffeeOrigin") ?: return null
+      val coffeeOrigin = CoffeeOrigin.valueOf(originString)
+      val coffeeShopName = document.getString("coffeeShopName") ?: return null
+      val methodString = document.getString("brewingMethod") ?: return null
+      val brewingMethod = BrewingMethod.valueOf(methodString)
+      val rateString = document.getString("coffeeRate") ?: return null
+      val coffeeRate = CoffeeRate.valueOf(rateString)
+      val date = document.getTimestamp("date") ?: return null
+      val tasteString = document.getString("coffeeTaste") ?: return null
+      val coffeeTaste = CoffeeTaste.valueOf(tasteString)
 
+      Journey(
+          uid = uid,
+          imageUrl = imageUrl,
+          description = description,
+          coffeeShopName = coffeeShopName,
+          coffeeOrigin = coffeeOrigin,
+          brewingMethod = brewingMethod,
+          coffeeTaste = coffeeTaste,
+          coffeeRate = coffeeRate,
+          date = date)
+    } catch (e: Exception) {
+      Log.e("JourneysRepositoryFirestore", "Error converting document to Journey", e)
+      null
+    }
+  }
   /**
    * Performs a Firestore operation and calls the appropriate callback based on the result.
    *
@@ -84,43 +121,6 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
           onFailure(e)
         }
       }
-    }
-  }
-
-  /**
-   * Converts a Firestore document to a Journey object.
-   *
-   * @param document The Firestore document to convert.
-   * @return The Journey object.
-   */
-  private fun documentTojourney(document: DocumentSnapshot): Journey? {
-    return try {
-      val uid = document.id
-      val imageUrl = document.getString("imageUrl") ?: return null
-      val description = document.getString("description") ?: return null
-      val coffeeShopName = document.getString("coffeeShopName") ?: return null
-      val originString = document.getString("coffeeOrigin") ?: return null
-      val coffeeOrigin = CoffeeOrigin.valueOf(originString)
-      val methodString = document.getString("brewingMethod") ?: return null
-      val brewingMethod = BrewingMethod.valueOf(methodString)
-      val tasteString = document.getString("coffeeTaste") ?: return null
-      val coffeeTaste = CoffeeTaste.valueOf(tasteString)
-      val rateString = document.getString("coffeeRate") ?: return null
-      val coffeeRate = CoffeeRate.valueOf(rateString)
-      val date = document.getTimestamp("date") ?: return null
-      Journey(
-          uid = uid,
-          imageUrl = imageUrl,
-          description = description,
-          coffeeShopName = coffeeShopName,
-          coffeeOrigin = coffeeOrigin,
-          brewingMethod = brewingMethod,
-          coffeeTaste = coffeeTaste,
-          coffeeRate = coffeeRate,
-          date = date)
-    } catch (e: Exception) {
-      Log.e("JourneysRepositoryFirestore", "Error converting document to Journey", e)
-      null
     }
   }
 }
