@@ -1,5 +1,6 @@
 package com.android.brewr.ui.overview
 
+import android.icu.util.GregorianCalendar
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -27,6 +28,9 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,7 +40,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +64,9 @@ import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.ui.theme.Purple80
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit, testTag: String) {
@@ -324,22 +333,57 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateField(date: String, onDateChange: (String) -> Unit) {
-  Column {
-    // Label Text
+fun DateField(date: Timestamp?, onDateChange: (Timestamp) -> Unit) {
+  var showDatePicker by remember { mutableStateOf(false) }
+  var selectedDate by remember { mutableStateOf(date) }
+  val datePickerState =
+      rememberDatePickerState(
+          initialSelectedDateMillis = date?.toDate()?.time, initialDisplayMode = DisplayMode.Picker)
+  val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+  // Trigger the DatePickerDialog
+  if (showDatePicker) {
+    DatePickerDialog(
+        onDismissRequest = { showDatePicker = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                val selectedMillis = datePickerState.selectedDateMillis
+                if (selectedMillis != null) {
+                  val calendar = GregorianCalendar()
+                  calendar.timeInMillis = selectedMillis
+                  val timestamp = Timestamp(calendar.time)
+                  selectedDate = timestamp
+                  onDateChange(timestamp)
+                }
+                showDatePicker = false
+              }) {
+                Text("OK", fontWeight = FontWeight.Bold)
+              }
+        },
+        dismissButton = {
+          TextButton(onClick = { showDatePicker = false }) {
+            Text("Cancel", fontWeight = FontWeight.Bold)
+          }
+        },
+        modifier = Modifier.testTag("datePickerDialog")) {
+          DatePicker(state = datePickerState)
+        }
+  }
+
+  Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
     Text(
         text = "Date",
-        modifier = Modifier.padding(bottom = 20.dp),
         fontSize = 16.sp,
-        fontWeight = FontWeight.Bold)
-
-    // Date Text
-    TextField(
-        value = date,
-        onValueChange = { onDateChange(it) },
-        label = { Text("DD/MM/YYYY") },
-        placeholder = { Text(date) },
-        modifier = Modifier.fillMaxWidth().testTag("inputDate"))
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.testTag("dateTitle"))
+    // UI element to open the DatePickerDialog
+    TextButton(onClick = { showDatePicker = true }, modifier = Modifier.testTag("dateButton")) {
+      Text(
+          text = selectedDate?.let { dateFormat.format(it.toDate()) } ?: "No Date Selected",
+          fontSize = 14.sp)
+    }
   }
 }
