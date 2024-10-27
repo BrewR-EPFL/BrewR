@@ -149,7 +149,7 @@ fun AddJourneyScreen(
               // Date
 
               var selectedDate by remember { mutableStateOf(date) }
-              DateField(null) { selectedDate = it }
+              DateField(selectedDate) { selectedDate = it }
 
               Button(
                   onClick = {

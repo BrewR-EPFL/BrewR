@@ -335,12 +335,12 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateField(date: Timestamp?, onDateChange: (Timestamp) -> Unit) {
+fun DateField(date: Timestamp, onDateChange: (Timestamp) -> Unit) {
   var showDatePicker by remember { mutableStateOf(false) }
   var selectedDate by remember { mutableStateOf(date) }
   val datePickerState =
       rememberDatePickerState(
-          initialSelectedDateMillis = date?.toDate()?.time, initialDisplayMode = DisplayMode.Picker)
+          initialSelectedDateMillis = date.toDate().time, initialDisplayMode = DisplayMode.Picker)
   val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
   // Trigger the DatePickerDialog
@@ -381,9 +381,7 @@ fun DateField(date: Timestamp?, onDateChange: (Timestamp) -> Unit) {
         modifier = Modifier.testTag("dateTitle"))
     // UI element to open the DatePickerDialog
     TextButton(onClick = { showDatePicker = true }, modifier = Modifier.testTag("dateButton")) {
-      Text(
-          text = selectedDate?.let { dateFormat.format(it.toDate()) } ?: "No Date Selected",
-          fontSize = 14.sp)
+      Text(text = selectedDate.let { dateFormat.format(it.toDate()) }, fontSize = 14.sp)
     }
   }
 }
