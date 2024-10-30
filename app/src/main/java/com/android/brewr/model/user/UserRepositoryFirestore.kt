@@ -7,15 +7,16 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 
-class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
-
-  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+class UserRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
+) : UserRepository {
 
   /**
    * Retrieves the current user's Gmail address.
    *
-   * @return User's Gmail address or null (if the user is not logged in or doesn't have a Gmail
-   *   associated).
+   * @param onSuccess A callback triggered with user's Gmail address upon successful retrieval
+   * @param onFailure A callback triggered with an exception upon unsuccessful retrieval (null user)
    */
   override fun getUserGmail(onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
     val user: FirebaseUser? = firebaseAuth.currentUser
@@ -27,6 +28,14 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     }
   }
 
+  /**
+   * Updates the current user's username.
+   *
+   * @param username The new username
+   * @param onSuccess A callback triggered upon successful update of username
+   * @param onFailure A callback triggered with an exception upon unsuccessful update of the
+   *   username
+   */
   override fun setUsername(
       username: String,
       onSuccess: () -> Unit,
@@ -50,8 +59,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   /**
    * Retrieves the current user's username.
    *
-   * @return The user's display name (username), or null (if the user is not logged in or has not
-   *   set a username).
+   * @param onSuccess A callback triggered with the user's display name upon successful retrieval
+   * @param onFailure A callback triggered with an Exception upon unsuccessful retrieval (null user)
    */
   override fun getUsername(onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
     val user: FirebaseUser? = firebaseAuth.currentUser
@@ -63,6 +72,14 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     }
   }
 
+  /**
+   * Retrieves the current user's profile picture URI.
+   *
+   * @param onSuccess A callback triggered with the user's profile picture URI upon successful
+   *   retrieval
+   * @param onFailure A callback triggered with the user's profile picture URI upon unsuccessful
+   *   retrieval
+   */
   override fun getProfilePicture(onSuccess: (Uri?) -> Unit, onFailure: (Exception) -> Unit) {
     val user: FirebaseUser? = firebaseAuth.currentUser
     if (user != null) {
