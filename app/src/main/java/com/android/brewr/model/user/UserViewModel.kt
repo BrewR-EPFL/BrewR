@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,7 +76,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
             // Provide the repository instance here
-            return UserViewModel(UserRepositoryFirestore(Firebase.firestore)) as T
+            return UserViewModel(
+                UserRepositoryFirestore(Firebase.firestore, FirebaseAuth.getInstance()))
+                as T
           }
         }
   }
