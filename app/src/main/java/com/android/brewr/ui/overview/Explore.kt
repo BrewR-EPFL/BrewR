@@ -26,14 +26,22 @@ fun ExploreScreen() {
   var showBottomSheet by remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Text(text = "Map", fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("mapText"))
+    Text(
+        text = "Map",
+        fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.testTag("mapText"))
 
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f),
             contentAlignment = Alignment.Center) {
-              Text(text = "Menu", fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("menuText"))
+              Text(
+                  text = "Menu",
+                  fontSize = 24.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.testTag("menuText"))
             }
       }
     }
