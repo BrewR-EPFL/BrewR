@@ -1,7 +1,11 @@
 package com.android.brewr.ui.overview
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -13,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import com.android.brewr.model.journey.Location
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
@@ -29,16 +34,47 @@ fun MapScreen(
 ) {
     val context = LocalContext.current
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var permissionGranted by remember { mutableStateOf(false) }
 
-    // Fetch the user's current location
+    // Permission launcher to request location access if not granted
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            permissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        }
+    )
+
+    // Check and request permissions
     LaunchedEffect(Unit) {
-        userLocation = getCurrentLocation(context) ?: LatLng(37.7749, -122.4194) // Default fallback
+        permissionGranted = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!permissionGranted) {
+            locationPermissionLauncher.launch(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        }
+    }
+
+    // Fetch the user's location if permission is granted
+    LaunchedEffect(permissionGranted) {
+        if (permissionGranted) {
+            userLocation = getCurrentLocation(context)
+        }
     }
 
     Scaffold(
         content = { paddingValues ->
+            // Use userLocation if available, otherwise fallback to San Francisco
             val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(userLocation ?: LatLng(37.7749, -122.4194), 10f)
+                position = CameraPosition.fromLatLngZoom(
+                    userLocation ?: LatLng(37.7749, -122.4194), // Default fallback
+                    10f
+                )
             }
 
             GoogleMap(
@@ -50,8 +86,17 @@ fun MapScreen(
                         state = MarkerState(
                             position = LatLng(location.latitude, location.longitude)
                         ),
-                        title = "Location Marker", // Replace with any appropriate title if available
+                        title = "Location Marker",
                         snippet = "Lat: ${location.latitude}, Lng: ${location.longitude}"
+                    )
+                }
+
+                // Add a marker for the user's location if available
+                userLocation?.let {
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "You are here",
+                        snippet = "Current location"
                     )
                 }
             }
