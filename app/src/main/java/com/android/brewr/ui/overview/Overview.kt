@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.Purple80
@@ -73,8 +74,17 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen()
-        }
+          ExploreScreen(
+              listOf(
+                  Location(
+                      latitude = 46.52279951385202,
+                      longitude = 6.628521155691434,
+                      name = "Lausanne 1"),
+                  Location(
+                      latitude = 46.52114969635275,
+                      longitude = 6.6276134176907675,
+                      name = "Lausanne 2")))
+        } // This part should be changed, once the explore.kt is fully implemented
       })
 }
 
