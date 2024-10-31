@@ -151,8 +151,18 @@ fun SignInScreen(navigationActions: NavigationActions) {
   }
 }
 
-// Helper function to initiate Google Sign-In
-fun doGoogleSignIn(
+/**
+ * Helper function to initiate Google Sign-In.
+ *
+ * @param credentialManager The CredentialManager instance to handle credentials.
+ * @param auth The FirebaseAuth instance for authentication.
+ * @param context The context in which the function is called.
+ * @param coroutineScope The CoroutineScope for launching coroutines.
+ * @param navigationActions The NavigationActions instance for navigation.
+ * @param addAccountLauncher The ActivityResultLauncher for adding a Google account.
+ * @param userState The MutableState to hold the current FirebaseUser.
+ */
+private fun doGoogleSignIn(
     credentialManager: CredentialManager,
     auth: FirebaseAuth,
     context: Context,
@@ -187,9 +197,13 @@ fun doGoogleSignIn(
   }
 }
 
-// Helper function to build Google ID Option
-fun getGoogleIdOption(context: Context): GetGoogleIdOption {
-  // Generate a nonce to improve security
+/**
+ * Generates a `GetGoogleIdOption` with a nonce to improve security.
+ *
+ * @param context The context in which the function is called.
+ * @return A configured `GetGoogleIdOption` instance.
+ */
+private fun getGoogleIdOption(context: Context): GetGoogleIdOption {
   val rawNonce = UUID.randomUUID().toString()
   val bytes = rawNonce.toByteArray()
   val md = MessageDigest.getInstance("SHA-256")
@@ -204,8 +218,16 @@ fun getGoogleIdOption(context: Context): GetGoogleIdOption {
       .build()
 }
 
-// Helper function to handle sign-in result
-suspend fun handleSignInResult(
+/**
+ * Handles the result of the sign-in process.
+ *
+ * @param result The response containing the credential.
+ * @param auth The FirebaseAuth instance for authentication.
+ * @param context The context in which the function is called.
+ * @param navigationActions The NavigationActions instance for navigation.
+ * @param userState The MutableState to hold the current FirebaseUser.
+ */
+private suspend fun handleSignInResult(
     result: GetCredentialResponse,
     auth: FirebaseAuth,
     context: Context,
@@ -247,8 +269,12 @@ suspend fun handleSignInResult(
   }
 }
 
-// Helper function to get intent for adding a Google account
-fun getAddGoogleAccountIntent(): Intent {
+/**
+ * Creates an Intent to add a Google account.
+ *
+ * @return An Intent to launch the add account activity.
+ */
+private fun getAddGoogleAccountIntent(): Intent {
   val intent = Intent(Settings.ACTION_ADD_ACCOUNT)
   intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
   return intent
