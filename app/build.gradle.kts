@@ -177,6 +177,9 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    // MockK
+    testImplementation(libs.mockk)
 }
 
 tasks.withType<Test> {

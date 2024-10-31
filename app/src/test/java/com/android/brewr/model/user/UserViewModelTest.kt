@@ -16,13 +16,15 @@ class UserViewModelTest {
   @Before
   fun setup() {
     userRepository = mock(UserRepository::class.java)
+    // `when`(userRepository.getUserGmail(any(), any())).thenReturn("test@gmail.com")
     userViewModel = UserViewModel(userRepository)
   }
 
   @Test
-  fun updateUserInfoCallsRepository() {
+  fun `updateUserInfo() calls the repository`() {
 
     userViewModel.updateUserInfo()
+
     // one call for init, one call for updateUserInfo() call
     verify(userRepository, times(2)).getUserGmail(any(), any())
     verify(userRepository, times(2)).getProfilePicture(any(), any())
@@ -30,7 +32,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun setUserNameCallsRepository() {
+  fun `setUsername() calls the repository`() {
 
     val onSuccess: () -> Unit = mock()
     val onFailure: (Exception) -> Unit = mock()
@@ -38,5 +40,16 @@ class UserViewModelTest {
 
     userViewModel.setUsername(username, onSuccess, onFailure)
     verify(userRepository).setUsername(eq(username), any(), any())
+  }
+
+  @Test
+  fun `setUserName() refreshes the username`() {
+
+    val onSuccess: () -> Unit = mock()
+    val onFailure: (Exception) -> Unit = mock()
+    val username = "newUsername"
+
+    userViewModel.setUsername(username, onSuccess, onFailure)
+    verify(userRepository).getUsername(any(), any())
   }
 }
