@@ -119,9 +119,10 @@ dependencies {
     // Firebase authentication
     implementation(libs.google.firebase.auth.ktx)
 
-    // Play Services Auth (for Google Sign-In)
-    implementation(libs.play.services.auth.v2050)
-
+    // Credential Manager dependencies
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.identity.googleid)
     implementation(libs.coil.compose)
 
 
