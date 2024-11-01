@@ -33,7 +33,7 @@ class MapScreenTest {
             Location(latitude = 46.5211, longitude = 6.6276, name = "Lausanne 2"))
 
     // Set content to ExploreScreen
-    composeTestRule.setContent { ExploreScreen(listLocations = sampleLocations) }
+    composeTestRule.setContent { MapScreen(listLocations = sampleLocations) }
 
     // Handle location permission if prompted
     runBlocking { grantLocationPermission() }
