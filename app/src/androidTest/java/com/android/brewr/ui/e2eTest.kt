@@ -109,6 +109,7 @@ class E2ETest {
 
     // Step1 : Click on a Journey to see the detail
     composeTestRule.onNodeWithTag("journeyListItem").performClick()
+    composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("backButton").performClick()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
 
