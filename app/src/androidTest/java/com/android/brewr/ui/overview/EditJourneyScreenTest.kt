@@ -30,7 +30,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
@@ -172,30 +171,17 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("OutlinedStar4").assertIsDisplayed()
     composeTestRule.onNodeWithTag("OutlinedStar5").assertIsDisplayed()
 
-    // Enter a date into the date field
-    composeTestRule.onNodeWithTag("inputDate").assertIsDisplayed().performTextInput("15/10/2024")
+    // Open the DatePickerDialog
+    composeTestRule.onNodeWithTag("dateButton").assertIsDisplayed().performClick()
+
+    // Verify the DatePickerDialog is shown
+    composeTestRule.onNodeWithTag("datePickerDialog").assertIsDisplayed()
+
+    // Confirm the selection
+    composeTestRule.onNodeWithText("Cancel").performClick()
 
     // Simulate clicking the Save button
     composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
-  }
-
-  @Test
-  fun doesNotSubmitWithInvalidDate() {
-    listJourneysViewModel.selectJourney(journey1)
-    composeTestRule.setContent {
-      EditJourneyScreen(
-          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
-    }
-
-    // Clear any existing input in the date field and enter an invalid date
-    composeTestRule.onNodeWithTag("inputDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputDate").performTextInput("notadate")
-
-    // Click the save button
-    composeTestRule.onNodeWithTag("journeySave").performClick()
-
-    // Verify that the function to add the journey was NOT called due to invalid date
-    verify(repositoryMock, never()).updateJourney(any(), any(), any())
   }
 
   @Test
