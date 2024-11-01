@@ -74,16 +74,6 @@ fun OverviewScreen(
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
           ExploreScreen()
-          //          MapScreen(
-          //              listOf(
-          //                  Location(
-          //                      latitude = 46.52279951385202,
-          //                      longitude = 6.628521155691434,
-          //                      name = "Lausanne 1"),
-          //                  Location(
-          //                      latitude = 46.52114969635275,
-          //                      longitude = 6.6276134176907675,
-          //                      name = "Lausanne 2")))
         }
       })
 }
