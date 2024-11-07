@@ -61,16 +61,14 @@ fun SignInScreen(navigationActions: NavigationActions) {
   val addAccountLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.StartActivityForResult()) {
-            // Retry sign-in after adding account
             doGoogleSignIn(
                 credentialManager = credentialManager,
                 auth = auth,
                 context = context,
                 coroutineScope = coroutineScope,
                 navigationActions = navigationActions,
-                addAccountLauncher = null, // Avoid infinite loop
-                userState = mutableStateOf(user) // Pass 'user' state
-                )
+                addAccountLauncher = null,
+                userState = mutableStateOf(user))
           }
 
   Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
@@ -80,12 +78,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 .padding(padding)
                 .background(
                     brush =
-                        Brush.verticalGradient(
-                            colors =
-                                listOf(
-                                    Color.White, // White color
-                                    Color(0xFFA17F59) // Light Brown color
-                                    ))),
+                        Brush.verticalGradient(colors = listOf(Color.White, Color(0xFFA17F59)))),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -121,8 +114,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                   coroutineScope = coroutineScope,
                   navigationActions = navigationActions,
                   addAccountLauncher = addAccountLauncher,
-                  userState = mutableStateOf(user) // Pass 'user' state
-                  )
+                  userState = mutableStateOf(user))
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(50),
@@ -151,25 +143,15 @@ fun SignInScreen(navigationActions: NavigationActions) {
   }
 }
 
-/**
- * Helper function to initiate Google Sign-In.
- *
- * @param credentialManager The CredentialManager instance to handle credentials.
- * @param auth The FirebaseAuth instance for authentication.
- * @param context The context in which the function is called.
- * @param coroutineScope The CoroutineScope for launching coroutines.
- * @param navigationActions The NavigationActions instance for navigation.
- * @param addAccountLauncher The ActivityResultLauncher for adding a Google account.
- * @param userState The MutableState to hold the current FirebaseUser.
- */
-private fun doGoogleSignIn(
+// Helper function to initiate Google Sign-In
+fun doGoogleSignIn(
     credentialManager: CredentialManager,
     auth: FirebaseAuth,
     context: Context,
     coroutineScope: CoroutineScope,
     navigationActions: NavigationActions,
     addAccountLauncher: ActivityResultLauncher<Intent>?,
-    userState: MutableState<FirebaseUser?> // Pass the 'user' state variable
+    userState: MutableState<FirebaseUser?>
 ) {
   val googleSignInRequest =
       GetCredentialRequest.Builder().addCredentialOption(getGoogleIdOption(context)).build()
@@ -182,10 +164,8 @@ private fun doGoogleSignIn(
           auth = auth,
           context = context,
           navigationActions = navigationActions,
-          userState = userState // Pass 'user' state
-          )
+          userState = userState)
     } catch (e: NoCredentialException) {
-      // No Google accounts available, prompt to add one
       addAccountLauncher?.launch(getAddGoogleAccountIntent())
     } catch (e: GetCredentialException) {
       e.printStackTrace()
@@ -197,17 +177,10 @@ private fun doGoogleSignIn(
   }
 }
 
-/**
- * Generates a `GetGoogleIdOption` with a nonce to improve security.
- *
- * @param context The context in which the function is called.
- * @return A configured `GetGoogleIdOption` instance.
- */
-private fun getGoogleIdOption(context: Context): GetGoogleIdOption {
+// Helper function to build Google ID Option
+fun getGoogleIdOption(context: Context): GetGoogleIdOption {
   val rawNonce = UUID.randomUUID().toString()
-  val bytes = rawNonce.toByteArray()
-  val md = MessageDigest.getInstance("SHA-256")
-  val digest = md.digest(bytes)
+  val digest = MessageDigest.getInstance("SHA-256").digest(rawNonce.toByteArray())
   val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
 
   return GetGoogleIdOption.Builder()
@@ -218,21 +191,13 @@ private fun getGoogleIdOption(context: Context): GetGoogleIdOption {
       .build()
 }
 
-/**
- * Handles the result of the sign-in process.
- *
- * @param result The response containing the credential.
- * @param auth The FirebaseAuth instance for authentication.
- * @param context The context in which the function is called.
- * @param navigationActions The NavigationActions instance for navigation.
- * @param userState The MutableState to hold the current FirebaseUser.
- */
-private suspend fun handleSignInResult(
+// Helper function to handle sign-in result
+suspend fun handleSignInResult(
     result: GetCredentialResponse,
     auth: FirebaseAuth,
     context: Context,
     navigationActions: NavigationActions,
-    userState: MutableState<FirebaseUser?> // Receive 'user' state variable
+    userState: MutableState<FirebaseUser?>
 ) {
   when (val credential = result.credential) {
     is CustomCredential -> {
@@ -244,7 +209,6 @@ private suspend fun handleSignInResult(
           val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
           auth.signInWithCredential(firebaseCredential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-              // Update the 'user' state variable
               userState.value = auth.currentUser
               Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
               navigationActions.navigateTo(Screen.OVERVIEW)
@@ -269,12 +233,8 @@ private suspend fun handleSignInResult(
   }
 }
 
-/**
- * Creates an Intent to add a Google account.
- *
- * @return An Intent to launch the add account activity.
- */
-private fun getAddGoogleAccountIntent(): Intent {
+// Helper function to get intent for adding a Google account
+fun getAddGoogleAccountIntent(): Intent {
   val intent = Intent(Settings.ACTION_ADD_ACCOUNT)
   intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
   return intent
