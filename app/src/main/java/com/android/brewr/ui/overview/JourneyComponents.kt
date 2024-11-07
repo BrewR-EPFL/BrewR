@@ -44,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,11 +59,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
+import com.android.brewr.model.map.Location
+import com.android.brewr.model.map.LocationViewModel
 import com.android.brewr.ui.theme.Purple80
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -97,14 +101,21 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
       modifier = Modifier.fillMaxWidth().height(150.dp).testTag("inputJourneyDescription"))
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
     onCheckChange: () -> Unit,
-    expanded: Boolean,
-    coffeeShopName: String,
-    onCoffeeShopNameChange: (String) -> Unit
+    coffeeshopExpanded: Boolean,
+    selectedLocation: Location,
+    onSelectedLocationChange: (Location) -> Unit
 ) {
+  var showDropdown by remember { mutableStateOf(false) }
+  val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+  val locationQuery by locationViewModel.query.collectAsState()
+
   Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.testTag("coffeeShopCheckRow").clickable { onCheckChange() }) {
@@ -116,13 +127,57 @@ fun CoffeeShopCheckRow(
         Text(text = "At a coffee shop", color = Color.Black)
       }
 
-  if (expanded) {
-    OutlinedTextField(
-        value = coffeeShopName,
-        onValueChange = onCoffeeShopNameChange,
-        label = { Text("Coffee Shop Name") },
-        placeholder = { Text("Enter the name") },
-        modifier = Modifier.fillMaxWidth().testTag("coffeeShopNameField"))
+  if (coffeeshopExpanded) {
+    ExposedDropdownMenuBox(
+        expanded = showDropdown && locationSuggestions.isNotEmpty(),
+        onExpandedChange = { showDropdown = it } // Toggle dropdown visibility
+        ) {
+          OutlinedTextField(
+              value = locationQuery,
+              onValueChange = {
+                locationViewModel.setQuery(it)
+                showDropdown = true // Show dropdown when user starts typing
+              },
+              label = { Text("Coffeeshop") },
+              placeholder = { Text("Enter the Coffeeshop") },
+              modifier =
+                  Modifier.menuAnchor() // Anchor the dropdown to this text field
+                      .fillMaxWidth()
+                      .testTag("inputCoffeeshopLocation"),
+              singleLine = true)
+
+          // Dropdown menu for location suggestions
+          ExposedDropdownMenu(
+              expanded = showDropdown && locationSuggestions.isNotEmpty(),
+              onDismissRequest = { showDropdown = false }) {
+                locationSuggestions.filterNotNull().take(3).forEach { location ->
+                  DropdownMenuItem(
+                      text = {
+                        Text(
+                            text =
+                                location.name.take(30) +
+                                    if (location.name.length > 30) "..."
+                                    else "", // Limit name length
+                            maxLines = 1 // Ensure name doesn't overflow
+                            )
+                      },
+                      onClick = {
+                        locationViewModel.setQuery(location.name)
+                        onSelectedLocationChange(location)
+                        // selectedLocation = location
+                        showDropdown = false // Close dropdown on selection
+                      },
+                      modifier = Modifier.padding(8.dp))
+                }
+
+                if (locationSuggestions.size > 3) {
+                  DropdownMenuItem(
+                      text = { Text("More...") },
+                      onClick = { /* Optionally show more results */},
+                      modifier = Modifier.padding(8.dp))
+                }
+              }
+        }
   }
 }
 

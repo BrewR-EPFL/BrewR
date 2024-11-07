@@ -127,12 +127,45 @@ fun JourneyRecordScreen(
             modifier =
                 Modifier.fillMaxWidth()
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .padding(20.dp)
                     .verticalScroll(rememberScrollState()), // Add padding to the whole Column
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
+            // Coffee Shop Name
+            val nameAndAddress = if (journey!!.location.name == "At home") {
+                listOf("At Home", "")
+            } else {
+                journey.location.name.split(",", limit = 2)
+            }
+
+            val coffeeShopName = nameAndAddress[0]
+            val coffeeShopAddress = if (nameAndAddress.size > 1) nameAndAddress[1].trim() else ""
+
+            if (coffeeShopName.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(2.dp) // Space between title and address
+                ) {
+
+                    Text(
+                        text = coffeeShopName,
+                        fontSize = 16.sp, // Adjust the font size for the name
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth().testTag(tag = "coffeeShopName")
+                    )
+                    if (coffeeShopAddress.isNotEmpty()) {
+                        Text(
+                            text = coffeeShopAddress,
+                            fontSize = 14.sp, // Adjust the font size for the address
+                            modifier = Modifier.fillMaxWidth().testTag(tag = "coffeeShopAddress")
+                        )
+                    }
+                }
+            }
+
+            /**
               // Coffee Shop Name
-              if (journey!!.coffeeShopName.isNotEmpty()) {
+              if (journey!!.location.name.isNotEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement =
@@ -144,11 +177,14 @@ fun JourneyRecordScreen(
                           fontWeight = FontWeight.Bold, // Make the title bold
                       )
                       Text(
-                          text = journey.coffeeShopName,
+                          text = journey.location.name,
                           fontSize = 14.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold,
                           modifier = Modifier.fillMaxWidth().testTag("coffeeShopName"))
                     }
               }
+
+              */
 
               // Image placeholder or uploaded image
               Box(modifier = Modifier.fillMaxWidth().height(200.dp).border(1.dp, Color.Gray)) {
@@ -162,6 +198,7 @@ fun JourneyRecordScreen(
                     contentDescription = "Uploaded Image",
                     modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.Center))
               }
+
 
               // Description
               if (journey.description.isNotEmpty()) {
