@@ -61,16 +61,14 @@ fun SignInScreen(navigationActions: NavigationActions) {
   val addAccountLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.StartActivityForResult()) {
-            // Retry sign-in after adding account
             doGoogleSignIn(
                 credentialManager = credentialManager,
                 auth = auth,
                 context = context,
                 coroutineScope = coroutineScope,
                 navigationActions = navigationActions,
-                addAccountLauncher = null, // Avoid infinite loop
-                userState = mutableStateOf(user) // Pass 'user' state
-                )
+                addAccountLauncher = null,
+                userState = mutableStateOf(user))
           }
 
   Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
@@ -80,12 +78,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 .padding(padding)
                 .background(
                     brush =
-                        Brush.verticalGradient(
-                            colors =
-                                listOf(
-                                    Color.White, // White color
-                                    Color(0xFFA17F59) // Light Brown color
-                                    ))),
+                        Brush.verticalGradient(colors = listOf(Color.White, Color(0xFFA17F59)))),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -121,8 +114,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                   coroutineScope = coroutineScope,
                   navigationActions = navigationActions,
                   addAccountLauncher = addAccountLauncher,
-                  userState = mutableStateOf(user) // Pass 'user' state
-                  )
+                  userState = mutableStateOf(user))
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(50),
@@ -159,7 +151,7 @@ fun doGoogleSignIn(
     coroutineScope: CoroutineScope,
     navigationActions: NavigationActions,
     addAccountLauncher: ActivityResultLauncher<Intent>?,
-    userState: MutableState<FirebaseUser?> // Pass the 'user' state variable
+    userState: MutableState<FirebaseUser?>
 ) {
   val googleSignInRequest =
       GetCredentialRequest.Builder().addCredentialOption(getGoogleIdOption(context)).build()
@@ -172,10 +164,8 @@ fun doGoogleSignIn(
           auth = auth,
           context = context,
           navigationActions = navigationActions,
-          userState = userState // Pass 'user' state
-          )
+          userState = userState)
     } catch (e: NoCredentialException) {
-      // No Google accounts available, prompt to add one
       addAccountLauncher?.launch(getAddGoogleAccountIntent())
     } catch (e: GetCredentialException) {
       e.printStackTrace()
@@ -189,11 +179,8 @@ fun doGoogleSignIn(
 
 // Helper function to build Google ID Option
 fun getGoogleIdOption(context: Context): GetGoogleIdOption {
-  // Generate a nonce to improve security
   val rawNonce = UUID.randomUUID().toString()
-  val bytes = rawNonce.toByteArray()
-  val md = MessageDigest.getInstance("SHA-256")
-  val digest = md.digest(bytes)
+  val digest = MessageDigest.getInstance("SHA-256").digest(rawNonce.toByteArray())
   val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
 
   return GetGoogleIdOption.Builder()
@@ -210,7 +197,7 @@ suspend fun handleSignInResult(
     auth: FirebaseAuth,
     context: Context,
     navigationActions: NavigationActions,
-    userState: MutableState<FirebaseUser?> // Receive 'user' state variable
+    userState: MutableState<FirebaseUser?>
 ) {
   when (val credential = result.credential) {
     is CustomCredential -> {
@@ -222,7 +209,6 @@ suspend fun handleSignInResult(
           val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
           auth.signInWithCredential(firebaseCredential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-              // Update the 'user' state variable
               userState.value = auth.currentUser
               Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
               navigationActions.navigateTo(Screen.OVERVIEW)
