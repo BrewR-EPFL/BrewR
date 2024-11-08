@@ -25,11 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.brewr.model.location.Hours
+import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.location.Location
 
 @Composable
-fun CoffeeInformationScreen(location: Location) {
+fun CoffeeInformationScreen(coffee: Coffee) {
 
   Scaffold(
       modifier = Modifier.testTag("coffeeInformationScreen"),
@@ -48,7 +49,7 @@ fun CoffeeInformationScreen(location: Location) {
                     painter =
                         rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .data(location.imageUrl) // Load the image from the URL
+                                .data(coffee.imageUrl) // Load the image from the URL
                                 .apply { crossfade(true) }
                                 .build()),
                     contentDescription = "Uploaded Image",
@@ -58,26 +59,28 @@ fun CoffeeInformationScreen(location: Location) {
               Column(
                   modifier = Modifier.fillMaxWidth(),
                   verticalArrangement =
-                      Arrangement.spacedBy(8.dp) // Space between title and buttons
+                      Arrangement.spacedBy(8.dp)
                   ) {
                     Text(
-                        text = location.name,
-                        fontSize = 16.sp, // Adjust the font size for the title
-                        fontWeight = FontWeight.Bold, // Make the title bold
+                        text = coffee.location.name,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "Opening hours: ${location.hours.open} - ${location.hours.close}",
+                        text = "Opening hours: ${coffee.hours.open} - ${coffee.hours.close}",
                         fontSize = 14.sp,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "About",
-                        fontSize = 14.sp,
-                    )
-                    Text(
-                        text = location.about,
-                        fontSize = 14.sp,
-                    )
+                  Column {
+                      Text(
+                          text = "About",
+                          fontSize = 14.sp,
+                          fontWeight = FontWeight.Bold,
+                      )
+                      Text(
+                          text = coffee.about,
+                          fontSize = 14.sp,
+                      )
+                  }
                   }
             }
       })
@@ -86,14 +89,15 @@ fun CoffeeInformationScreen(location: Location) {
 @Preview(showBackground = true)
 @Composable
 fun CoffeeInformationScreenPreview() {
-  val location =
-      Location(
-          name = "Sample Coffee Shop",
+  val coffee =
+      Coffee(
+          Location(
+              latitude = 48.87847905807652,
+              longitude = 2.3562626423266946,
+              name = "Caƒé tranquille"),
           imageUrl =
-              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fc00ae460-cf75-474a-8e05-bbcaf1d01709?alt=media&token=37e85904-64b9-4610-83db-bcd2e5b8c332",
-          hours = Hours(open = "8:00 AM", close = "5:00 PM"),
-          latitude = 46.5152778,
-          longitude = 6.6286111,
-          about = "A sample coffee shop for preview")
-  CoffeeInformationScreen(location)
+              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35",
+          hours = com.android.brewr.model.coffee.Hours(open = "8:00 AM", close = "5:00 PM"),
+          about = "Best coffee in the 10th arrondissement of Paris")
+  CoffeeInformationScreen(coffee)
 }

@@ -69,10 +69,8 @@ class OverviewScreenTest {
     composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
 
     composeTestRule.onNodeWithTag("Explore").performClick()
-    composeTestRule.onNodeWithTag("mapText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("menuButton").performClick()
-    composeTestRule.onNodeWithTag("menuText").assertIsDisplayed()
   }
 
   @Test

@@ -12,51 +12,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.location.Location
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen() {
+fun ExploreScreen(pd: PaddingValues) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
+  val coffee =
+      Coffee(
+          Location(
+              latitude = 48.87847905807652,
+              longitude = 2.3562626423266946,
+              name = "Caƒé tranquille"),
+          imageUrl =
+              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35",
+          hours = com.android.brewr.model.coffee.Hours(open = "8:00 AM", close = "5:00 PM"),
+          about = "Best coffee in the 10th arrondissement of Paris")
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Text(
-        text = "Map",
-        fontSize = 32.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.testTag("mapText"))
+    MapScreen(listOf(coffee.location))
 
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f),
             contentAlignment = Alignment.Center) {
-              val location =
-                  Location(
-                      name = "Caƒé tranquille",
-                      imageUrl =
-                          "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35",
-                      hours =
-                          com.android.brewr.model.location.Hours(
-                              open = "8:00 AM", close = "5:00 PM"),
-                      latitude = 48.87847905807652,
-                      longitude = 2.3562626423266946,
-                      about = "A sample coffee shop for preview")
-              CoffeeInformationScreen(location)
+              CoffeeInformationScreen(coffee)
             }
       }
     }
 
     IconButton(
         onClick = { showBottomSheet = true },
-        modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).testTag("menuButton")) {
+        modifier = Modifier.align(Alignment.BottomStart).padding(20.dp).testTag("menuButton")) {
           Box(
               modifier =
                   Modifier.size(56.dp)
@@ -78,5 +72,5 @@ fun ExploreScreen() {
 @Preview(showBackground = true)
 @Composable
 fun ExploreScreenPreview() {
-  ExploreScreen()
+  ExploreScreen(PaddingValues(0.dp))
 }
