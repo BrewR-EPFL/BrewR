@@ -1,3 +1,3 @@
-package com.android.brewr.model.journey
+package com.android.brewr.model.location
 
 data class Location(val latitude: Double, val longitude: Double, val name: String)
