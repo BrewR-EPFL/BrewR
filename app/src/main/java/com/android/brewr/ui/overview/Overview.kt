@@ -73,7 +73,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(pd)
+          ExploreScreen()
         }
       })
 }

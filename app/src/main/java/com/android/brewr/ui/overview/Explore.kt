@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(pd: PaddingValues) {
+fun ExploreScreen() {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -72,5 +72,5 @@ fun ExploreScreen(pd: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun ExploreScreenPreview() {
-  ExploreScreen(PaddingValues(0.dp))
+  ExploreScreen()
 }
