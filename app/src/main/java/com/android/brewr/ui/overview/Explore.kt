@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.brewr.model.location.Location
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,11 +38,18 @@ fun ExploreScreen() {
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f),
             contentAlignment = Alignment.Center) {
-              Text(
-                  text = "Menu",
-                  fontSize = 24.sp,
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.testTag("menuText"))
+              val location =
+                  Location(
+                      name = "Caƒé tranquille",
+                      imageUrl =
+                          "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35",
+                      hours =
+                          com.android.brewr.model.location.Hours(
+                              open = "8:00 AM", close = "5:00 PM"),
+                      latitude = 48.87847905807652,
+                      longitude = 2.3562626423266946,
+                      about = "A sample coffee shop for preview")
+              CoffeeInformationScreen(location)
             }
       }
     }
