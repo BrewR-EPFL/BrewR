@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.android.brewr.model.journey.Location
+import com.android.brewr.model.location.Location
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
