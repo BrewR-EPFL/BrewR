@@ -94,7 +94,7 @@ fun CoffeeInformationScreenPreview() {
               name = "Caƒé tranquille"),
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35",
-          hours = com.android.brewr.model.coffee.Hours(open = "8:00 AM", close = "5:00 PM"),
+          hours = Hours(open = "8:00 AM", close = "5:00 PM"),
           about = "Best coffee in the 10th arrondissement of Paris")
   CoffeeInformationScreen(coffee)
 }
