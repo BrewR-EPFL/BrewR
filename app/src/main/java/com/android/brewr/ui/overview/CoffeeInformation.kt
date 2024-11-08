@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -58,9 +57,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
 
               Column(
                   modifier = Modifier.fillMaxWidth(),
-                  verticalArrangement =
-                      Arrangement.spacedBy(8.dp)
-                  ) {
+                  verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = coffee.location.name,
                         fontSize = 16.sp,
@@ -70,7 +67,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                         text = "Opening hours: ${coffee.hours.open} - ${coffee.hours.close}",
                         fontSize = 14.sp,
                     )
-                  Column {
+                    Column {
                       Text(
                           text = "About",
                           fontSize = 14.sp,
@@ -80,7 +77,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                           text = coffee.about,
                           fontSize = 14.sp,
                       )
-                  }
+                    }
                   }
             }
       })
