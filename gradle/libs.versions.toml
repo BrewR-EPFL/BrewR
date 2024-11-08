@@ -21,7 +21,6 @@ kaspresso = "1.5.5"
 mockitoAndroid = "5.13.0"
 mockitoCore = "5.13.0"
 mockitoKotlin = "5.4.0"
-mockkAndroid = "1.13.7"
 mockkVersion = "1.13.2"
 playServicesAuthVersion = "21.2.0"
 playServicesMaps = "19.0.0"
@@ -71,7 +70,6 @@ mockito-android = { module = "org.mockito:mockito-android", version.ref = "mocki
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 play-services-auth-v2050 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }

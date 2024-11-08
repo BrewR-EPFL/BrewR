@@ -187,7 +187,6 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     // For unit testing
     testImplementation(libs.mockk.mockk)
-    androidTestImplementation(libs.mockk.android)
 
 
     // --------- Kaspresso test framework ----------
