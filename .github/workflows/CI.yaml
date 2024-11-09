@@ -52,6 +52,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Run tests
+        run: |
+          # To run the CI with debug information, add --info
+          ./gradlew check --parallel --build-cache
+
       - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
