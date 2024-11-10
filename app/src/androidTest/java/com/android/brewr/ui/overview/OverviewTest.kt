@@ -72,8 +72,10 @@ class OverviewScreenTest {
   @Test
   fun exploreScreen_displayCorrectly() {
     composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+
     composeTestRule.onNodeWithTag("Explore").performClick()
-    composeTestRule.onNodeWithTag("exploreContent").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("menuButton").performClick()
   }
 
   @Test
