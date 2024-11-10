@@ -122,9 +122,13 @@ fun CoffeeShopCheckRow(
         Icon(
             imageVector = if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Close,
             contentDescription = if (isYesSelected) "Checked" else "Unchecked",
-            tint = Color.Black)
+            tint = Color.Black,
+            modifier = Modifier.testTag("coffeeShopCheckboxIcon"))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "At a coffee shop", color = Color.Black)
+        Text(
+            text = "At a coffee shop",
+            color = Color.Black,
+            modifier = Modifier.testTag("coffeeShopCheckText"))
       }
 
   if (coffeeshopExpanded) {
@@ -149,7 +153,8 @@ fun CoffeeShopCheckRow(
           // Dropdown menu for location suggestions
           ExposedDropdownMenu(
               expanded = showDropdown && locationSuggestions.isNotEmpty(),
-              onDismissRequest = { showDropdown = false }) {
+              onDismissRequest = { showDropdown = false },
+              modifier = Modifier.testTag("locationSuggestionsDropdown")) {
                 locationSuggestions.filterNotNull().take(3).forEach { location ->
                   DropdownMenuItem(
                       text = {
@@ -164,7 +169,6 @@ fun CoffeeShopCheckRow(
                       onClick = {
                         locationViewModel.setQuery(location.name)
                         onSelectedLocationChange(location)
-                        // selectedLocation = location
                         showDropdown = false // Close dropdown on selection
                       },
                       modifier = Modifier.padding(8.dp))

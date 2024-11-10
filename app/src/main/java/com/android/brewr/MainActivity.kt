@@ -60,7 +60,7 @@ fun BrewRApp() {
   val listJourneysViewModel: ListJourneysViewModel =
       viewModel(factory = ListJourneysViewModel.Factory)
 
-  NavHost(navController, Route.AUTH) {
+  NavHost(navController, Route.OVERVIEW) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,

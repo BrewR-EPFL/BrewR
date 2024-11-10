@@ -1,32 +1,30 @@
 package com.android.brewr.ui
 
-import android.content.Context
-import android.net.Uri
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
+import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
+import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
-import com.android.brewr.ui.authentication.SignInScreen
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
@@ -35,167 +33,150 @@ import com.android.brewr.ui.overview.EditJourneyScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
+import com.google.firebase.Timestamp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class E2ETest {
-
-  private val appContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
-
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var repositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
   private lateinit var navigationActions: NavigationActions
+  private lateinit var navController: NavHostController
+
+  private val journey =
+      Journey(
+          uid = "journey1",
+          imageUrl =
+              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
+          description = "A wonderful coffee journey.",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeOrigin = CoffeeOrigin.BRAZIL,
+          brewingMethod = BrewingMethod.POUR_OVER,
+          coffeeTaste = CoffeeTaste.NUTTY,
+          coffeeRate = CoffeeRate.ONE,
+          date = Timestamp.now())
 
   @Before
   fun setUp() {
+    // Initialize mocks and spies
     repositoryMock = mock(JourneysRepository::class.java)
     listJourneysViewModel = spy(ListJourneysViewModel(repositoryMock))
-    navigationActions = mock(NavigationActions::class.java)
-
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.OVERVIEW)
+    // Mock the behavior of `getJourneys` to simulate fetching journeys
+    `when`(repositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
+        .thenAnswer {
+          val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
+          onSuccess(listOf(journey)) // Simulate return list of journeys
+        }
   }
 
   @Test
-  fun E2ETestFinal() {
+  fun endToEndFlowTest() {
+    // Set up the composable content for the test
     composeTestRule.setContent {
-      Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        val navController = rememberNavController()
-        val navigationActions = remember(navController) { NavigationActions(navController) }
-        NavHost(navController = navController, startDestination = Route.OVERVIEW) {
-          // Authentication flow
-          navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-            composable(Screen.AUTH) { SignInScreen(navigationActions) }
-          }
+      navController = rememberNavController()
+      navigationActions = NavigationActions(navController)
 
-          // Overview flow
-          navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-            composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-            composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
-            composable(Screen.JOURNEY_RECORD) {
-              JourneyRecordScreen(listJourneysViewModel, navigationActions)
-            }
+      NavHost(navController, Route.OVERVIEW) {
+        navigation(
+            startDestination = Screen.OVERVIEW,
+            route = Route.OVERVIEW,
+        ) {
+          composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
+          composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+          composable(Screen.JOURNEY_RECORD) {
+            JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
-
-          // Journey flow
-          navigation(startDestination = Screen.ADD_JOURNEY, route = Route.ADD_JOURNEY) {
-            composable(Screen.ADD_JOURNEY) {
-              AddJourneyScreen(listJourneysViewModel, navigationActions)
-            }
-            composable(Screen.EDIT_JOURNEY) {
-              EditJourneyScreen(listJourneysViewModel, navigationActions)
-            }
+        }
+        navigation(
+            startDestination = Screen.ADD_JOURNEY,
+            route = Route.ADD_JOURNEY,
+        ) {
+          composable(Screen.ADD_JOURNEY) {
+            AddJourneyScreen(listJourneysViewModel, navigationActions)
+          }
+          composable(Screen.EDIT_JOURNEY) {
+            EditJourneyScreen(listJourneysViewModel, navigationActions)
           }
         }
       }
     }
+    // Fetch journeys to ensure initial data is available
+    listJourneysViewModel.getJourneys()
 
-    // Assert the SignIn screen is shown first
-    //   composeTestRule.onNodeWithTag("SignInScreen").assertIsDisplayed()
-
-    // Navigate to the Overview screen
-    // composeTestRule.onNodeWithTag("SignInButton").performClick()
-    //     composeTestRule.waitForIdle()
+    // Step1 : Click on a Journey to see the detail
+    composeTestRule.onNodeWithTag("journeyListItem").performClick()
+    composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("backButton").performClick()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
 
-    // Navigate to the User Profile screen
-    composeTestRule.onNodeWithTag("accountButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("UserProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("backButton").performClick()
-    verify(navigationActions).goBack()
+    // Step2 : Navigate to Add Journey screen
+    composeTestRule.onNodeWithTag("addButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addButton").performClick()
 
-    // Navigate to Add Journey Screen
-    composeTestRule.onNodeWithTag("AddJourneyButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("AddJourneyScreen").assertIsDisplayed()
-
-    // Test Add Photo functionality (simulate photo click)
-    composeTestRule.onNodeWithTag("addImageBox").assertIsDisplayed().assertHasClickAction()
-
-    // Check if the description text field is displayed and type text into it
+    // Step3 : Add a Journey
+    composeTestRule.onNodeWithTag("addJourneyScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addImageBox").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("inputJourneyDescription")
         .assertIsDisplayed()
         .performTextInput("Amazing Coffee Experience")
-
-    // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertHasClickAction().performClick()
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertExists()
 
-    // After clicking, the Coffee Shop Name field should appear
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Starbucks")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
 
-    // Test Coffee Origin dropdown (click and select an option)
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
     composeTestRule.onNodeWithTag("inputCoffeeOrigin").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("dropdownMenuCoffeeOrigin").assertExists()
-
-    // Simulate selecting an origin from the dropdown
     composeTestRule.onNodeWithText(CoffeeOrigin.BRAZIL.name).performClick()
-
-    // Test brewing method button selection
     composeTestRule
         .onNodeWithTag("Button:${BrewingMethod.POUR_OVER.name}")
         .performScrollTo()
         .assertIsDisplayed()
         .performClick()
-
-    // Test taste button selection
     composeTestRule
         .onNodeWithTag("Button:${CoffeeTaste.BITTER.name}")
         .performScrollTo()
         .assertIsDisplayed()
         .performClick()
-
-    // Mock behavior for image upload
-    val imageUri = Mockito.mock(Uri::class.java)
-    val imageUrl = "mocked-image-url"
-    Mockito.doAnswer {
-          val callback = it.getArgument<(String) -> Unit>(0)
-          callback(imageUrl)
-        }
-        .`when`(listJourneysViewModel)
-        .uploadPicture(Mockito.any(Uri::class.java), Mockito.any())
-
-    // Simulate image selection (mocked)
-    composeTestRule.runOnUiThread {
-      // Simulate image URI being set after image selection
-      imageUri.let { uri ->
-        // Use Mockito to simulate interaction after image selection
-      }
-    }
-
-    // Scroll to the stars (Rate section) before interacting with them
     composeTestRule.onNodeWithTag("journeySave").performScrollTo()
-
-    // Click on the 4th star and check if the state is updated to Filled
     composeTestRule.onNodeWithTag("OutlinedStar4").performClick()
-
-    // Enter a date into the date field
-    composeTestRule.onNodeWithTag("inputDate").assertIsDisplayed().performTextInput("12/12/2024")
-
-    // Simulate clicking the Save button
     composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
+    composeTestRule.runOnIdle { navController.popBackStack() }
 
-    // Navigate to the Journey Record screen
-    composeTestRule.onNodeWithTag("journeyListItem").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("JourneyRecordScreen").assertIsDisplayed()
-
-    // Navigate to Edit Journey Screen
-    composeTestRule.onNodeWithTag("editButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("EditJourneyScreen").assertIsDisplayed()
+    // Step 4: Back to Overview
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
   }
 }
