@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,20 +41,18 @@ fun GalleryScreen(
   val context = LocalContext.current
 
   if (journeys.isNotEmpty()) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize().padding(padding),
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-      items(journeys) { journey ->
-        JourneyItem(journey = journey) {
-          listJourneysViewModel.selectJourney(journey)
-          navigationActions.navigateTo(Screen.JOURNEY_RECORD)
+        modifier = Modifier.fillMaxSize().padding(padding),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          items(journeys) { journey ->
+            JourneyItem(journey = journey) {
+              listJourneysViewModel.selectJourney(journey)
+              navigationActions.navigateTo(Screen.JOURNEY_RECORD)
+            }
+          }
         }
-      }
-    }
   } else {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
       Text(modifier = Modifier.testTag("emptyJourneyPrompt"), text = "You have no Journey yet.")
@@ -71,7 +69,7 @@ fun JourneyItem(journey: Journey, onClick: () -> Unit) {
               .padding(vertical = 4.dp)
               .clickable(onClick = onClick),
   ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Column(modifier = Modifier.fillMaxWidth()) {
       Image(
           painter =
               rememberAsyncImagePainter(
@@ -84,7 +82,8 @@ fun JourneyItem(journey: Journey, onClick: () -> Unit) {
                               })
                       .build()),
           contentDescription = "Selected Image",
-          modifier = Modifier.testTag("journeyImage").size(120.dp))
+          modifier =
+              Modifier.testTag("journeyImage").fillMaxWidth().heightIn(min = 50.dp, max = 300.dp))
     }
   }
 }
