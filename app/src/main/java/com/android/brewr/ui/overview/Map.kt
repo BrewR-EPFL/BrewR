@@ -76,13 +76,13 @@ fun MapScreen(listLocations: List<Location>) {
               listLocations.forEach { location ->
                 Log.d(
                     "MapScreen",
-                    "Adding marker for ${location.name} at (${location.latitude}, ${location.longitude})")
+                    "Adding marker for ${location.address} at (${location.latitude}, ${location.longitude})")
                 Marker(
                     state =
                         remember {
                           MarkerState(position = LatLng(location.latitude, location.longitude))
                         },
-                    title = location.name, // Use name as title for logging purposes
+                    title = location.address, // Use name as title for logging purposes
                     snippet = "Lat: ${location.latitude}, Lng: ${location.longitude}")
               }
 
