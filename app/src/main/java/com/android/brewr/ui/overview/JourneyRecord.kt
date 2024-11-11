@@ -57,6 +57,8 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.Gold
 import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -105,7 +107,7 @@ fun JourneyRecordScreen(
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.EDIT_JOURNEY) },
             shape = RoundedCornerShape(50),
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = CoffeeBrown,
             modifier = Modifier.testTag("editButton")) {
               Row(
                   modifier = Modifier.padding(horizontal = 16.dp),
@@ -268,7 +270,7 @@ fun JourneyRecordScreen(
                                 Icon(
                                     imageVector = Icons.Filled.Star,
                                     contentDescription = "Filled Star $i",
-                                    tint = Color(0xFFFFD700), // Gold color for filled star
+                                    tint = Gold, // Gold color for filled star
                                     modifier = Modifier.size(40.dp).testTag("FilledStar$i"))
                               } else {
                                 Icon(

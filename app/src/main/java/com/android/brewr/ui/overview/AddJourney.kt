@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +40,7 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
@@ -152,6 +154,7 @@ fun AddJourneyScreen(
               DateField(selectedDate) { selectedDate = it }
 
               Button(
+                  colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
                       uploadPicture(imageUri!!) { imageUrl ->
