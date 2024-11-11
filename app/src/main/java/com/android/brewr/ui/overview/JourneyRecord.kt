@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -59,6 +61,7 @@ import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.Gold
+import com.android.brewr.ui.theme.LightBrown
 import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -131,7 +134,7 @@ fun JourneyRecordScreen(
                     .padding(paddingValues)
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()), // Add padding to the whole Column
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
               // Coffee Shop Name
               if (journey!!.coffeeShopName.isNotEmpty()) {
@@ -165,6 +168,106 @@ fun JourneyRecordScreen(
                     modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.Center))
               }
 
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    // Brewing Method
+                    if (journey.brewingMethod != BrewingMethod.DEFAULT) {
+                      Button(
+                          onClick = {},
+                          enabled = false,
+                          shape = RoundedCornerShape(16.dp),
+                          modifier = Modifier.testTag("brewingMethod"),
+                          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  disabledContainerColor = LightBrown,
+                                  disabledContentColor = CoffeeBrown)) {
+                            Text(
+                                journey.brewingMethod.name.replace("_", " "),
+                                modifier = Modifier.padding(4.dp))
+                          }
+                    }
+                    // Taste
+                    if (journey.coffeeTaste != CoffeeTaste.DEFAULT) {
+                      Button(
+                          onClick = {},
+                          enabled = false,
+                          shape = RoundedCornerShape(16.dp),
+                          modifier = Modifier.testTag("coffeeTaste"),
+                          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  disabledContainerColor = LightBrown,
+                                  disabledContentColor = CoffeeBrown)) {
+                            Text(journey.coffeeTaste.name, modifier = Modifier.padding(4.dp))
+                          }
+                    }
+                  }
+              // Coffee Rating
+              if (journey.coffeeRate != CoffeeRate.DEFAULT) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                  // Map CoffeeRate to the number of stars
+                  val starCount =
+                      journey.coffeeRate
+                          .ordinal // ordinal gives you 0-based index, so we don't add 1 due to
+                  // the default parameter
+                  Row(
+                      modifier =
+                          Modifier.fillMaxWidth().testTag("rateRow") // Add a test tag for testing
+                      ) {
+                        for (i in 1..5) {
+                          if (i <= starCount) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = "Filled Star $i",
+                                tint = Gold, // Gold color for filled star
+                                modifier = Modifier.size(40.dp).testTag("FilledStar$i"))
+                          } else {
+                            Icon(
+                                imageVector = Icons.Outlined.Star,
+                                contentDescription = "Outlined Star $i",
+                                tint = Color(0xFF312F2F), // Same gold color for consistency
+                                modifier = Modifier.size(40.dp).testTag("OutlinedStar$i"))
+                          }
+                        }
+                      }
+                }
+              }
+
+              // Coffee Origin
+              if (journey.coffeeOrigin != CoffeeOrigin.DEFAULT) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                      Text(
+                          text = "Coffee Origin:",
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold, // Make the title bold
+                      )
+                      Text(
+                          text = journey.coffeeOrigin.name.replace("_", " "),
+                          fontSize = 16.sp, // Adjust the font size for the title
+                          fontWeight = FontWeight.Bold,
+                          modifier = Modifier.fillMaxWidth().testTag("CoffeeOrigin"))
+                    }
+              }
+
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    // Label Text
+                    Text(text = "Date:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                    // Date Text
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val formattedDate = dateFormat.format(journey.date.toDate())
+                    Text(
+                        text = formattedDate,
+                        fontSize = 16.sp, // Adjust the font size for the title
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth().testTag("date"))
+                  }
               // Description
               if (journey.description.isNotEmpty()) {
                 Column(
@@ -183,127 +286,6 @@ fun JourneyRecordScreen(
                           modifier = Modifier.fillMaxWidth().testTag("journeyDescription"))
                     }
               }
-
-              // Coffee Origin
-              if (journey.coffeeOrigin != CoffeeOrigin.DEFAULT) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement =
-                        Arrangement.spacedBy(2.dp) // Space between title and buttons
-                    ) {
-                      Text(
-                          text = "Coffee Origin",
-                          fontSize = 16.sp, // Adjust the font size for the title
-                          fontWeight = FontWeight.Bold, // Make the title bold
-                      )
-                      Text(
-                          text = journey.coffeeOrigin.name.replace("_", " "),
-                          fontSize = 14.sp, // Adjust the font size for the title
-                          modifier = Modifier.fillMaxWidth().testTag("CoffeeOrigin"))
-                    }
-              }
-
-              // Brewing Method
-              if (journey.brewingMethod != BrewingMethod.DEFAULT) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement =
-                        Arrangement.spacedBy(2.dp) // Space between title and buttons
-                    ) {
-                      Text(
-                          text = "Brewing Method",
-                          fontSize = 16.sp, // Adjust the font size for the title
-                          fontWeight = FontWeight.Bold, // Make the title bold
-                      )
-                      Text(
-                          text = journey.brewingMethod.name.replace("_", " "),
-                          fontSize = 14.sp, // Adjust the font size for the title
-                          modifier = Modifier.fillMaxWidth().testTag("brewingMethod"))
-                    }
-              }
-
-              // Taste
-              if (journey.coffeeTaste != CoffeeTaste.DEFAULT) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement =
-                        Arrangement.spacedBy(2.dp) // Space between title and buttons
-                    ) {
-                      Text(
-                          text = "Coffee Taste",
-                          fontSize = 16.sp, // Adjust the font size for the title
-                          fontWeight = FontWeight.Bold, // Make the title bold
-                      )
-                      Text(
-                          text = journey.coffeeTaste.name,
-                          fontSize = 14.sp, // Adjust the font size for the title
-                          modifier = Modifier.fillMaxWidth().testTag("coffeeTaste"))
-                    }
-              }
-
-              // Coffee Rating
-              if (journey.coffeeRate != CoffeeRate.DEFAULT) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement =
-                        Arrangement.spacedBy(2.dp) // Space between title and buttons
-                    ) {
-                      Text(
-                          text = "Rate",
-                          fontSize = 16.sp, // Adjust the font size for the title
-                          fontWeight = FontWeight.Bold, // Make the title bold
-                      )
-
-                      // Map CoffeeRate to the number of stars
-                      val starCount =
-                          journey.coffeeRate
-                              .ordinal // ordinal gives you 0-based index, so we don't add 1 due to
-                      // the default parameter
-                      Row(
-                          modifier =
-                              Modifier.fillMaxWidth()
-                                  .testTag("rateRow"), // Add a test tag for testing
-                          horizontalArrangement = Arrangement.Center // Center the star icons
-                          ) {
-                            for (i in 1..5) {
-                              if (i <= starCount) {
-                                Icon(
-                                    imageVector = Icons.Filled.Star,
-                                    contentDescription = "Filled Star $i",
-                                    tint = Gold, // Gold color for filled star
-                                    modifier = Modifier.size(40.dp).testTag("FilledStar$i"))
-                              } else {
-                                Icon(
-                                    imageVector = Icons.Outlined.Star,
-                                    contentDescription = "Outlined Star $i",
-                                    tint = Color(0xFF312F2F), // Same gold color for consistency
-                                    modifier = Modifier.size(40.dp).testTag("OutlinedStar$i"))
-                              }
-                            }
-                          }
-                    }
-              }
-
-              Column(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalArrangement =
-                      Arrangement.spacedBy(2.dp) // Space between title and buttons
-                  ) {
-                    // Label Text
-                    Text(
-                        text = "Date",
-                        modifier = Modifier.padding(bottom = 20.dp),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold)
-
-                    // Date Text
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val formattedDate = dateFormat.format(journey.date.toDate())
-                    Text(
-                        text = formattedDate,
-                        fontSize = 14.sp, // Adjust the font size for the title
-                        modifier = Modifier.fillMaxWidth().testTag("date"))
-                  }
 
               // Confirmation dialog for deleting the journey
               if (showDeleteDialog) {
