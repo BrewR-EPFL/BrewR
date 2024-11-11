@@ -3,6 +3,7 @@ agp = "8.7.2"
 coilCompose = "2.1.0"
 firebaseBomVersion = "33.5.1"
 googleServices = "4.4.2"
+gsonVersion = "2.10.1"
 kotlin = "2.0.20"
 coreKtx = "1.12.0"
 ktfmt = "0.17.0"
@@ -34,6 +35,7 @@ espressoIntents = "3.6.1"
 androidxCredentials = "1.3.0"
 googleIdentity = "1.1.1"
 places = "4.0.0"
+firebaseCrashlyticsBuildtools = "3.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +43,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 firebase-bom-v3200 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -82,6 +85,7 @@ androidx-credentials = { group = "androidx.credentials", name = "credentials", v
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "androidxCredentials" }
 google-identity-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleIdentity" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
