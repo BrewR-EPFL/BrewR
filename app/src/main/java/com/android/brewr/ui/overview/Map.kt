@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.android.brewr.model.location.Location
 import com.google.android.gms.location.LocationServices
@@ -105,4 +106,16 @@ private suspend fun getCurrentLocation(context: Context): LatLng? {
     e.printStackTrace()
     null
   }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MapScreenPreview() {
+    val coffees =
+        listOf(
+            Location(
+                latitude = 48.87847905807652,
+                longitude = 2.3562626423266946,
+                address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"))
+    MapScreen(coffees)
 }
