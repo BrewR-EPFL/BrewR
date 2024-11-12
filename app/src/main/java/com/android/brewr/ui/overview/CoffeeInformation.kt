@@ -122,15 +122,15 @@ fun CoffeeInformationScreen(coffee: Coffee) {
 fun CoffeeInformationScreenPreview() {
   val coffee =
       Coffee(
+          "",
           coffeeShopName = "Café tranquille",
           Location(
               latitude = 48.87847905807652,
               longitude = 2.3562626423266946,
               address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
-          rating = 4.9f,
+          rating = 4.9,
           hours = Hours(open = "8:00 AM", close = "5:00 PM"),
-          reviews =
-              listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0f)),
+          reviews = listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0)),
           imagesUrls =
               listOf(
                   "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35"))
