@@ -69,10 +69,7 @@ fun MapScreen(listLocations: List<Location>) {
         }
 
         GoogleMap(
-            modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues)
-                    .testTag("mapScreen"), // Tag for GoogleMap
+            modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
               listLocations.forEach { location ->
                 Log.d(
@@ -111,11 +108,11 @@ private suspend fun getCurrentLocation(context: Context): LatLng? {
 @Preview(showBackground = true)
 @Composable
 fun MapScreenPreview() {
-    val coffees =
-        listOf(
-            Location(
-                latitude = 48.87847905807652,
-                longitude = 2.3562626423266946,
-                address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"))
-    MapScreen(coffees)
+  val coffees =
+      listOf(
+          Location(
+              latitude = 48.87847905807652,
+              longitude = 2.3562626423266946,
+              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"))
+  MapScreen(coffees)
 }
