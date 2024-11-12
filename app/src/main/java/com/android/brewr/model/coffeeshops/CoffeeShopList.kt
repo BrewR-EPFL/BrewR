@@ -15,15 +15,13 @@ data class CoffeeShop(
 
 class CoffeeShopList(private val context: Context) {
 
-    // Loads and sorts the coffee shops by rating in descending order
-    fun getCoffeeShopsByHighRate(): List<CoffeeShop> {
-        val inputStream = context.assets.open("coffee_shops.json")
-        val reader = InputStreamReader(inputStream)
-        val coffeeShopListType = object : com.google.gson.reflect.TypeToken<List<CoffeeShop>>() {}.type
-        val coffeeShops: List<CoffeeShop> = Gson().fromJson(reader, coffeeShopListType)
+  // Loads and sorts the coffee shops by rating in descending order
+  fun getCoffeeShopsByHighRate(): List<CoffeeShop> {
+    val inputStream = context.assets.open("coffee_shops.json")
+    val reader = InputStreamReader(inputStream)
+    val coffeeShopListType = object : com.google.gson.reflect.TypeToken<List<CoffeeShop>>() {}.type
+    val coffeeShops: List<CoffeeShop> = Gson().fromJson(reader, coffeeShopListType)
 
-        return coffeeShops.sortedByDescending { it.rating }
-    }
-
+    return coffeeShops.sortedByDescending { it.rating }
+  }
 }
-
