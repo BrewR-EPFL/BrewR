@@ -8,22 +8,29 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.brewr.BuildConfig
+import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.Review
+import com.android.brewr.model.location.Location
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1
 
 fun fetchNearbyCoffeeShops(
+    scope: CoroutineScope,
     context: Context,
     currentLocation: LatLng,
     radius: Double = 3000.0,
-    onSuccess: (List<JSONObject>) -> Unit
+    onSuccess: (List<Coffee>) -> Unit
 ) {
   // Initialize the Places API with the API key if it is not already initialized
   if (!Places.isInitialized()) {
@@ -50,7 +57,7 @@ fun fetchNearbyCoffeeShops(
   val request =
       SearchNearbyRequest.builder(circle, placeFields)
           .setIncludedTypes(type)
-          .setMaxResultCount(20)
+          .setMaxResultCount(1)
           .build()
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -58,36 +65,37 @@ fun fetchNearbyCoffeeShops(
     placesClient
         .searchNearby(request)
         .addOnSuccessListener { response ->
-          val coffeeShops =
-              response.places.map { place ->
-                JSONObject().apply {
-                  put("id", place.id)
-                  put("name", place.displayName)
-                  put("address", place.formattedAddress)
-                  put("latitude", place.location?.latitude)
-                  put("longitude", place.location?.longitude)
-                  put("openingHours", place.openingHours)
-                  put("rating", place?.rating)
-                  put(
-                      "reviews",
-                      place.reviews?.map { review ->
-                        JSONObject().apply {
-                          put("authorName", review.authorAttribution.name)
-                          put("text", review.text)
-                          put("rating", review.rating)
-                        }
-                      } ?: JSONArray())
-                  put(
-                      "photos",
-                      place.photoMetadatas?.map { photoMetadata -> photoMetadata } ?: JSONArray())
-                }
-              }
-          if (coffeeShops.isNotEmpty()) {
-            Log.d("PlacesAPI", "Coffee shops founded: ${coffeeShops.size}")
-          } else {
-            Log.d("PlacesAPI", "No coffee shops found.")
+          val coffeeShops = mutableListOf<Coffee>()
+          scope.launch {
+            response.places.map { place ->
+              coffeeShops.add(
+                  Coffee(
+                      id = place.id ?: "Undefined",
+                      coffeeShopName = place.displayName ?: "Undefined",
+                      location =
+                          Location(
+                              place.location?.latitude,
+                              place.location?.longitude,
+                              place.formattedAddress ?: "Undefined"),
+                      rating = place.rating ?: 0.0,
+                      hours = place.openingHours?.weekdayText,
+                      reviews =
+                          place.reviews?.map { review ->
+                            Review(
+                                authorName = review.authorAttribution.name,
+                                text = review.text ?: "Undefined",
+                                rating = review.rating)
+                          },
+                      imagesUrls = fetchAllPhotoUris(place, placesClient)))
+            }
+            if (coffeeShops.isNotEmpty()) {
+              Log.d("PlacesAPI", "Coffee shops founded: ${coffeeShops.size}")
+            } else {
+              Log.d("PlacesAPI", "No coffee shops found.")
+            }
+            onSuccess(coffeeShops)
+            scope.cancel()
           }
-          onSuccess(coffeeShops)
         }
         .addOnFailureListener { exception ->
           Log.e("PlacesAPI", "Place not found: ${exception.message}")
@@ -99,4 +107,14 @@ fun fetchNearbyCoffeeShops(
         LOCATION_PERMISSION_REQUEST_CODE)
     return
   }
+}
+
+private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
+  return place.photoMetadatas?.map { metadata ->
+    val photoUriRequest =
+        FetchResolvedPhotoUriRequest.builder(metadata).setMaxWidth(500).setMaxHeight(300).build()
+
+    // Fetch the URI and wait for the result
+    placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
+  } ?: emptyList() // If no photo metadata, return an empty list
 }
