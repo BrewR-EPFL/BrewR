@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
-import com.android.brewr.model.journey.Location
+import com.android.brewr.model.location.Location
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -68,21 +68,18 @@ fun MapScreen(listLocations: List<Location>) {
         }
 
         GoogleMap(
-            modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues)
-                    .testTag("mapScreen"), // Tag for GoogleMap
+            modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
               listLocations.forEach { location ->
                 Log.d(
                     "MapScreen",
-                    "Adding marker for ${location.name} at (${location.latitude}, ${location.longitude})")
+                    "Adding marker for ${location.address} at (${location.latitude}, ${location.longitude})")
                 Marker(
                     state =
                         remember {
                           MarkerState(position = LatLng(location.latitude, location.longitude))
                         },
-                    title = location.name, // Use name as title for logging purposes
+                    title = location.address, // Use name as title for logging purposes
                     snippet = "Lat: ${location.latitude}, Lng: ${location.longitude}")
               }
 

@@ -151,7 +151,6 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.location)
-    implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -196,9 +195,6 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.play.services.maps)
 
-
-    // Gson library for JSON parsing
-    implementation(libs.gson)
 }
 
 tasks.withType<Test> {
