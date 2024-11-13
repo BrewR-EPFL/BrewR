@@ -1,7 +1,6 @@
 package com.android.brewr.model.coffee
 
 import android.content.Context
-import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
@@ -14,14 +13,11 @@ fun fetchAndSortCoffeeShopsByRating(
     radius: Double = 3000.0,
     onSuccess: (List<Coffee>) -> Unit
 ) {
-    fetchNearbyCoffeeShops(
-        scope = scope,
-        context = context,
-        currentLocation = currentLocation,
-        radius = radius
-    ) { coffeeShops ->
+  fetchNearbyCoffeeShops(
+      scope = scope, context = context, currentLocation = currentLocation, radius = radius) {
+          coffeeShops ->
         // Sort the fetched coffee shops by rating in descending order
         val sortedCoffeeShops = coffeeShops.sortedByDescending { it.rating }
         onSuccess(sortedCoffeeShops)
-    }
+      }
 }
