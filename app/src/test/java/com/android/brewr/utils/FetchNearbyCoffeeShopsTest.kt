@@ -52,6 +52,8 @@ class FetchNearbyCoffeeShopsTest {
     placesClient = mockk()
     mockkStatic(Places::class)
     mockkStatic(Log::class)
+    mockkStatic(ContextCompat::class)
+    mockkStatic(ActivityCompat::class)
     every { Places.isInitialized() } returns true
     every { Places.initialize(any(), any()) } just Runs
     every { Places.createClient(any()) } returns placesClient
@@ -81,7 +83,7 @@ class FetchNearbyCoffeeShopsTest {
     every { place1.formattedAddress } returns "123 Coffee St"
     every { place1.location } returns currentLocation
     every { place1.rating } returns 4.5
-    every { place1.openingHours?.weekdayText } returns listOf("8am-10PM")
+    every { place1.openingHours?.weekdayText } returns listOf("Monday: 7:30 AM – 8:00 PM")
     val mockReview = mockk<Review>()
     every { mockReview.authorAttribution.name } returns "John Doe"
     every { mockReview.text } returns "Great coffee shop!"
@@ -137,9 +139,6 @@ class FetchNearbyCoffeeShopsTest {
 
   @Test
   fun fetchNearbyCoffeeShops_request_permission() {
-    mockkStatic(ContextCompat::class)
-    mockkStatic(ActivityCompat::class)
-
     every {
       ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
     } returns PackageManager.PERMISSION_DENIED

@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
 import com.google.android.gms.maps.model.LatLng
@@ -19,7 +20,6 @@ import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -68,25 +68,25 @@ fun fetchNearbyCoffeeShops(
           val coffeeShops = mutableListOf<Coffee>()
           scope.launch {
             response.places.map { place ->
-              coffeeShops.add(
-                  Coffee(
-                      id = place.id ?: "Undefined",
-                      coffeeShopName = place.displayName ?: "Undefined",
-                      location =
-                          Location(
-                              place.location?.latitude,
-                              place.location?.longitude,
-                              place.formattedAddress ?: "Undefined"),
-                      rating = place.rating ?: 0.0,
-                      hours = place.openingHours?.weekdayText,
-                      reviews =
-                          place.reviews?.map { review ->
-                            Review(
-                                authorName = review.authorAttribution.name,
-                                text = review.text ?: "Undefined",
-                                rating = review.rating)
-                          },
-                      imagesUrls = fetchAllPhotoUris(place, placesClient)))
+              place.location?.let {
+                coffeeShops.add(
+                    Coffee(
+                        id = place.id ?: "Undefined",
+                        coffeeShopName = place.displayName ?: "Undefined",
+                        location =
+                            Location(
+                                it.latitude, it.longitude, place.formattedAddress ?: "Undefined"),
+                        rating = place.rating ?: 0.0,
+                        hours = getHours(place.openingHours?.weekdayText),
+                        reviews =
+                            place.reviews?.map { review ->
+                              Review(
+                                  authorName = review.authorAttribution.name,
+                                  review = review.text ?: "Undefined",
+                                  rating = review.rating)
+                            },
+                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+              }
             }
             if (coffeeShops.isNotEmpty()) {
               Log.d("PlacesAPI", "Coffee shops founded: ${coffeeShops.size}")
@@ -94,7 +94,6 @@ fun fetchNearbyCoffeeShops(
               Log.d("PlacesAPI", "No coffee shops found.")
             }
             onSuccess(coffeeShops)
-            scope.cancel()
           }
         }
         .addOnFailureListener { exception ->
@@ -117,4 +116,23 @@ private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient):
     // Fetch the URI and wait for the result
     placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
   } ?: emptyList() // If no photo metadata, return an empty list
+}
+
+private fun getHours(weekdayText: List<String>?): Hours {
+  val listHour =
+      weekdayText?.map { dayText ->
+        // Split by colon to separate the day name from the time range
+        val (_, timeRange) = dayText.split(": ", limit = 2)
+
+        // Split the time range by "–" to get the opening and closing times
+        val (openTime, closeTime) = timeRange.split(" – ")
+
+        // Return the Hours object with the parsed values
+        Hours(openTime.trim(), closeTime.trim())
+      } ?: emptyList()
+  return if (listHour.isNotEmpty()) {
+    listHour[0]
+  } else {
+    Hours("Undefined", "Undefined")
+  }
 }
