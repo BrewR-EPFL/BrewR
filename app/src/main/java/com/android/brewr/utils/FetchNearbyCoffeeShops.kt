@@ -34,7 +34,7 @@ fun fetchNearbyCoffeeShops(
 ) {
   // Initialize the Places API with the API key if it is not already initialized
   if (!Places.isInitialized()) {
-    val apiKey = BuildConfig.PLACES_API_KEY
+    val apiKey = BuildConfig.MAPS_API_KEY
     Places.initialize(context, apiKey)
   }
 

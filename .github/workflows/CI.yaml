@@ -52,6 +52,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Clean and build
+        run: |
+            ./gradlew clean
+            ./gradlew build
+
       - name: Run tests
         run: |
           # To run the CI with debug information, add --info
