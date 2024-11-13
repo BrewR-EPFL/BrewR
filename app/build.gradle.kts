@@ -38,6 +38,7 @@ android {
             useSupportLibrary = true
         }
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "PLACES_API_KEY", "\"${mapsApiKey}\"")
     }
 
     buildTypes {
