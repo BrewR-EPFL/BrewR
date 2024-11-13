@@ -38,8 +38,6 @@ android {
             useSupportLibrary = true
         }
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        //To be able to use APIKEY in the code
-        buildConfigField("String", "MAPS_API_KEY", "\"${mapsApiKey}\"")
     }
 
     buildTypes {
