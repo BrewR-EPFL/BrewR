@@ -28,7 +28,7 @@ fun ExploreScreen(coffees: List<Coffee>) {
 
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
-        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)) {
+        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
           CoffeeInformationScreen(coffees[0])
         }
       }

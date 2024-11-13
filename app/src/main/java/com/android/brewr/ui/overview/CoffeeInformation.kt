@@ -23,15 +23,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString as buildAnnotatedString1
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.coffee.Coffee
-import com.android.brewr.model.coffee.Hours
-import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.location.Location
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -58,7 +54,11 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                                 .apply { crossfade(true) }
                                 .build()),
                     contentDescription = "Uploaded Image",
-                    modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.Center))
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .height(200.dp)
+                            .align(Alignment.Center)
+                            .testTag("coffeeImage"))
               }
 
               Column(
@@ -68,7 +68,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                         text = coffee.coffeeShopName,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                    )
+                        modifier = Modifier.testTag("coffeeShopName"))
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(start = 6.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -82,7 +82,8 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                                         "Address: ".length)
                                     append(coffee.location.address)
                                   },
-                              fontSize = 16.sp)
+                              fontSize = 16.sp,
+                              modifier = Modifier.testTag("coffeeShopAddress"))
 
                           Text(
                               text =
@@ -94,7 +95,8 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                                         "Opening Hours: ".length)
                                     append("${coffee.hours.open} - ${coffee.hours.close}")
                                   },
-                              fontSize = 16.sp)
+                              fontSize = 16.sp,
+                              modifier = Modifier.testTag("coffeeShopHours"))
 
                           Row(
                               verticalAlignment = Alignment.CenterVertically,
@@ -109,30 +111,11 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                                               "Rating: ".length)
                                           append(String.format("%.1f/5", coffee.rating))
                                         },
-                                    fontSize = 16.sp)
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.testTag("coffeeShopRating"))
                               }
                         }
                   }
             }
       })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CoffeeInformationScreenPreview() {
-  val coffee =
-      Coffee(
-          "",
-          coffeeShopName = "Café tranquille",
-          Location(
-              latitude = 48.87847905807652,
-              longitude = 2.3562626423266946,
-              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
-          rating = 4.9,
-          hours = Hours(open = "8:00 AM", close = "5:00 PM"),
-          reviews = listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0)),
-          imagesUrls =
-              listOf(
-                  "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35"))
-  CoffeeInformationScreen(coffee)
 }
