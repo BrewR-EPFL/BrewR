@@ -1,6 +1,7 @@
 package com.android.brewr.ui.userProfile
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -39,7 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
@@ -78,22 +81,33 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Row(
-                  horizontalArrangement = Arrangement.SpaceAround,
-                  verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = username ?: "Username",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.testTag("Username"))
-                    Spacer(Modifier.width(280.dp))
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.Top) {
+                    Column {
+                      Text(
+                          text = username ?: "Username",
+                          style = MaterialTheme.typography.headlineMedium,
+                          modifier = Modifier.testTag("Username"))
+                      Spacer(Modifier.height(8.dp))
+                      Text(
+                          text = userEmail ?: "Username@gmail.com",
+                          modifier = Modifier.testTag("User Email"))
+                    }
+
                     if (userProfilePicture != null) {
-                      AsyncImage(userProfilePicture, "profilePicture")
+                      Image(
+                          painter =
+                              rememberAsyncImagePainter(
+                                  ImageRequest.Builder(LocalContext.current)
+                                      .data(userProfilePicture)
+                                      .apply { crossfade(true) }
+                                      .build()),
+                          contentDescription = "Uploaded Image",
+                          modifier = Modifier.size(60.dp))
                     }
                   }
-
-              Text(
-                  text = userEmail ?: "Username@gmail.com",
-                  modifier = Modifier.testTag("User Email"))
-              Spacer(Modifier.height(40.dp))
+              Spacer(Modifier.height(20.dp))
 
               // Top part with horizontally aligned icon buttons
               Row(
