@@ -44,18 +44,13 @@ jobs:
       - name: Decode secrets
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES2 }}
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
-          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
+          echo "$LOCAL_PROPERTIES2" | base64 --decode > ./local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-
-      - name: Clean and build
-        run: |
-            ./gradlew clean
-            ./gradlew build
 
       - name: Run tests
         run: |
