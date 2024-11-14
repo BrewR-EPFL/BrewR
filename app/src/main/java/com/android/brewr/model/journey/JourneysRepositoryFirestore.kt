@@ -1,6 +1,7 @@
 package com.android.brewr.model.journey
 
 import android.util.Log
+import com.android.brewr.model.map.Location
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -98,7 +99,14 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       val uid = document.id
       val imageUrl = document.getString("imageUrl") ?: return null
       val description = document.getString("description") ?: return null
-      val coffeeShopName = document.getString("coffeeShopName") ?: return null
+      val locationData = document.get("location") as? Map<*, *> ?: return null
+      val location =
+          locationData.let {
+            Location(
+                latitude = it["latitude"] as? Double ?: 0.0,
+                longitude = it["longitude"] as? Double ?: 0.0,
+                name = it["name"] as? String ?: "home")
+          }
       val originString = document.getString("coffeeOrigin") ?: return null
       val coffeeOrigin = CoffeeOrigin.valueOf(originString)
       val methodString = document.getString("brewingMethod") ?: return null
@@ -112,7 +120,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
           uid = uid,
           imageUrl = imageUrl,
           description = description,
-          coffeeShopName = coffeeShopName,
+          location = location,
           coffeeOrigin = coffeeOrigin,
           brewingMethod = brewingMethod,
           coffeeTaste = coffeeTaste,

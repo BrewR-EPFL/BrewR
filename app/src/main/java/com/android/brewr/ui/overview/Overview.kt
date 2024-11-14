@@ -22,6 +22,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -35,6 +36,8 @@ import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.tasks.await
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.LightBrown
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -148,12 +151,11 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
 fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
   Text(
       text = text,
+      color = if (isSelected) Color.White else CoffeeBrown,
       modifier =
           Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
               .clickable { onClick() }
-              .background(
-                  if (isSelected) Purple80 else androidx.compose.ui.graphics.Color.Gray,
-                  RoundedCornerShape(8.dp))
+              .background(if (isSelected) CoffeeBrown else LightBrown, RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.brewr.model.journey.*
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -37,8 +38,12 @@ class JourneyRecordScreenTest {
           uid = "Ksd22S9M4pD4JswrHefa",
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F448195f9-c8bc-4bdc-a8da-c7691c053b16?alt=media&token=bcc21fec-04d4-4dda-8972-be949c29bd23",
-          description = "Matcha Latte looks like android",
-          coffeeShopName = "Coffee Shop: Mock Coffee Shop",
+          description = "Great coffee",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
           coffeeTaste = CoffeeTaste.SWEET,
@@ -67,12 +72,13 @@ class JourneyRecordScreenTest {
     composeTestRule.onNodeWithTag("deleteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName").assertTextEquals("Coffee page")
     composeTestRule
-        .onNodeWithTag("coffeeShopName")
-        .assertTextEquals("Coffee Shop: Mock Coffee Shop")
-    composeTestRule
-        .onNodeWithTag("journeyDescription")
-        .assertTextEquals("Matcha Latte looks like android")
+        .onNodeWithTag("coffeeShopAddress")
+        .assertTextEquals(
+            "Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra")
+
+    composeTestRule.onNodeWithTag("journeyDescription").assertTextEquals("Great coffee")
     composeTestRule.onNodeWithTag("CoffeeOrigin").assertTextEquals("BRAZIL")
     composeTestRule.onNodeWithTag("brewingMethod").assertTextEquals("ESPRESSO MACHINE")
     composeTestRule.onNodeWithTag("coffeeTaste").assertTextEquals("SWEET")
@@ -144,7 +150,11 @@ class JourneyRecordScreenTest {
             uid = "",
             imageUrl = "",
             description = "",
-            coffeeShopName = "",
+            location =
+                Location(
+                    46.5183076,
+                    6.6338096,
+                    "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
             coffeeOrigin = CoffeeOrigin.BRAZIL,
             brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
             coffeeTaste = CoffeeTaste.SWEET,

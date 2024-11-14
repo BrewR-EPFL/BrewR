@@ -3,6 +3,7 @@ package com.android.brewr.model.journey
 import android.os.Looper
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
+import com.android.brewr.model.map.Location
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -42,7 +43,11 @@ class JourneysRepositoryFirestoreTest {
           uid = "journey1",
           imageUrl = "https://example.com/image.jpg",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -137,7 +142,13 @@ class JourneysRepositoryFirestoreTest {
     whenever(documentSnapshot.id).thenReturn("uid1")
     whenever(documentSnapshot.getString("imageUrl")).thenReturn("http://image1.url")
     whenever(documentSnapshot.getString("description")).thenReturn("desc1")
-    whenever(documentSnapshot.getString("coffeeShopName")).thenReturn("Shop1")
+    val locationMap =
+        mapOf(
+            "latitude" to 46.5183076,
+            "longitude" to 6.6338096,
+            "name" to
+                "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra")
+    whenever(documentSnapshot.get("location")).thenReturn(locationMap)
     whenever(documentSnapshot.getString("coffeeOrigin")).thenReturn("BRAZIL")
     whenever(documentSnapshot.getString("brewingMethod")).thenReturn("FRENCH_PRESS")
     whenever(documentSnapshot.getString("coffeeTaste")).thenReturn("BITTER")
@@ -157,7 +168,11 @@ class JourneysRepositoryFirestoreTest {
     assertEquals("uid1", journey.uid)
     assertEquals("http://image1.url", journey.imageUrl)
     assertEquals("desc1", journey.description)
-    assertEquals("Shop1", journey.coffeeShopName)
+    assertEquals(46.5183076, journey.location.latitude ?: 0.0, 0.0001)
+    assertEquals(6.6338096, journey.location.longitude ?: 0.0, 0.0001)
+    assertEquals(
+        "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra",
+        journey.location.name)
     assertEquals(CoffeeOrigin.BRAZIL, journey.coffeeOrigin)
     assertEquals(BrewingMethod.FRENCH_PRESS, journey.brewingMethod)
     assertEquals(CoffeeTaste.BITTER, journey.coffeeTaste)
