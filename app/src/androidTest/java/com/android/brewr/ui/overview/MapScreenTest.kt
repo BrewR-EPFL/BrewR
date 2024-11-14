@@ -11,6 +11,7 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
+import com.android.brewr.ui.explore.MapScreen
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
