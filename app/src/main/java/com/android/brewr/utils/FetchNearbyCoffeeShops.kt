@@ -116,7 +116,7 @@ private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient):
   } ?: emptyList() // If no photo metadata, return an empty list
 }
 
-private fun getHours(weekdayText: List<String>?): Hours {
+private fun getHours(weekdayText: List<String>?): List<Hours> {
   val listHour =
       weekdayText?.map { dayText ->
         // Split by colon to separate the day name from the time range
@@ -132,9 +132,5 @@ private fun getHours(weekdayText: List<String>?): Hours {
         // Return the Hours object with the parsed values
         Hours(openTime.trim(), closeTime.trim())
       } ?: emptyList()
-  return if (listHour.isNotEmpty()) {
-    listHour[2] // return Wednesday Hours
-  } else {
-    Hours("Undefined", "Undefined")
-  }
+  return listHour.ifEmpty { listOf(Hours("Undefined", "Undefined")) }
 }
