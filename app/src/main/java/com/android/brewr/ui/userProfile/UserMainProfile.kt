@@ -105,6 +105,17 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                                       .build()),
                           contentDescription = "Uploaded Image",
                           modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
+                    } else {
+                      Image(
+                          painter =
+                              rememberAsyncImagePainter(
+                                  ImageRequest.Builder(LocalContext.current)
+                                      .data(
+                                          "https://banner2.cleanpng.com/20180404/sqe/avhxkafxo.webp")
+                                      .apply { crossfade(true) }
+                                      .build()),
+                          contentDescription = "Uploaded Image",
+                          modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
                     }
                   }
               Spacer(Modifier.height(20.dp))
