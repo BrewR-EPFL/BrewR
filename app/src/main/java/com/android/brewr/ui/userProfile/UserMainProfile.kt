@@ -62,7 +62,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
   var showDialog by remember { mutableStateOf(false) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("UserProfileScreen"),
       topBar = {
         TopAppBar(
             title = {},

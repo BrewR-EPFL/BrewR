@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.utils.updatePicture
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +53,7 @@ fun EditJourneyScreen(
   val imageUrl by remember { mutableStateOf(task.imageUrl) }
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf(task.description) }
-  var coffeeShopName by remember { mutableStateOf(task.coffeeShopName) }
+  var selectedLocation by remember { mutableStateOf(task.location) }
   var coffeeOrigin by remember { mutableStateOf(task.coffeeOrigin) }
   var brewingMethod by remember { mutableStateOf(task.brewingMethod) }
   var coffeeTaste by remember { mutableStateOf(task.coffeeTaste) }
@@ -59,7 +61,7 @@ fun EditJourneyScreen(
   val date by remember { mutableStateOf(task.date) }
 
   var expanded by remember {
-    mutableStateOf(coffeeShopName.isNotEmpty())
+    mutableStateOf(selectedLocation.name.isNotEmpty())
   } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
 
@@ -124,9 +126,9 @@ fun EditJourneyScreen(
                     isYesSelected = !isYesSelected
                     expanded = isYesSelected
                   },
-                  expanded = expanded,
-                  coffeeShopName = coffeeShopName,
-                  onCoffeeShopNameChange = { coffeeShopName = it })
+                  coffeeshopExpanded = expanded,
+                  selectedLocation = selectedLocation,
+                  onSelectedLocationChange = { selectedLocation = it })
 
               // Coffee Origin Dropdown Menu
               CoffeeOriginDropdownMenu(
@@ -153,6 +155,7 @@ fun EditJourneyScreen(
               var finalImageUrl by remember { mutableStateOf(imageUrl) }
               // Save button
               Button(
+                  colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
                       updatePicture(imageUri!!, imageUrl) { finalImageUrl = it }
@@ -162,7 +165,7 @@ fun EditJourneyScreen(
                             uid = uid,
                             imageUrl = finalImageUrl,
                             description = description,
-                            coffeeShopName = coffeeShopName,
+                            location = selectedLocation,
                             coffeeOrigin = coffeeOrigin,
                             brewingMethod = brewingMethod,
                             coffeeTaste = coffeeTaste,

@@ -47,10 +47,10 @@ jobs:
     - name: Decode google-services.json
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
       run: |
         echo $GOOGLE_SERVICES_JSON | base64 --decode > ./app/google-services.json
-        echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties      
+        echo "$MAPS_API_KEY" | base64 --decode > ./local.properties      
 
       # Debug: Check if google-services.json is correctly decoded
     - name: Debug google-services.json

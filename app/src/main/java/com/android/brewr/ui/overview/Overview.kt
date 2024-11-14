@@ -16,13 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
-import com.android.brewr.ui.theme.Purple80
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.LightBrown
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -97,12 +99,11 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
 fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
   Text(
       text = text,
+      color = if (isSelected) Color.White else CoffeeBrown,
       modifier =
           Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
               .clickable { onClick() }
-              .background(
-                  if (isSelected) Purple80 else androidx.compose.ui.graphics.Color.Gray,
-                  RoundedCornerShape(8.dp))
+              .background(if (isSelected) CoffeeBrown else LightBrown, RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
 }

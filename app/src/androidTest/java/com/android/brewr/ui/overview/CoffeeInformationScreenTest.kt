@@ -12,6 +12,7 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
+import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -34,7 +35,15 @@ class CoffeeInformationScreenTest {
               longitude = 2.3562626423266946,
               address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
           rating = 4.9,
-          hours = Hours(open = "8:00 AM", close = "5:00 PM"),
+          hours =
+              listOf(
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM"),
+                  Hours(open = "8:00 AM", close = "5:00 PM")),
           reviews = listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0)),
           imagesUrls =
               listOf(
@@ -67,7 +76,8 @@ class CoffeeInformationScreenTest {
         .onNodeWithTag("coffeeShopHours")
         .assertIsDisplayed()
         .assertTextEquals(
-            "Opening Hours: " + "${mockCoffee.hours.open} - ${mockCoffee.hours.close}")
+            "Opening Hours: " +
+                "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
         .onNodeWithTag("coffeeShopRating")
         .assertIsDisplayed()

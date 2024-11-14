@@ -37,6 +37,7 @@ import com.android.brewr.R
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.theme.CoffeeBrown
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -79,8 +80,7 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
             Modifier.fillMaxSize()
                 .padding(padding)
                 .background(
-                    brush =
-                        Brush.verticalGradient(colors = listOf(Color.White, Color(0xFFA17F59)))),
+                    brush = Brush.verticalGradient(colors = listOf(Color.White, CoffeeBrown))),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
