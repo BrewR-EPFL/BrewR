@@ -160,6 +160,17 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
+    // Add these new dependencies
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.android)
+
+    // You already have MockK, but make sure it's the latest version
+    testImplementation(libs.mockk.mockk)  // This is already in your file
+
+    // Optional but recommended for better test assertions
+    testImplementation(libs.truth)
+
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
@@ -188,6 +199,11 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     // For unit testing
     testImplementation(libs.mockk.mockk)
+
+    testImplementation(libs.kotlin.test.junit)
+
+    // MockK requires kotlin-reflect for certain operations, such as mocking classes with generics
+    testImplementation(libs.jetbrains.kotlin.reflect)
 
 
     // --------- Kaspresso test framework ----------
