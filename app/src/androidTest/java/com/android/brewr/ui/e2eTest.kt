@@ -25,6 +25,8 @@ import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
+import com.android.brewr.model.user.UserRepository
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
@@ -48,8 +50,10 @@ import org.mockito.Mockito.`when`
 class E2ETest {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var repositoryMock: JourneysRepository
+  private lateinit var journeyRepositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
+  private lateinit var userRepositoryMock: UserRepository
+  private lateinit var userViewModel: UserViewModel
   private lateinit var navigationActions: NavigationActions
   private lateinit var navController: NavHostController
 
@@ -73,10 +77,12 @@ class E2ETest {
   @Before
   fun setUp() {
     // Initialize mocks and spies
-    repositoryMock = mock(JourneysRepository::class.java)
-    listJourneysViewModel = spy(ListJourneysViewModel(repositoryMock))
+    journeyRepositoryMock = mock(JourneysRepository::class.java)
+    listJourneysViewModel = spy(ListJourneysViewModel(journeyRepositoryMock))
+    userRepositoryMock = mock(UserRepository::class.java)
+    userViewModel = spy(UserViewModel(userRepositoryMock))
     // Mock the behavior of `getJourneys` to simulate fetching journeys
-    `when`(repositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
+    `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
@@ -96,7 +102,7 @@ class E2ETest {
             route = Route.OVERVIEW,
         ) {
           composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-          composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+          composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
           composable(Screen.JOURNEY_RECORD) {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }

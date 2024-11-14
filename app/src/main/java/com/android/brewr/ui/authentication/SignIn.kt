@@ -34,6 +34,7 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import com.android.brewr.R
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -49,7 +50,7 @@ import java.util.*
 import kotlinx.coroutines.*
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
+fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
   val auth = Firebase.auth
@@ -67,6 +68,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 auth = auth,
                 context = context,
                 coroutineScope = coroutineScope,
+                userViewModel = userViewModel,
                 navigationActions = navigationActions,
                 addAccountLauncher = null,
                 userState = mutableStateOf(user))
@@ -112,6 +114,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                   auth = auth,
                   context = context,
                   coroutineScope = coroutineScope,
+                  userViewModel = userViewModel,
                   navigationActions = navigationActions,
                   addAccountLauncher = addAccountLauncher,
                   userState = mutableStateOf(user))
@@ -149,6 +152,7 @@ fun doGoogleSignIn(
     auth: FirebaseAuth,
     context: Context,
     coroutineScope: CoroutineScope,
+    userViewModel: UserViewModel,
     navigationActions: NavigationActions,
     addAccountLauncher: ActivityResultLauncher<Intent>?,
     userState: MutableState<FirebaseUser?>
@@ -163,6 +167,7 @@ fun doGoogleSignIn(
           result = result,
           auth = auth,
           context = context,
+          userViewModel = userViewModel,
           navigationActions = navigationActions,
           userState = userState)
     } catch (e: NoCredentialException) {
@@ -196,6 +201,7 @@ suspend fun handleSignInResult(
     result: GetCredentialResponse,
     auth: FirebaseAuth,
     context: Context,
+    userViewModel: UserViewModel,
     navigationActions: NavigationActions,
     userState: MutableState<FirebaseUser?>
 ) {
@@ -211,6 +217,7 @@ suspend fun handleSignInResult(
             if (task.isSuccessful) {
               userState.value = auth.currentUser
               Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+              userViewModel.updateUserInfo()
               navigationActions.navigateTo(Screen.OVERVIEW)
             } else {
               Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()

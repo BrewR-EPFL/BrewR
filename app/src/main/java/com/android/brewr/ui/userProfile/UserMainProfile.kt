@@ -1,6 +1,7 @@
 package com.android.brewr.ui.userProfile
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -27,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.google.firebase.auth.ktx.auth
@@ -45,8 +51,14 @@ import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserMainProfileScreen(navigationActions: NavigationActions) {
+fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
+
+  // Collect username, userEmail, and user profile picture url from ViewModel
+  val username by userViewModel.username.collectAsState()
+  val userEmail by userViewModel.userEmail.collectAsState()
+  val userProfilePicture by userViewModel.userProfilePicture.collectAsState()
+
   var showDialog by remember { mutableStateOf(false) }
 
   Scaffold(
@@ -68,12 +80,45 @@ fun UserMainProfileScreen(navigationActions: NavigationActions) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              Text(
-                  "Username",
-                  style = MaterialTheme.typography.headlineMedium,
-                  modifier = Modifier.testTag("Username"))
-              Text("Username@gmail.com", modifier = Modifier.testTag("User Email"))
-              Spacer(Modifier.height(40.dp))
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.Top) {
+                    Column {
+                      Text(
+                          text = username ?: "Username",
+                          style = MaterialTheme.typography.headlineMedium,
+                          modifier = Modifier.testTag("Username"))
+                      Spacer(Modifier.height(8.dp))
+                      Text(
+                          text = userEmail ?: "Username@gmail.com",
+                          modifier = Modifier.testTag("User Email"))
+                    }
+
+                    if (userProfilePicture != null) {
+                      Image(
+                          painter =
+                              rememberAsyncImagePainter(
+                                  ImageRequest.Builder(LocalContext.current)
+                                      .data(userProfilePicture)
+                                      .apply { crossfade(true) }
+                                      .build()),
+                          contentDescription = "Uploaded Image",
+                          modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
+                    } else {
+                      Image(
+                          painter =
+                              rememberAsyncImagePainter(
+                                  ImageRequest.Builder(LocalContext.current)
+                                      .data(
+                                          "https://banner2.cleanpng.com/20180404/sqe/avhxkafxo.webp")
+                                      .apply { crossfade(true) }
+                                      .build()),
+                          contentDescription = "Uploaded Image",
+                          modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
+                    }
+                  }
+              Spacer(Modifier.height(20.dp))
 
               // Top part with horizontally aligned icon buttons
               Row(
