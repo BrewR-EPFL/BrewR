@@ -91,7 +91,9 @@ fun fetchNearbyCoffeeShops(
                                   review = review.text ?: "Undefined",
                                   rating = review.rating)
                             },
-                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                        imagesUrls = listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain"),
+                        //imagesUrls = fetchAllPhotoUris(place, placesClient)
+                ))
               }
             }
             if (coffeeShops.isNotEmpty()) {

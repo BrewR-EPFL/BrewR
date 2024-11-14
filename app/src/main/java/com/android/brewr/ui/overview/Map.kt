@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.coffee.Coffee
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -26,7 +26,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun MapScreen(listLocations: List<Location>) {
+fun MapScreen(coffees: List<Coffee>) {
   val context = LocalContext.current
   var userLocation by remember { mutableStateOf<LatLng?>(null) }
   var permissionGranted by remember { mutableStateOf(false) }
@@ -64,23 +64,25 @@ fun MapScreen(listLocations: List<Location>) {
   Scaffold(
       content = { paddingValues ->
         val cameraPositionState = rememberCameraPositionState {
-          position = CameraPosition.fromLatLngZoom(userLocation ?: LatLng(37.7749, -122.4194), 10f)
+          position = CameraPosition.fromLatLngZoom(userLocation ?: LatLng(46.5197, 6.6323), 14f)
         }
 
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
-              listLocations.forEach { location ->
+              coffees.forEach { coffee ->
                 Log.d(
                     "MapScreen",
-                    "Adding marker for ${location.address} at (${location.latitude}, ${location.longitude})")
+                    "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")
                 Marker(
                     state =
                         remember {
-                          MarkerState(position = LatLng(location.latitude, location.longitude))
+                          MarkerState(
+                              position =
+                                  LatLng(coffee.location.latitude, coffee.location.longitude))
                         },
-                    title = location.address, // Use name as title for logging purposes
-                    snippet = "Lat: ${location.latitude}, Lng: ${location.longitude}")
+                    title = coffee.coffeeShopName,
+                    snippet = "Address: ${coffee.location.address}")
               }
 
               userLocation?.let {
