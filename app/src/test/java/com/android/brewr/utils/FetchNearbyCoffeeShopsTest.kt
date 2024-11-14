@@ -83,7 +83,7 @@ class FetchNearbyCoffeeShopsTest {
     every { place1.formattedAddress } returns "123 Coffee St"
     every { place1.location } returns currentLocation
     every { place1.rating } returns 4.5
-    every { place1.openingHours?.weekdayText } returns listOf("Monday: 7:30 AM – 8:00 PM")
+    every { place1.openingHours?.weekdayText } returns listOf("Monday: Closed","Tuesday: 8AM - 11PM","Wednesday: 8AM - 11PM")
     val mockReview = mockk<Review>()
     every { mockReview.authorAttribution.name } returns "John Doe"
     every { mockReview.text } returns "Great coffee shop!"
