@@ -9,6 +9,7 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.google.firebase.Timestamp
@@ -32,7 +33,11 @@ class OverviewScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,

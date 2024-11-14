@@ -10,6 +10,8 @@ import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,11 +61,30 @@ class AddJourneyScreenTest {
     // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
 
-    // After clicking, the Coffee Shop Name field should appear
+    // After clicking, the coffee shop location input field should appear
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
+
+    // Interact with the dropdown for coffee shop location suggestions
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Starbucks")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
+
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
 
     // Test Coffee Origin dropdown (click and select an option)
     composeTestRule.onNodeWithTag("inputCoffeeOrigin").assertIsDisplayed().performClick()
