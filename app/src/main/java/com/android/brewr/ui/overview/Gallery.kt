@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -82,8 +83,9 @@ fun JourneyItem(journey: Journey, onClick: () -> Unit) {
                               })
                       .build()),
           contentDescription = "Selected Image",
+          contentScale = ContentScale.Crop,
           modifier =
-              Modifier.testTag("journeyImage").fillMaxWidth().heightIn(min = 50.dp, max = 300.dp))
+              Modifier.testTag("journeyImage").fillMaxWidth().heightIn(min = 180.dp, max = 300.dp))
     }
   }
 }
