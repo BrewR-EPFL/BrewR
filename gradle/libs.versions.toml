@@ -2,15 +2,10 @@
 agp = "8.7.2"
 biometric = "1.2.0"
 coilCompose = "2.1.0"
-coreTesting = "2.2.0"
 firebaseBomVersion = "33.5.1"
 googleServices = "4.4.2"
 kotlin = "2.0.20"
 coreKtx = "1.12.0"
-kotlinReflectVersion = "2.0.20"
-kotlinTestJunit = "1.8.21"
-kotlinxCoroutinesAndroid = "1.7.3"
-kotlinxCoroutinesTest = "1.7.3"
 ktfmt = "0.17.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -44,25 +39,18 @@ googleIdentity = "1.1.1"
 places = "4.0.0"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
 constraintlayout = "2.1.4"
-placesVersion = "4.1.0"
-truth = "1.1.5"
 
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-bom-v3200 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
-jetbrains-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinReflectVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinTestJunit" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -101,8 +89,6 @@ google-identity-googleid = { group = "com.google.android.libraries.identity.goog
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
-google-places = { group = "com.google.android.libraries.places", name = "places", version.ref = "placesVersion" }
-truth = { module = "com.google.truth:truth", version.ref = "truth" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

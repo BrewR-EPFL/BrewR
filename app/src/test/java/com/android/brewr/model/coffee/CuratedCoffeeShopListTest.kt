@@ -141,7 +141,7 @@ class CuratedCoffeeShopListTest {
         coffeeShopName = name,
         location = Location(0.0, 0.0, "Test Address"),
         rating = rating,
-        hours = Hours("9:00 AM", "5:00 PM"),
+        hours = listOf(Hours("9:00 AM", "5:00 PM")),
         reviews = emptyList(),
         imagesUrls = emptyList())
   }
