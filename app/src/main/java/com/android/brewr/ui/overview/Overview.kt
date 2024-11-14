@@ -36,7 +36,10 @@ import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -80,11 +83,12 @@ fun OverviewScreen(
 
   LaunchedEffect(permissionGranted) {
     if (permissionGranted) {
-      fetchNearbyCoffeeShops(
-          coroutineScope,
-          context,
-          getCurrentLocation(context) ?: LatLng(46.5197, 6.6323),
-          onSuccess = { coffeeShops = it })
+      coroutineScope.launch {
+        val currentLocation =
+            withContext(Dispatchers.IO) { getCurrentLocation(context) } ?: LatLng(46.5197, 6.6323)
+        fetchNearbyCoffeeShops(
+            coroutineScope, context, currentLocation, onSuccess = { coffeeShops = it })
+      }
     }
   }
 
