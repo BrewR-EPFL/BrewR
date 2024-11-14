@@ -67,7 +67,9 @@ import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.map.LocationViewModel
-import com.android.brewr.ui.theme.Purple80
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.Gold
+import com.android.brewr.ui.theme.LightBrown
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -274,7 +276,7 @@ fun BrewingMethodField(
                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                   colors =
                       ButtonDefaults.buttonColors(
-                          containerColor = Purple80, contentColor = Color.White)) {
+                          containerColor = LightBrown, contentColor = CoffeeBrown)) {
                     Text(method.name.replace("_", " "), modifier = Modifier.padding(4.dp))
                   }
             } else {
@@ -322,7 +324,7 @@ fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste
                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                   colors =
                       ButtonDefaults.buttonColors(
-                          containerColor = Purple80, contentColor = Color.White)) {
+                          containerColor = LightBrown, contentColor = CoffeeBrown)) {
                     Text(taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
                   }
             } else {
@@ -370,7 +372,7 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
                   Icon(
                       imageVector = Icons.Filled.Star,
                       contentDescription = "Filled Star $i",
-                      tint = Color(0xFFFFD700), // Gold color for filled star
+                      tint = Gold, // Gold color for filled star
                       modifier =
                           Modifier.size(40.dp).testTag("FilledStar$i").clickable {
                             // Update the coffeeRate when the star is clicked
