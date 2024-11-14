@@ -139,23 +139,6 @@ class FetchNearbyCoffeeShopsTest {
   }
 
   @Test
-  fun fetchNearbyCoffeeShops_request_permission() {
-    every {
-      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-    } returns PackageManager.PERMISSION_DENIED
-    every { ActivityCompat.requestPermissions(any<Activity>(), any(), any()) } just Runs
-
-    fetchNearbyCoffeeShops(testScope, context, currentLocation, radius) {}
-
-    verify {
-      ActivityCompat.requestPermissions(
-          context as Activity,
-          arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-          LOCATION_PERMISSION_REQUEST_CODE)
-    }
-  }
-
-  @Test
   fun fetchNearbyCoffeeShops_fails() {
     // Simulate an API failure using Tasks.forException
     val apiException = Exception("API call failed")

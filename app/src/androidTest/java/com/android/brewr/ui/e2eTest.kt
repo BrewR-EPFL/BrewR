@@ -1,5 +1,6 @@
 package com.android.brewr.ui
 
+import android.Manifest
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -17,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -49,6 +51,12 @@ import org.mockito.Mockito.`when`
 @RunWith(AndroidJUnit4::class)
 class E2ETest {
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val fineLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
+  @get:Rule
+  val coarseLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
   private lateinit var journeyRepositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel

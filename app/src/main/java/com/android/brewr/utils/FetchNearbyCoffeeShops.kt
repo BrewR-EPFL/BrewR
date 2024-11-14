@@ -1,11 +1,9 @@
 package com.android.brewr.utils
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.Coffee
@@ -36,13 +34,6 @@ fun fetchNearbyCoffeeShops(
   if (!Places.isInitialized()) {
     val apiKey = BuildConfig.MAPS_API_KEY
     Places.initialize(context, apiKey)
-  }
-  if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-      PackageManager.PERMISSION_GRANTED) {
-    ActivityCompat.requestPermissions(
-        context as Activity,
-        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        LOCATION_PERMISSION_REQUEST_CODE)
   }
   val circle = CircularBounds.newInstance(currentLocation, radius)
   val type = listOf("cafe")
@@ -91,11 +82,18 @@ fun fetchNearbyCoffeeShops(
                                   review = review.text ?: "Undefined",
                                   rating = review.rating)
                             },
+                        // use this image to avoid using API to fetch photos as it is very expensive
+                        //                        imagesUrls =
+                        //                            listOf(
+                        //
+                        // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
                         imagesUrls = fetchAllPhotoUris(place, placesClient)))
               }
             }
             if (coffeeShops.isNotEmpty()) {
-              Log.d("PlacesAPI", "Coffee shops founded: ${coffeeShops.size}")
+              Log.d(
+                  "PlacesAPI",
+                  "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
             } else {
               Log.d("PlacesAPI", "No coffee shops found.")
             }
@@ -111,13 +109,15 @@ fun fetchNearbyCoffeeShops(
 }
 
 private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
-  return place.photoMetadatas?.map { metadata ->
+  val metadata = place.photoMetadatas?.get(0)
+  metadata?.let {
     val photoUriRequest =
-        FetchResolvedPhotoUriRequest.builder(metadata).setMaxWidth(500).setMaxHeight(300).build()
-
+        FetchResolvedPhotoUriRequest.builder(it).setMaxWidth(500).setMaxHeight(300).build()
     // Fetch the URI and wait for the result
-    placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
-  } ?: emptyList() // If no photo metadata, return an empty list
+    val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
+    return listOf(result)
+  }
+  return emptyList()
 }
 
 private fun getHours(weekdayText: List<String>?): List<Hours> {
