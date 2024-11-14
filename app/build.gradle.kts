@@ -10,9 +10,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
 
     id("jacoco")
-    id("com.google.gms.google-services") // Ensure this is present
-
-
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) // Ensure this is present
 }
 
 android {
@@ -62,6 +61,7 @@ android {
 
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
@@ -144,6 +144,7 @@ dependencies {
 
     // Play Services Auth (for Google Sign-In)
     implementation(libs.play.services.auth.v2050)
+    implementation(libs.coil.compose)
 
 
     implementation(libs.androidx.core.ktx)
@@ -156,6 +157,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -199,11 +201,6 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.auth)
     implementation(libs.play.services.maps)
-
-
-    // Coil
-    implementation(libs.coil.compose)
-
 
     // MockK
     testImplementation(libs.mockk)
