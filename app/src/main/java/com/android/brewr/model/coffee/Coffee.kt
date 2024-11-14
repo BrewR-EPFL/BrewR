@@ -7,7 +7,7 @@ data class Coffee(
     val coffeeShopName: String,
     val location: Location,
     val rating: Double,
-    val hours: List<Hours>,
+    val hours: Hours,
     val reviews: List<Review>?,
     val imagesUrls: List<String>
 )
