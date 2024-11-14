@@ -117,7 +117,7 @@ private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient):
     val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
     return listOf(result)
   }
-  return emptyList()
+  return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
 }
 
 private fun getHours(weekdayText: List<String>?): List<Hours> {
