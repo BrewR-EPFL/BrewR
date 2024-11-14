@@ -46,23 +46,6 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     repository.getProfilePicture(onSuccess = { userProfilePicture_.value = it }, onFailure = {})
   }
 
-  /**
-   * Sets a new username for the user.
-   *
-   * @param username The new username to set.
-   * @param onSuccess Callback invoked on success.
-   * @param onFailure Callback invoked on failure.
-   */
-  fun setUsername(username: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    repository.setUsername(
-        username,
-        onSuccess = {
-          fetchUsername() // Refresh the username state after setting it
-          onSuccess()
-        },
-        onFailure = { e -> onFailure(e) })
-  }
-
   fun updateUserInfo() {
     fetchUserGmail()
     fetchUsername()

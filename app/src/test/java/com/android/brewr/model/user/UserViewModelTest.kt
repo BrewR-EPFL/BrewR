@@ -5,8 +5,6 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class UserViewModelTest {
@@ -29,27 +27,5 @@ class UserViewModelTest {
     verify(userRepository, times(2)).getUserGmail(any(), any())
     verify(userRepository, times(2)).getProfilePicture(any(), any())
     verify(userRepository, times(2)).getUsername(any(), any())
-  }
-
-  @Test
-  fun `setUsername() calls the repository`() {
-
-    val onSuccess: () -> Unit = mock()
-    val onFailure: (Exception) -> Unit = mock()
-    val username = "newUsername"
-
-    userViewModel.setUsername(username, onSuccess, onFailure)
-    verify(userRepository).setUsername(eq(username), any(), any())
-  }
-
-  @Test
-  fun `setUserName() refreshes the username`() {
-
-    val onSuccess: () -> Unit = mock()
-    val onFailure: (Exception) -> Unit = mock()
-    val username = "newUsername"
-
-    userViewModel.setUsername(username, onSuccess, onFailure)
-    verify(userRepository).getUsername(any(), any())
   }
 }

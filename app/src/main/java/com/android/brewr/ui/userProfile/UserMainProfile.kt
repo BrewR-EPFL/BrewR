@@ -104,7 +104,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                                       .apply { crossfade(true) }
                                       .build()),
                           contentDescription = "Uploaded Image",
-                          modifier = Modifier.size(60.dp))
+                          modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
                     }
                   }
               Spacer(Modifier.height(20.dp))

@@ -46,6 +46,7 @@ class UserMainProfileScreenTest {
     // Verify username and email
     composeTestRule.onNodeWithTag("Username").assertTextEquals("Username")
     composeTestRule.onNodeWithTag("User Email").assertTextEquals("Username@gmail.com")
+    composeTestRule.onNodeWithTag("User Profile Photo").assertIsDisplayed()
 
     // Test clicking unimplemented feature buttons
     composeTestRule.onNodeWithTag("Preference button").performClick()
