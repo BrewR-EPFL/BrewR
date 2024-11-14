@@ -29,8 +29,8 @@ class MapScreenTest {
     // Sample list of locations for testing
     val sampleLocations =
         listOf(
-            Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
-            Location(latitude = 46.5211, longitude = 6.6276, name = "Lausanne 2"))
+            Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+            Location(latitude = 46.5211, longitude = 6.6276, address = "Lausanne 2"))
 
     // Set content to ExploreScreen
     composeTestRule.setContent { MapScreen(listLocations = sampleLocations) }

@@ -53,7 +53,7 @@ fun EditJourneyScreen(
   val imageUrl by remember { mutableStateOf(task.imageUrl) }
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf(task.description) }
-  var coffeeShopName by remember { mutableStateOf(task.coffeeShopName) }
+  var selectedLocation by remember { mutableStateOf(task.location) }
   var coffeeOrigin by remember { mutableStateOf(task.coffeeOrigin) }
   var brewingMethod by remember { mutableStateOf(task.brewingMethod) }
   var coffeeTaste by remember { mutableStateOf(task.coffeeTaste) }
@@ -61,7 +61,7 @@ fun EditJourneyScreen(
   val date by remember { mutableStateOf(task.date) }
 
   var expanded by remember {
-    mutableStateOf(coffeeShopName.isNotEmpty())
+    mutableStateOf(selectedLocation.name.isNotEmpty())
   } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(false) }
 
@@ -126,9 +126,9 @@ fun EditJourneyScreen(
                     isYesSelected = !isYesSelected
                     expanded = isYesSelected
                   },
-                  expanded = expanded,
-                  coffeeShopName = coffeeShopName,
-                  onCoffeeShopNameChange = { coffeeShopName = it })
+                  coffeeshopExpanded = expanded,
+                  selectedLocation = selectedLocation,
+                  onSelectedLocationChange = { selectedLocation = it })
 
               // Coffee Origin Dropdown Menu
               CoffeeOriginDropdownMenu(
@@ -165,7 +165,7 @@ fun EditJourneyScreen(
                             uid = uid,
                             imageUrl = finalImageUrl,
                             description = description,
-                            coffeeShopName = coffeeShopName,
+                            location = selectedLocation,
                             coffeeOrigin = coffeeOrigin,
                             brewingMethod = brewingMethod,
                             coffeeTaste = coffeeTaste,

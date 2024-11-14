@@ -3,8 +3,11 @@ package com.android.brewr.ui.overview
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -19,9 +22,12 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -47,7 +53,11 @@ class EditJourneyScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -101,17 +111,29 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
 
     // Check if the Coffee Shop Name field displays the correct coffee shop name
-    composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertIsDisplayed()
-        .assert(hasText("Starbucks"))
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
 
-    // After clicking, the Coffee Shop Name field should appear
+    // Update the coffee shop location
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Local Brew")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
 
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
     // Test Coffee Origin before change match the journey's origin
     composeTestRule
         .onNodeWithTag("inputCoffeeOrigin")
@@ -199,8 +221,27 @@ class EditJourneyScreenTest {
         .performTextInput("Another wonderful coffee journey.")
     // Coffee Shop Name
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").performClick()
-    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextClearance()
-    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextInput("Pablo's Coffee")
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performTextClearance()
+    composeTestRule
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
+
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
     // Coffee Origin
     composeTestRule
         .onNodeWithTag("Button:${BrewingMethod.FRENCH_PRESS.name}")
@@ -242,3 +283,5 @@ class EditJourneyScreenTest {
     verify(navigationActions).goBack()
   }
 }
+
+private fun Unit.performTextInput(s: String) {}

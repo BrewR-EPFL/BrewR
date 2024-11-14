@@ -10,7 +10,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
 
     id("jacoco")
-    id("com.google.gms.google-services") // Ensure this is present
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) // Ensure this is present
 }
 
 android {
@@ -60,6 +61,7 @@ android {
 
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
@@ -151,6 +153,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
