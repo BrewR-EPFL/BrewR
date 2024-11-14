@@ -13,12 +13,14 @@ object Route {
 }
 
 object Screen {
+
   const val AUTH = "Auth Screen"
   const val OVERVIEW = "Overview Screen"
   const val ADD_JOURNEY = "Add Journey Screen"
   const val USERPROFILE = "User Profile Screen"
   const val JOURNEY_RECORD = "Journey Screen"
   const val EDIT_JOURNEY = "Edit Journey Screen"
+  const val EXPLORE: String = "coffees explore screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)

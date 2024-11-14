@@ -19,6 +19,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.Hours
+import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -32,8 +35,10 @@ import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.navigation.Screen.EXPLORE
 import com.android.brewr.ui.overview.AddJourneyScreen
 import com.android.brewr.ui.overview.EditJourneyScreen
+import com.android.brewr.ui.overview.ExploreScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
@@ -81,6 +86,17 @@ class E2ETest {
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
+  val sampleCoffees =
+      listOf(
+          Coffee(
+              "1",
+              "Coffee1",
+              com.android.brewr.model.location.Location(
+                  latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+              4.5,
+              listOf(Hours("10", "20"), Hours("10", "20")),
+              listOf(Review("Lei", "good", 5.0)),
+              listOf("test.jpg")))
 
   @Before
   fun setUp() {
@@ -95,11 +111,6 @@ class E2ETest {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
         }
-  }
-
-  @Test
-  fun endToEndFlowTest() {
-    // Set up the composable content for the test
     composeTestRule.setContent {
       navController = rememberNavController()
       navigationActions = NavigationActions(navController)
@@ -114,6 +125,7 @@ class E2ETest {
           composable(Screen.JOURNEY_RECORD) {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
+          composable(EXPLORE) { ExploreScreen(sampleCoffees) }
         }
         navigation(
             startDestination = Screen.ADD_JOURNEY,
@@ -128,6 +140,11 @@ class E2ETest {
         }
       }
     }
+  }
+
+  @Test
+  fun endToEndGalleryFlowTest() {
+    composeTestRule.onNodeWithTag("Gallery").assertIsDisplayed().performClick()
     // Fetch journeys to ensure initial data is available
     listJourneysViewModel.getJourneys()
 
@@ -153,10 +170,7 @@ class E2ETest {
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertHasClickAction().performClick()
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertExists()
 
-    composeTestRule
-        .onNodeWithTag("inputCoffeeshopLocation")
-        .performClick()
-        .performTextInput("Starbucks Lausanne")
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performClick().performTextInput("Star")
 
     runBlocking {
       repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
@@ -166,7 +180,7 @@ class E2ETest {
             .isNotEmpty()) {
           return@runBlocking // Exit loop if the dropdown becomes visible
         }
-        delay(100)
+        delay(1000)
       }
     }
     composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
@@ -194,5 +208,25 @@ class E2ETest {
 
     // Step 4: Back to Overview
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun endToEndExploreFlowTest() {
+    // go the the explore screen
+    composeTestRule.onNodeWithTag("Explore").assertIsDisplayed().performClick()
+    composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // go to menu screen
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
+
+    // check the bottomSheet and coffee shop information existence
+    composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("coffeeShopAddress").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("coffeeShopHours").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
   }
 }
