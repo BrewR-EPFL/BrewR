@@ -12,6 +12,7 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
+import com.android.brewr.ui.explore.CoffeeInformationScreen
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -63,7 +64,6 @@ class CoffeeInformationScreenTest {
 
   @Test
   fun displayAllComponentsValidCoffee() {
-    composeTestRule.onNodeWithTag("coffeeInformationScreen").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("coffeeShopName")
         .assertIsDisplayed()

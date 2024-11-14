@@ -2,6 +2,8 @@ package com.android.brewr.ui.overview
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
@@ -14,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.ui.explore.CoffeeInformationScreen
+import com.android.brewr.ui.explore.MapScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,8 +32,8 @@ fun ExploreScreen(coffees: List<Coffee>) {
 
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
-        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
-          CoffeeInformationScreen(coffees[0])
+        LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
+          items(coffees) { coffee -> CoffeeInformationScreen(coffee) }
         }
       }
     }

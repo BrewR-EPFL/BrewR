@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import android.annotation.SuppressLint
 import android.content.Context
