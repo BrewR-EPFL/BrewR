@@ -37,7 +37,13 @@ fun fetchNearbyCoffeeShops(
     val apiKey = BuildConfig.MAPS_API_KEY
     Places.initialize(context, apiKey)
   }
-
+  if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+      PackageManager.PERMISSION_GRANTED) {
+    ActivityCompat.requestPermissions(
+        context as Activity,
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        LOCATION_PERMISSION_REQUEST_CODE)
+  }
   val circle = CircularBounds.newInstance(currentLocation, radius)
   val type = listOf("cafe")
   // Specify the fields we want in the Place API response
@@ -100,10 +106,6 @@ fun fetchNearbyCoffeeShops(
           Log.e("PlacesAPI", "Place not found: ${exception.message}")
         }
   } else {
-    ActivityCompat.requestPermissions(
-        context as Activity,
-        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        LOCATION_PERMISSION_REQUEST_CODE)
     return
   }
 }
@@ -123,15 +125,19 @@ private fun getHours(weekdayText: List<String>?): Hours {
       weekdayText?.map { dayText ->
         // Split by colon to separate the day name from the time range
         val (_, timeRange) = dayText.split(": ", limit = 2)
-
         // Split the time range by "–" to get the opening and closing times
-        val (openTime, closeTime) = timeRange.split(" – ")
 
+        val (openTime, closeTime) =
+            if (timeRange == "Closed" || "–" !in timeRange) {
+              "Undefined" to "Undefined"
+            } else {
+              timeRange.split("–").let { it[0].trim() to it.getOrElse(1) { "Undefined" }.trim() }
+            }
         // Return the Hours object with the parsed values
         Hours(openTime.trim(), closeTime.trim())
       } ?: emptyList()
   return if (listHour.isNotEmpty()) {
-    listHour[0]
+    listHour[2] // return Wednesday Hours
   } else {
     Hours("Undefined", "Undefined")
   }
