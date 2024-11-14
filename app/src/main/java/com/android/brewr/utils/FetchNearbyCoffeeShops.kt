@@ -85,7 +85,8 @@ fun fetchNearbyCoffeeShops(
                                   review = review.text ?: "Undefined",
                                   rating = review.rating)
                             },
-                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                        imagesUrls = listOf("test")))
+                //                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
               }
             }
             if (coffeeShops.isNotEmpty()) {
