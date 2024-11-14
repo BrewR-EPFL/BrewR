@@ -29,36 +29,9 @@ import kotlinx.coroutines.tasks.await
 fun MapScreen(coffees: List<Coffee>) {
   val context = LocalContext.current
   var userLocation by remember { mutableStateOf<LatLng?>(null) }
-  var permissionGranted by remember { mutableStateOf(false) }
-
-  val locationPermissionLauncher =
-      rememberLauncherForActivityResult(
-          contract = ActivityResultContracts.RequestMultiplePermissions(),
-          onResult = { permissions ->
-            permissionGranted =
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-          })
 
   LaunchedEffect(Unit) {
-    permissionGranted =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED
-
-    if (!permissionGranted) {
-      locationPermissionLauncher.launch(
-          arrayOf(
-              Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-    }
-  }
-
-  LaunchedEffect(permissionGranted) {
-    if (permissionGranted) {
       userLocation = getCurrentLocation(context)
-    }
   }
 
   Scaffold(

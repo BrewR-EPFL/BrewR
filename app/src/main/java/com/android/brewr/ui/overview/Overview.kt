@@ -2,6 +2,7 @@ package com.android.brewr.ui.overview
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,7 +32,9 @@ import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.Purple80
 import com.android.brewr.utils.fetchNearbyCoffeeShops
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -76,7 +79,7 @@ fun OverviewScreen(
   LaunchedEffect(permissionGranted) {
     if (permissionGranted) {
       fetchNearbyCoffeeShops(
-          coroutineScope, context, LatLng(46.5197, 6.6323), onSuccess = { coffeeShops = it })
+          coroutineScope, context, getCurrentLocation(context)?:LatLng(46.5197, 6.6323), onSuccess = { coffeeShops = it })
     }
   }
 
@@ -150,4 +153,15 @@ fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -
                   RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
+}
+@SuppressLint("MissingPermission")
+private suspend fun getCurrentLocation(context: Context): LatLng? {
+    return try {
+        val locationClient = LocationServices.getFusedLocationProviderClient(context)
+        val location = locationClient.lastLocation.await()
+        location?.let { LatLng(it.latitude, it.longitude) }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }
