@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.coffee.Coffee
+import java.time.LocalDate
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -91,9 +92,16 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                                     append("Opening Hours: ")
                                     addStyle(
                                         SpanStyle(fontWeight = FontWeight.Bold),
-                                        0,
-                                        "Opening Hours: ".length)
-                                    append("${coffee.hours.open} - ${coffee.hours.close}")
+                                        start = 0,
+                                        end = "Opening Hours: ".length)
+                                    val todayIndex = LocalDate.now().dayOfWeek.value - 1
+
+                                    if (todayIndex in coffee.hours.indices) {
+                                      val todayHours = coffee.hours[todayIndex]
+                                      append("${todayHours.open} - ${todayHours.close}")
+                                    } else {
+                                      append("Hours not available")
+                                    }
                                   },
                               fontSize = 16.sp,
                               modifier = Modifier.testTag("coffeeShopHours"))

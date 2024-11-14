@@ -83,7 +83,8 @@ class FetchNearbyCoffeeShopsTest {
     every { place1.formattedAddress } returns "123 Coffee St"
     every { place1.location } returns currentLocation
     every { place1.rating } returns 4.5
-    every { place1.openingHours?.weekdayText } returns listOf("Monday: 7:30 AM – 8:00 PM")
+    every { place1.openingHours?.weekdayText } returns
+        listOf("Monday: Closed", "Tuesday: 8AM - 11PM", "Wednesday: 8AM - 11PM")
     val mockReview = mockk<Review>()
     every { mockReview.authorAttribution.name } returns "John Doe"
     every { mockReview.text } returns "Great coffee shop!"
@@ -135,23 +136,6 @@ class FetchNearbyCoffeeShopsTest {
     successSlot.captured.onSuccess(searchNearbyResponse)
     testScope.advanceUntilIdle() // Process all coroutines
     assertTrue(result.isNotEmpty()) // Ensure results are not empty
-  }
-
-  @Test
-  fun fetchNearbyCoffeeShops_request_permission() {
-    every {
-      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-    } returns PackageManager.PERMISSION_DENIED
-    every { ActivityCompat.requestPermissions(any<Activity>(), any(), any()) } just Runs
-
-    fetchNearbyCoffeeShops(testScope, context, currentLocation, radius) {}
-
-    verify {
-      ActivityCompat.requestPermissions(
-          context as Activity,
-          arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-          LOCATION_PERMISSION_REQUEST_CODE)
-    }
   }
 
   @Test

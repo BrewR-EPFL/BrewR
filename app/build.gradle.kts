@@ -141,6 +141,10 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.identity.googleid)
+
+
+    // Play Services Auth (for Google Sign-In)
+    implementation(libs.play.services.auth.v2050)
     implementation(libs.coil.compose)
 
 
@@ -197,8 +201,6 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.kotlin)
-    // For unit testing
-    testImplementation(libs.mockk.mockk)
 
     testImplementation(libs.kotlin.test.junit)
 
@@ -217,6 +219,8 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.play.services.maps)
 
+    // MockK
+    testImplementation(libs.mockk)
 }
 
 tasks.withType<Test> {

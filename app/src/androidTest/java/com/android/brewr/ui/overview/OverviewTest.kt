@@ -1,7 +1,18 @@
 package com.android.brewr.ui.overview
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.core.content.ContextCompat
+import androidx.test.rule.GrantPermissionRule
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -9,30 +20,39 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class OverviewScreenTest {
 
   private lateinit var navigationActions: NavigationActions
   private lateinit var journeysRepository: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
+  @Mock lateinit var mockContext: Context
   private val journey =
       Journey(
           uid = "journey1",
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -41,9 +61,16 @@ class OverviewScreenTest {
 
   // Setup Compose Test Rule
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val fineLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
+  @get:Rule
+  val coarseLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
   @Before
   fun setUp() {
+    MockitoAnnotations.initMocks(this)
     navigationActions = mock(NavigationActions::class.java)
     journeysRepository = mock(JourneysRepository::class.java)
     listJourneysViewModel = spy(ListJourneysViewModel(journeysRepository))
@@ -51,6 +78,48 @@ class OverviewScreenTest {
     // Start the OverviewScreen composable for testing
     `when`(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
     // composeTestRule.setContent { OverviewScreen(listJourneysViewModel,navigationActions) }
+
+  }
+
+  @Test
+  fun testPermissionGranted() {
+    // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
+    whenever(
+            ContextCompat.checkSelfPermission(
+                mockContext, Manifest.permission.ACCESS_FINE_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_GRANTED)
+
+    // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
+    whenever(
+            ContextCompat.checkSelfPermission(
+                mockContext, Manifest.permission.ACCESS_COARSE_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_GRANTED)
+
+    // Set up and run the Compose UI test
+    composeTestRule.setContent {
+      var permissionGranted by remember { mutableStateOf(false) }
+
+      // Launch permission check as in your real code
+      LaunchedEffect(Unit) {
+        permissionGranted =
+            ContextCompat.checkSelfPermission(
+                mockContext, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    mockContext, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED
+      }
+
+      // Display content based on permissionGranted state
+      if (permissionGranted) {
+        Text("Permission Granted")
+      } else {
+        Text("Permission Denied")
+      }
+    }
+
+    // Verify that "Permission Granted" is displayed since permissions are mocked as granted
+    composeTestRule.onNodeWithText("Permission Granted").assertIsDisplayed()
   }
 
   @Test

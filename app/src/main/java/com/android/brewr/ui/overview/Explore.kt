@@ -24,7 +24,7 @@ fun ExploreScreen(coffees: List<Coffee>) {
   var showBottomSheet by remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    MapScreen(coffees.map { it.location })
+    MapScreen(coffees)
 
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {

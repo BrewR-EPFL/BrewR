@@ -1,8 +1,12 @@
 package com.android.brewr.ui
 
+import android.Manifest
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -14,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -21,6 +26,9 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
+import com.android.brewr.model.user.UserRepository
+import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
@@ -30,6 +38,8 @@ import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,9 +51,17 @@ import org.mockito.Mockito.`when`
 @RunWith(AndroidJUnit4::class)
 class E2ETest {
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val fineLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
+  @get:Rule
+  val coarseLocationPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
-  private lateinit var repositoryMock: JourneysRepository
+  private lateinit var journeyRepositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
+  private lateinit var userRepositoryMock: UserRepository
+  private lateinit var userViewModel: UserViewModel
   private lateinit var navigationActions: NavigationActions
   private lateinit var navController: NavHostController
 
@@ -53,7 +71,11 @@ class E2ETest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -63,10 +85,12 @@ class E2ETest {
   @Before
   fun setUp() {
     // Initialize mocks and spies
-    repositoryMock = mock(JourneysRepository::class.java)
-    listJourneysViewModel = spy(ListJourneysViewModel(repositoryMock))
+    journeyRepositoryMock = mock(JourneysRepository::class.java)
+    listJourneysViewModel = spy(ListJourneysViewModel(journeyRepositoryMock))
+    userRepositoryMock = mock(UserRepository::class.java)
+    userViewModel = spy(UserViewModel(userRepositoryMock))
     // Mock the behavior of `getJourneys` to simulate fetching journeys
-    `when`(repositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
+    `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
@@ -86,7 +110,7 @@ class E2ETest {
             route = Route.OVERVIEW,
         ) {
           composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
-          composable(Screen.USERPROFILE) { UserMainProfileScreen(navigationActions) }
+          composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
           composable(Screen.JOURNEY_RECORD) {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
@@ -125,10 +149,31 @@ class E2ETest {
         .assertIsDisplayed()
         .performTextInput("Amazing Coffee Experience")
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertHasClickAction().performClick()
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertExists()
+
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Starbucks")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
+
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
+
     composeTestRule.onNodeWithTag("inputCoffeeOrigin").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("dropdownMenuCoffeeOrigin").assertExists()
     composeTestRule.onNodeWithText(CoffeeOrigin.BRAZIL.name).performClick()

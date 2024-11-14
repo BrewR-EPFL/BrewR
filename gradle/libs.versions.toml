@@ -26,7 +26,7 @@ kaspresso = "1.5.5"
 mockitoAndroid = "5.13.0"
 mockitoCore = "5.13.0"
 mockitoKotlin = "5.4.0"
-mockkVersion = "1.13.2"
+mockk = "1.13.7"
 playServicesAuthVersion = "21.2.0"
 playServicesMaps = "19.0.0"
 robolectric = "4.11.1"
@@ -46,6 +46,7 @@ googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
 constraintlayout = "2.1.4"
 placesVersion = "4.1.0"
 truth = "1.1.5"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -80,12 +81,10 @@ compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifes
 kaspresso = { group = "com.kaspersky.android-components", name = "kaspresso", version.ref = "kaspresso" }
 kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspresso-compose-support", version.ref = "kaspresso" }
 
-
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
-
-mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 play-services-auth-v2050 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
