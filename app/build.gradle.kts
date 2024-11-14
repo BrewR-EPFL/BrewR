@@ -61,6 +61,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig=true
         viewBinding = true
     }
 
@@ -153,6 +154,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.location)
+    implementation(libs.places)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
@@ -184,7 +186,8 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.kotlin)
-
+    // For unit testing
+    testImplementation(libs.mockk.mockk)
 
 
     // --------- Kaspresso test framework ----------
