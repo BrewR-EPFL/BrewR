@@ -7,6 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.Hours
+import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -27,13 +30,19 @@ class MapScreenTest {
     uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     // Sample list of locations for testing
-    val sampleLocations =
+    val sampleCoffees =
         listOf(
-            Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
-            Location(latitude = 46.5211, longitude = 6.6276, address = "Lausanne 2"))
+            Coffee(
+                "1",
+                "Coffee1",
+                Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+                4.5,
+                listOf(Hours("10", "20"), Hours("10", "20")),
+                listOf(Review("Lei", "good", 5.0)),
+                listOf("test.jpg")))
 
     // Set content to ExploreScreen
-    composeTestRule.setContent { MapScreen(listLocations = sampleLocations) }
+    composeTestRule.setContent { MapScreen(sampleCoffees) }
 
     // Handle location permission if prompted
     runBlocking { grantLocationPermission() }

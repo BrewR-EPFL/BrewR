@@ -79,7 +79,10 @@ fun OverviewScreen(
   LaunchedEffect(permissionGranted) {
     if (permissionGranted) {
       fetchNearbyCoffeeShops(
-          coroutineScope, context, getCurrentLocation(context)?:LatLng(46.5197, 6.6323), onSuccess = { coffeeShops = it })
+          coroutineScope,
+          context,
+          getCurrentLocation(context) ?: LatLng(46.5197, 6.6323),
+          onSuccess = { coffeeShops = it })
     }
   }
 
@@ -154,14 +157,15 @@ fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -
               .padding(8.dp)
               .testTag(text))
 }
+
 @SuppressLint("MissingPermission")
 private suspend fun getCurrentLocation(context: Context): LatLng? {
-    return try {
-        val locationClient = LocationServices.getFusedLocationProviderClient(context)
-        val location = locationClient.lastLocation.await()
-        location?.let { LatLng(it.latitude, it.longitude) }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
+  return try {
+    val locationClient = LocationServices.getFusedLocationProviderClient(context)
+    val location = locationClient.lastLocation.await()
+    location?.let { LatLng(it.latitude, it.longitude) }
+  } catch (e: Exception) {
+    e.printStackTrace()
+    null
+  }
 }

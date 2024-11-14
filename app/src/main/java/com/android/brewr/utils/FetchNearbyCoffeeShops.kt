@@ -1,11 +1,9 @@
 package com.android.brewr.utils
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.Coffee
@@ -84,10 +82,7 @@ fun fetchNearbyCoffeeShops(
                                   review = review.text ?: "Undefined",
                                   rating = review.rating)
                             },
-                        //use this image to avoid using API to fetch photos as it is very expensive
-                        imagesUrls = listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain"),
-                        //imagesUrls = fetchAllPhotoUris(place, placesClient)
-                ))
+                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
               }
             }
             if (coffeeShops.isNotEmpty()) {
