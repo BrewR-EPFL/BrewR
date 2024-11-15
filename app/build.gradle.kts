@@ -52,6 +52,7 @@ android {
                 "proguard-rules.pro"
             )
             if (ksFile != null && keyPW != null && keyAlias != null && ksPW != null) {
+                println("we are here") // debug print
                 signingConfig = signingConfigs.create("release") {
                     storeFile(file(ksFile)) // Path to your keystore
                     storePassword(ksPW) // Keystore
