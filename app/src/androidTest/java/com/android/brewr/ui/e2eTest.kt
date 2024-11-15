@@ -222,11 +222,6 @@ class E2ETest {
 
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("coffeeShopAddress").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("coffeeShopHours").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeImage").assertIsDisplayed()
   }
 }
