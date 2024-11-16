@@ -109,7 +109,7 @@ fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
     onCheckChange: () -> Unit,
     coffeeshopExpanded: Boolean,
-    selectedLocation: Location,
+    //selectedLocation: Location,
     onSelectedLocationChange: (Location) -> Unit
 ) {
   var showDropdown by remember { mutableStateOf(false) }
@@ -184,6 +184,9 @@ fun CoffeeShopCheckRow(
                 }
               }
         }
+  }
+    else{
+        onSelectedLocationChange(Location())
   }
 }
 

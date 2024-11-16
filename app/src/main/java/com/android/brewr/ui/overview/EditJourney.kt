@@ -127,7 +127,7 @@ fun EditJourneyScreen(
                     expanded = isYesSelected
                   },
                   coffeeshopExpanded = expanded,
-                  selectedLocation = selectedLocation,
+                  //selectedLocation = selectedLocation,
                   onSelectedLocationChange = { selectedLocation = it })
 
               // Coffee Origin Dropdown Menu
@@ -172,6 +172,7 @@ fun EditJourneyScreen(
                             coffeeRate = coffeeRate,
                             date = selectedDate)
                     listJourneysViewModel.updateJourney(updatedJourney)
+                      listJourneysViewModel.selectJourney(updatedJourney)
                     navigationActions.goBack()
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {

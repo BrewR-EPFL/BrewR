@@ -128,7 +128,7 @@ fun AddJourneyScreen(
                       expanded = isYesSelected
                     },
                     coffeeshopExpanded = expanded,
-                    selectedLocation = selectedLocation,
+                   // selectedLocation = selectedLocation,
                     onSelectedLocationChange = { selectedLocation = it })
               }
 
