@@ -12,19 +12,23 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.CoffeeInformationScreen
+import com.android.brewr.ui.explore.CoffeeInformationCardScreen
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
-class CoffeeInformationScreenTest {
+class CoffeeInformationCardTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var uiDevice: UiDevice
+  private lateinit var navigationActions: NavigationActions
 
   // Set up a mock Coffee object
   private val mockCoffee =
@@ -56,7 +60,11 @@ class CoffeeInformationScreenTest {
     uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     // Set content to CoffeeInformationScreen
-    composeTestRule.setContent { CoffeeInformationScreen(coffee = mockCoffee) }
+    navigationActions = mock(NavigationActions::class.java)
+    composeTestRule.setContent {
+      CoffeeInformationCardScreen(
+          coffee = mockCoffee, onClick = { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
+    }
 
     // Handle location permission if prompted
     runBlocking { grantLocationPermission() }

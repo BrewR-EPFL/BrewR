@@ -16,13 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
-import com.android.brewr.ui.explore.CoffeeInformationScreen
+import com.android.brewr.ui.explore.CoffeeInformationCardScreen
 import com.android.brewr.ui.explore.MapScreen
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(coffees: List<Coffee>) {
+fun ExploreScreen(coffees: List<Coffee>, navigationActions: NavigationActions) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -33,7 +35,10 @@ fun ExploreScreen(coffees: List<Coffee>) {
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
         LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
-          items(coffees) { coffee -> CoffeeInformationScreen(coffee) }
+          items(coffees) { coffee ->
+            CoffeeInformationCardScreen(
+                coffee, { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
+          }
         }
       }
     }

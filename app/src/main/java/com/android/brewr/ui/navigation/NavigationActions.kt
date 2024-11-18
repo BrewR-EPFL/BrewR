@@ -20,7 +20,8 @@ object Screen {
   const val USERPROFILE = "User Profile Screen"
   const val JOURNEY_RECORD = "Journey Screen"
   const val EDIT_JOURNEY = "Edit Journey Screen"
-  const val EXPLORE: String = "coffees explore screen"
+  const val EXPLORE = "coffees explore screen"
+  const val EXPLORE_INFOS = "coffee information screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -29,8 +30,6 @@ object TopLevelDestinations {
   val OVERVIEW =
       TopLevelDestination(route = Route.OVERVIEW, icon = Icons.Outlined.Menu, textId = "Overview")
 }
-
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.OVERVIEW)
 
 open class NavigationActions(
     private val navController: NavHostController,

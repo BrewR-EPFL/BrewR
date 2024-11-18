@@ -119,7 +119,7 @@ fun OverviewScreen(
               modifier =
                   Modifier.fillMaxWidth()
                       .height(1.dp)
-                      .background(androidx.compose.ui.graphics.Color.LightGray))
+                      .background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
@@ -130,7 +130,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeeShops)
+          ExploreScreen(coffeeShops, navigationActions)
         }
       })
 }
