@@ -60,10 +60,8 @@ fun EditJourneyScreen(
   var coffeeRate by remember { mutableStateOf(task.coffeeRate) }
   val date by remember { mutableStateOf(task.date) }
 
-  var expanded by remember {
-    mutableStateOf(false)
-  } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(selectedLocation.name !="At home") }
+  var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
+  var isYesSelected by remember { mutableStateOf(selectedLocation.name != "At home") }
   val getImageLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
