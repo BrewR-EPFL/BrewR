@@ -65,21 +65,21 @@ class CoffeeInformationScreenTest {
   @Test
   fun displayAllComponentsValidCoffee() {
     composeTestRule
-        .onNodeWithTag("coffeeShopName")
+        .onNodeWithTag("coffeeShopName:1")
         .assertIsDisplayed()
         .assertTextEquals(mockCoffee.coffeeShopName)
     composeTestRule
-        .onNodeWithTag("coffeeShopAddress")
+        .onNodeWithTag("coffeeShopAddress:1")
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffee.location.address)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours")
+        .onNodeWithTag("coffeeShopHours:1")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
                 "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
-        .onNodeWithTag("coffeeShopRating")
+        .onNodeWithTag("coffeeShopRating:1")
         .assertIsDisplayed()
         .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffee.rating)))
   }
