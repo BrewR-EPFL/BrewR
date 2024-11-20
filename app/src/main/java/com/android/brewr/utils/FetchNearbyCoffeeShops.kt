@@ -112,14 +112,19 @@ fun fetchNearbyCoffeeShops(
 
 private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
   val metadata = place.photoMetadatas?.get(0)
-  metadata?.let {
-    val photoUriRequest =
-        FetchResolvedPhotoUriRequest.builder(it).setMaxWidth(500).setMaxHeight(300).build()
-    // Fetch the URI and wait for the result
-    val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
-    return listOf(result)
-  }
-  return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
+    try {
+        metadata?.let {
+            val photoUriRequest =
+                FetchResolvedPhotoUriRequest.builder(it).setMaxWidth(500).setMaxHeight(300).build()
+            // Fetch the URI and wait for the result
+            val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
+            return listOf(result)
+        }
+        return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
+    }catch (e: Exception) {
+        e.printStackTrace()
+        return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
+    }
 }
 
 private fun getHours(weekdayText: List<String>?): List<Hours> {
