@@ -28,7 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.fetchAndSortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -52,6 +54,7 @@ fun OverviewScreen(
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
   var coffeeShops by remember { mutableStateOf<List<Coffee>>(emptyList()) }
+  var curatedCoffees by remember { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -66,6 +69,7 @@ fun OverviewScreen(
                     permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
           })
 
+  // Request location permissions
   LaunchedEffect(Unit) {
     permissionGranted =
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -81,13 +85,29 @@ fun OverviewScreen(
     }
   }
 
+  // Fetch coffee shops and curate them by rating
   LaunchedEffect(permissionGranted) {
     if (permissionGranted) {
       coroutineScope.launch {
         val currentLocation =
-            withContext(Dispatchers.IO) { getCurrentLocation(context) } ?: LatLng(46.5197, 6.6323)
+            withContext(Dispatchers.IO) { getCurrentLocation(context) }
+                ?: LatLng(46.5197, 6.6323) // Default location if GPS fails
+
+        // Fetch nearby coffee shops
         fetchNearbyCoffeeShops(
-            coroutineScope, context, currentLocation, onSuccess = { coffeeShops = it })
+            coroutineScope,
+            context,
+            currentLocation,
+            onSuccess = { fetchedCoffeeShops ->
+              coffeeShops = fetchedCoffeeShops
+
+              // Sort coffee shops by rating to generate curated list
+              fetchAndSortCoffeeShopsByRating(
+                  coroutineScope,
+                  context,
+                  currentLocation,
+                  onSuccess = { sortedCoffees -> curatedCoffees = sortedCoffees })
+            })
       }
     }
   }
@@ -115,11 +135,7 @@ fun OverviewScreen(
                       }
                 }
               })
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(1.dp)
-                      .background(androidx.compose.ui.graphics.Color.LightGray))
+          Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
@@ -130,7 +146,8 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeeShops)
+          // Pass both coffeeShops and curatedCoffees to ExploreScreen
+          ExploreScreen(coffees = coffeeShops, curatedCoffees = curatedCoffees)
         }
       })
 }
