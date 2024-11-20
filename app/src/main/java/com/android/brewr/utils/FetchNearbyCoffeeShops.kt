@@ -52,7 +52,7 @@ fun fetchNearbyCoffeeShops(
   val request =
       SearchNearbyRequest.builder(circle, placeFields)
           .setIncludedTypes(type)
-          .setMaxResultCount(20)
+          .setMaxResultCount(1)
           .build()
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
