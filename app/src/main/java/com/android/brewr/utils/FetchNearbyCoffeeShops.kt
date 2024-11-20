@@ -57,49 +57,54 @@ fun fetchNearbyCoffeeShops(
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
       PackageManager.PERMISSION_GRANTED) {
-    placesClient
-        .searchNearby(request)
-        .addOnSuccessListener { response ->
-          val coffeeShops = mutableListOf<Coffee>()
-          scope.launch {
-            response.places.map { place ->
-              place.location?.let {
-                coffeeShops.add(
-                    Coffee(
-                        id = place.id ?: "Undefined",
-                        coffeeShopName = place.displayName ?: "Undefined",
-                        location =
-                            Location(
-                                it.latitude, it.longitude, place.formattedAddress ?: "Undefined"),
-                        rating = place.rating ?: 0.0,
-                        hours = getHours(place.openingHours?.weekdayText),
-                        reviews =
-                            place.reviews?.map { review ->
-                              Review(
-                                  authorName = review.authorAttribution.name,
-                                  review = review.text ?: "Undefined",
-                                  rating = review.rating)
-                            },
-                        // use this image to avoid using API to fetch photos as it is very expensive
-                        //                        imagesUrls =
-                        //                            listOf(
-                        // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+    try {
+      placesClient
+          .searchNearby(request)
+          .addOnSuccessListener { response ->
+            val coffeeShops = mutableListOf<Coffee>()
+            scope.launch {
+              response.places.map { place ->
+                place.location?.let {
+                  coffeeShops.add(
+                      Coffee(
+                          id = place.id ?: "Undefined",
+                          coffeeShopName = place.displayName ?: "Undefined",
+                          location =
+                              Location(
+                                  it.latitude, it.longitude, place.formattedAddress ?: "Undefined"),
+                          rating = place.rating ?: 0.0,
+                          hours = getHours(place.openingHours?.weekdayText),
+                          reviews =
+                              place.reviews?.map { review ->
+                                Review(
+                                    authorName = review.authorAttribution.name,
+                                    review = review.text ?: "Undefined",
+                                    rating = review.rating)
+                              },
+                          // use this image to avoid using API to fetch photos as it is very
+                          // expensive
+                          //                        imagesUrls =
+                          //                            listOf(
+                          // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                          imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                }
               }
+              if (coffeeShops.isNotEmpty()) {
+                Log.d(
+                    "PlacesAPI",
+                    "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+              } else {
+                Log.d("PlacesAPI", "No coffee shops found.")
+              }
+              onSuccess(coffeeShops)
             }
-            if (coffeeShops.isNotEmpty()) {
-              Log.d(
-                  "PlacesAPI",
-                  "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
-            } else {
-              Log.d("PlacesAPI", "No coffee shops found.")
-            }
-            onSuccess(coffeeShops)
           }
-        }
-        .addOnFailureListener { exception ->
-          Log.e("PlacesAPI", "Place not found: ${exception.message}")
-        }
+          .addOnFailureListener { exception ->
+            Log.e("PlacesAPI", "Place not found: ${exception.message}")
+          }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
   } else {
     return
   }
