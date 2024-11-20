@@ -42,16 +42,21 @@ fun ExploreScreen(coffees: List<Coffee>, curatedCoffees: List<Coffee>) {
                   horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         text = if (showCuratedList) "Curated List" else "Nearby Coffeeshops",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
 
                     Button(
                         onClick = { showCuratedList = !showCuratedList },
                         colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
-                        shape = RoundedCornerShape(50),
-                        modifier = Modifier.testTag("toggleListButton")) {
+                        shape = RoundedCornerShape(15.dp),
+                        modifier =
+                            Modifier.padding(start = 8.dp)
+                                .height(40.dp)
+                                .wrapContentWidth()
+                                .testTag("toggleListButton")) {
                           Text(
                               text = if (showCuratedList) "Show Nearby" else "Show Curated",
+                              style = MaterialTheme.typography.bodySmall,
                               color = Color.White)
                         }
                   }
