@@ -21,8 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-
 fun fetchNearbyCoffeeShops(
     scope: CoroutineScope,
     context: Context,
@@ -85,7 +83,6 @@ fun fetchNearbyCoffeeShops(
                         // use this image to avoid using API to fetch photos as it is very expensive
                         //                        imagesUrls =
                         //                            listOf(
-                        //
                         // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
                         imagesUrls = fetchAllPhotoUris(place, placesClient)))
               }
@@ -126,7 +123,6 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
         // Split by colon to separate the day name from the time range
         val (_, timeRange) = dayText.split(": ", limit = 2)
         // Split the time range by "–" to get the opening and closing times
-
         val (openTime, closeTime) =
             if (timeRange == "Closed" || "–" !in timeRange) {
               "Undefined" to "Undefined"
