@@ -24,8 +24,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -109,7 +109,6 @@ fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
     onCheckChange: () -> Unit,
     coffeeshopExpanded: Boolean,
-    //selectedLocation: Location,
     onSelectedLocationChange: (Location) -> Unit
 ) {
   var showDropdown by remember { mutableStateOf(false) }
@@ -122,13 +121,13 @@ fun CoffeeShopCheckRow(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.testTag("coffeeShopCheckRow").clickable { onCheckChange() }) {
         Icon(
-            imageVector = if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Close,
+            imageVector = if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Home,
             contentDescription = if (isYesSelected) "Checked" else "Unchecked",
             tint = Color.Black,
             modifier = Modifier.testTag("coffeeShopCheckboxIcon"))
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "At a coffee shop",
+            text =  if (isYesSelected) "At a coffee shop" else "At home",
             color = Color.Black,
             modifier = Modifier.testTag("coffeeShopCheckText"))
       }
@@ -185,8 +184,8 @@ fun CoffeeShopCheckRow(
               }
         }
   }
-    else{
-        onSelectedLocationChange(Location())
+  else if (!isYesSelected) {
+    onSelectedLocationChange(Location())
   }
 }
 

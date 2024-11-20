@@ -62,8 +62,8 @@ fun AddJourneyScreen(
   var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
   val date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
   val context = LocalContext.current
-  var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(false) }
+  var expanded by remember { mutableStateOf(true) } // State for the dropdown menu
+  var isYesSelected by remember { mutableStateOf(true) }
 
   val getImageLauncher =
       rememberLauncherForActivityResult(
@@ -128,7 +128,6 @@ fun AddJourneyScreen(
                       expanded = isYesSelected
                     },
                     coffeeshopExpanded = expanded,
-                   // selectedLocation = selectedLocation,
                     onSelectedLocationChange = { selectedLocation = it })
               }
 
