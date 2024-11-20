@@ -43,12 +43,14 @@ fun CoffeeInformationScreen(coffee: Coffee) {
         contentDescription = "Selected Image",
         contentScale = ContentScale.Crop,
         modifier =
-            Modifier.testTag("coffeeImage").fillMaxWidth().heightIn(min = 180.dp, max = 300.dp))
+            Modifier.testTag("coffeeImage:${coffee.id}")
+                .fillMaxWidth()
+                .heightIn(min = 180.dp, max = 300.dp))
     Text(
         text = coffee.coffeeShopName,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.testTag("coffeeShopName"))
+        modifier = Modifier.testTag("coffeeShopName:${coffee.id}"))
     Column(
         modifier = Modifier.fillMaxWidth().padding(start = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -60,7 +62,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                     append(coffee.location.address)
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopAddress"))
+              modifier = Modifier.testTag("coffeeShopAddress:${coffee.id}"))
 
           Text(
               text =
@@ -80,7 +82,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                     }
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopHours"))
+              modifier = Modifier.testTag("coffeeShopHours:${coffee.id}"))
 
           Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -93,7 +95,7 @@ fun CoffeeInformationScreen(coffee: Coffee) {
                           append(String.format("%.1f/5", coffee.rating))
                         },
                     fontSize = 16.sp,
-                    modifier = Modifier.testTag("coffeeShopRating"))
+                    modifier = Modifier.testTag("coffeeShopRating:${coffee.id}"))
               }
         }
   }
