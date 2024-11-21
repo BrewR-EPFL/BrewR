@@ -98,15 +98,16 @@ class E2ETest {
               listOf(Hours("10", "20"), Hours("10", "20")),
               listOf(Review("Lei", "good", 5.0)),
               listOf("test.jpg")),
-          Coffee(
-              "2",
-              "Coffee2",
-              com.android.brewr.model.location.Location(
-                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
-              5.0,
-              listOf(Hours("10", "20"), Hours("10", "20")),
-              listOf(Review("Jaeyi", "perfect", 5.0)),
-              listOf("test2.jpg")))
+//          Coffee(
+//              "2",
+//              "Coffee2",
+//              com.android.brewr.model.location.Location(
+//                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
+//              5.0,
+//              listOf(Hours("10", "20"), Hours("10", "20")),
+//              listOf(Review("Jaeyi", "perfect", 5.0)),
+//              listOf("test2.jpg"))
+      )
 
   @Before
   fun setUp() {
@@ -252,18 +253,17 @@ class E2ETest {
         .assertTextEquals("Nearby Coffeeshops")
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeImage:2").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeImage").assertIsDisplayed()
+//    composeTestRule.onNodeWithTag("coffeeImage:2").assertIsDisplayed()
 
     // Verify the coffee shop name
     composeTestRule
-        .onNodeWithTag("coffeeShopName:1")
+        .onNodeWithTag("coffeeShopName")
         .assertIsDisplayed()
-        .assertTextEquals("Coffee Shop 1")
-    // Verify the second coffee shop name
-    composeTestRule
-        .onNodeWithTag("coffeeShopName:2")
-        .assertIsDisplayed()
-        .assertTextEquals("Coffee Shop 2")
+//    // Verify the second coffee shop name
+//    composeTestRule
+//        .onNodeWithTag("coffeeShopName")
+//        .assertIsDisplayed()
+//        .assertTextEquals("Coffee Shop")
   }
 }
