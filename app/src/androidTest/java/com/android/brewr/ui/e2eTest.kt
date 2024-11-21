@@ -171,7 +171,6 @@ class E2ETest {
         .onNodeWithTag("inputJourneyDescription")
         .assertIsDisplayed()
         .performTextInput("Amazing Coffee Experience")
-    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
 
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertHasClickAction().performClick()
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertExists()
