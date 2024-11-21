@@ -20,12 +20,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.journey.ListJourneysViewModel
@@ -36,10 +37,8 @@ import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -51,11 +50,12 @@ fun OverviewScreen(
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var coffeeShops by remember { mutableStateOf<List<Coffee>>(emptyList()) }
+  var coffeeShops by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
   var permissionGranted by remember { mutableStateOf(false) }
+  var isFetched by rememberSaveable { mutableStateOf(false) }
 
   val locationPermissionLauncher =
       rememberLauncherForActivityResult(
@@ -68,9 +68,9 @@ fun OverviewScreen(
 
   LaunchedEffect(Unit) {
     permissionGranted =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(
+            ActivityCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
 
@@ -82,13 +82,15 @@ fun OverviewScreen(
   }
 
   LaunchedEffect(permissionGranted) {
-    if (permissionGranted) {
+    if (permissionGranted && !isFetched) {
       coroutineScope.launch {
-        val currentLocation =
-            withContext(Dispatchers.IO) { getCurrentLocation(context) } ?: LatLng(46.5197, 6.6323)
-        fetchNearbyCoffeeShops(
-            coroutineScope, context, currentLocation, onSuccess = { coffeeShops = it })
+        getCurrentLocation(
+            context,
+            onSuccess = {
+              fetchNearbyCoffeeShops(coroutineScope, context, it, onSuccess = { coffeeShops = it })
+            })
       }
+      isFetched = true
     }
   }
 
@@ -164,13 +166,17 @@ fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -
 }
 
 @SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context): LatLng? {
-  return try {
+private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
+  try {
     val locationClient = LocationServices.getFusedLocationProviderClient(context)
     val location = locationClient.lastLocation.await()
-    location?.let { LatLng(it.latitude, it.longitude) }
+    if (location != null) {
+      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
+    } else {
+      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
+    }
   } catch (e: Exception) {
     e.printStackTrace()
-    null
+    onSuccess(LatLng(46.5197, 6.6323))
   }
 }
