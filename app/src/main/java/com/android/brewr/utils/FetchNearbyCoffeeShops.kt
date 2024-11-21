@@ -87,16 +87,16 @@ fun fetchNearbyCoffeeShops(
                           //                            listOf(
                           // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
                           imagesUrls = fetchAllPhotoUris(place, placesClient)))
-
+                }
+                if (coffeeShops.isNotEmpty()) {
+                  Log.d(
+                      "PlacesAPI",
+                      "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+                } else {
+                  Log.d("PlacesAPI", "No coffee shops found.")
+                }
+                onSuccess(coffeeShops)
               }
-              if (coffeeShops.isNotEmpty()) {
-                Log.d(
-                    "PlacesAPI",
-                    "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
-              } else {
-                Log.d("PlacesAPI", "No coffee shops found.")
-              }
-              onSuccess(coffeeShops)
             }
           }
           .addOnFailureListener { exception ->

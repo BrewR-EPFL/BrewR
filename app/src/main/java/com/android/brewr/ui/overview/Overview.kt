@@ -88,7 +88,11 @@ fun OverviewScreen(
         getCurrentLocation(
             context,
             onSuccess = {
-              fetchNearbyCoffeeShops(coroutineScope, context, it, onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
+              fetchNearbyCoffeeShops(
+                  coroutineScope,
+                  context,
+                  it,
+                  onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
             })
       }
       isFetched = true
