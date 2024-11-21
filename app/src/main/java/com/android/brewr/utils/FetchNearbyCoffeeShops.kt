@@ -54,7 +54,7 @@ fun fetchNearbyCoffeeShops(
   val request =
       SearchNearbyRequest.builder(circle, placeFields)
           .setIncludedTypes(type)
-          .setMaxResultCount(20)
+          .setMaxResultCount(1) // change it to 20 for real showcase
           .build()
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -82,12 +82,12 @@ fun fetchNearbyCoffeeShops(
                                   review = review.text ?: "Undefined",
                                   rating = review.rating)
                             },
-                        // use this image to avoid using API to fetch photos as it is very expensive
-                        //                        imagesUrls =
-                        //                            listOf(
-                        //
-                        // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                        //                         use this image to avoid using API to fetch photos
+                        // as it is very expensive
+                        imagesUrls =
+                            listOf(
+                                "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                //                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
               }
             }
             if (coffeeShops.isNotEmpty()) {
