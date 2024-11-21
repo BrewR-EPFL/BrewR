@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -15,34 +15,50 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.brewr.model.coffee.Coffee
-import com.android.brewr.ui.explore.CoffeeInformationCardScreen
-import com.android.brewr.ui.explore.MapScreen
-import com.android.brewr.ui.navigation.NavigationActions
-import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.model.coffee.CoffeesViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(coffees: List<Coffee>, navigationActions: NavigationActions) {
+fun ExploreScreen(coffeesViewModel: CoffeesViewModel) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
 
+  // Collect coffees list
+  val coffees = coffeesViewModel.coffees.collectAsState().value
+
+  // State for controlling the current view in the bottom sheet
+  var showCoffeeInfos by remember { mutableStateOf(false) }
+
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    // Map Screen
     MapScreen(coffees)
 
+    // Modal Bottom Sheet
     if (showBottomSheet) {
       ModalBottomSheet(onDismissRequest = { showBottomSheet = false }, sheetState = sheetState) {
-        LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
-          items(coffees) { coffee ->
-            CoffeeInformationCardScreen(
-                coffee, { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
-          }
+        if (!showCoffeeInfos) {
+          LazyColumn(
+              modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f).testTag("bottomSheet")) {
+                items(coffees) { coffee ->
+                  CoffeeInformationCardScreen(
+                      coffee = coffee,
+                      onClick = {
+                        coffeesViewModel.selectCoffee(coffee)
+                        showCoffeeInfos = true
+                      })
+                }
+              }
+        } else {
+          // Coffee Information Screen
+          CoffeeInformationScreen(
+              coffeesViewModel = coffeesViewModel, onBack = { showCoffeeInfos = false })
         }
       }
     }
 
+    // Floating Menu Button
     IconButton(
         onClick = { showBottomSheet = true },
         modifier = Modifier.align(Alignment.BottomStart).padding(20.dp).testTag("menuButton")) {
@@ -60,6 +76,7 @@ fun ExploreScreen(coffees: List<Coffee>, navigationActions: NavigationActions) {
               }
         }
 
+    // Automatically show the bottom sheet when the screen loads
     LaunchedEffect(Unit) { coroutineScope.launch { sheetState.show() } }
   }
 }

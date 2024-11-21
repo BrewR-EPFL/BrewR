@@ -27,8 +27,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -47,11 +48,11 @@ import kotlinx.coroutines.withContext
 fun OverviewScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
+    coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var coffeeShops by remember { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -87,7 +88,11 @@ fun OverviewScreen(
         val currentLocation =
             withContext(Dispatchers.IO) { getCurrentLocation(context) } ?: LatLng(46.5197, 6.6323)
         fetchNearbyCoffeeShops(
-            coroutineScope, context, currentLocation, onSuccess = { coffeeShops = it })
+            coroutineScope,
+            context,
+            currentLocation,
+            onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) },
+        )
       }
     }
   }
@@ -115,11 +120,7 @@ fun OverviewScreen(
                       }
                 }
               })
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(1.dp)
-                      .background(Color.LightGray))
+          Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
@@ -130,7 +131,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeeShops, navigationActions)
+          ExploreScreen(coffeesViewModel)
         }
       })
 }

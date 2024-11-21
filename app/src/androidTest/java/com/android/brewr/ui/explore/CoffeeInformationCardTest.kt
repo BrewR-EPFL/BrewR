@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -12,7 +12,6 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.CoffeeInformationCardScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import java.time.LocalDate
