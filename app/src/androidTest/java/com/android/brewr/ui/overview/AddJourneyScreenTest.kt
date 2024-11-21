@@ -58,6 +58,26 @@ class AddJourneyScreenTest {
         .assertIsDisplayed()
         .performTextInput("Amazing Coffee Experience")
 
+    // Check if the location input field is displayed
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckboxIcon", useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At a coffee shop")
+    // Check if the Coffee Shop Name input field displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
+
+    // Test the coffee shop checkbox interaction
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    // Assert that the text "At home" is displayed
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At home")
+    // Check if the Coffee Shop Name input field not display
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsNotDisplayed()
+
     // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
 

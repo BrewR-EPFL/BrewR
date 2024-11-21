@@ -60,11 +60,8 @@ fun EditJourneyScreen(
   var coffeeRate by remember { mutableStateOf(task.coffeeRate) }
   val date by remember { mutableStateOf(task.date) }
 
-  var expanded by remember {
-    mutableStateOf(selectedLocation.name.isNotEmpty())
-  } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(false) }
-
+  var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
+  var isYesSelected by remember { mutableStateOf(selectedLocation.name != "At home") }
   val getImageLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
@@ -127,7 +124,6 @@ fun EditJourneyScreen(
                     expanded = isYesSelected
                   },
                   coffeeshopExpanded = expanded,
-                  selectedLocation = selectedLocation,
                   onSelectedLocationChange = { selectedLocation = it })
 
               // Coffee Origin Dropdown Menu
@@ -172,6 +168,7 @@ fun EditJourneyScreen(
                             coffeeRate = coffeeRate,
                             date = selectedDate)
                     listJourneysViewModel.updateJourney(updatedJourney)
+                    listJourneysViewModel.selectJourney(updatedJourney)
                     navigationActions.goBack()
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
