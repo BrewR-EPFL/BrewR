@@ -42,13 +42,13 @@ class CoffeeInformationCardTest {
           rating = 4.9,
           hours =
               listOf(
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM")),
+                  Hours("Monday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Tuesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Wednesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Thursday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Friday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Saturday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Sunday", open = "8:00 AM", close = "5:00 PM")),
           reviews = listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0)),
           imagesUrls =
               listOf(

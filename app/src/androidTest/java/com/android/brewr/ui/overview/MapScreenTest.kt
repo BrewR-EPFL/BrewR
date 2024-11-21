@@ -38,7 +38,7 @@ class MapScreenTest {
                 "Coffee1",
                 Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
                 4.5,
-                listOf(Hours("10", "20"), Hours("10", "20")),
+                listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
                 listOf("test.jpg")))
 
