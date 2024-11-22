@@ -1,5 +1,6 @@
 package com.android.brewr.ui.overview
 
+import android.icu.util.GregorianCalendar
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -23,10 +24,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,8 +40,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,12 +59,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
-import com.android.brewr.ui.theme.Purple80
+import com.android.brewr.model.map.Location
+import com.android.brewr.model.map.LocationViewModel
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.Gold
+import com.android.brewr.ui.theme.LightBrown
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit, testTag: String) {
@@ -88,32 +103,88 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
       modifier = Modifier.fillMaxWidth().height(150.dp).testTag("inputJourneyDescription"))
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
     onCheckChange: () -> Unit,
-    expanded: Boolean,
-    coffeeShopName: String,
-    onCoffeeShopNameChange: (String) -> Unit
+    coffeeshopExpanded: Boolean,
+    onSelectedLocationChange: (Location) -> Unit
 ) {
+  var showDropdown by remember { mutableStateOf(false) }
+  val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+  val locationQuery by locationViewModel.query.collectAsState()
+
   Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.testTag("coffeeShopCheckRow").clickable { onCheckChange() }) {
         Icon(
-            imageVector = if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Close,
+            imageVector = if (isYesSelected) Icons.Outlined.Check else Icons.Outlined.Home,
             contentDescription = if (isYesSelected) "Checked" else "Unchecked",
-            tint = Color.Black)
+            tint = Color.Black,
+            modifier = Modifier.testTag("coffeeShopCheckboxIcon"))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "At a coffee shop", color = Color.Black)
+        Text(
+            text = if (isYesSelected) "At a coffee shop" else "At home",
+            color = Color.Black,
+            modifier = Modifier.testTag("coffeeShopCheckText"))
       }
 
-  if (expanded) {
-    OutlinedTextField(
-        value = coffeeShopName,
-        onValueChange = onCoffeeShopNameChange,
-        label = { Text("Coffee Shop Name") },
-        placeholder = { Text("Enter the name") },
-        modifier = Modifier.fillMaxWidth().testTag("coffeeShopNameField"))
+  if (coffeeshopExpanded) {
+    ExposedDropdownMenuBox(
+        expanded = showDropdown && locationSuggestions.isNotEmpty(),
+        onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility
+        modifier = Modifier.testTag("exposedDropdownMenuBox")) {
+          OutlinedTextField(
+              value = locationQuery,
+              onValueChange = {
+                locationViewModel.setQuery(it)
+                showDropdown = true // Show dropdown when user starts typing
+              },
+              label = { Text("Coffeeshop") },
+              placeholder = { Text("Enter the Coffeeshop") },
+              modifier =
+                  Modifier.menuAnchor() // Anchor the dropdown to this text field
+                      .fillMaxWidth()
+                      .testTag("inputCoffeeshopLocation"),
+              singleLine = true)
+
+          // Dropdown menu for location suggestions
+          ExposedDropdownMenu(
+              expanded = showDropdown && locationSuggestions.isNotEmpty(),
+              onDismissRequest = { showDropdown = false },
+              modifier = Modifier.testTag("locationSuggestionsDropdown")) {
+                locationSuggestions.filterNotNull().take(3).forEach { location ->
+                  DropdownMenuItem(
+                      text = {
+                        Text(
+                            text =
+                                location.name.take(30) +
+                                    if (location.name.length > 30) "..."
+                                    else "", // Limit name length
+                            maxLines = 1 // Ensure name doesn't overflow
+                            )
+                      },
+                      onClick = {
+                        locationViewModel.setQuery(location.name)
+                        onSelectedLocationChange(location)
+                        showDropdown = false // Close dropdown on selection
+                      },
+                      modifier = Modifier.padding(8.dp))
+                }
+
+                if (locationSuggestions.size > 3) {
+                  DropdownMenuItem(
+                      text = { Text("More...") },
+                      onClick = { /* Optionally show more results */},
+                      modifier = Modifier.padding(8.dp))
+                }
+              }
+        }
+  } else if (!isYesSelected) {
+    onSelectedLocationChange(Location())
   }
 }
 
@@ -206,7 +277,7 @@ fun BrewingMethodField(
                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                   colors =
                       ButtonDefaults.buttonColors(
-                          containerColor = Purple80, contentColor = Color.White)) {
+                          containerColor = LightBrown, contentColor = CoffeeBrown)) {
                     Text(method.name.replace("_", " "), modifier = Modifier.padding(4.dp))
                   }
             } else {
@@ -254,7 +325,7 @@ fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste
                   contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                   colors =
                       ButtonDefaults.buttonColors(
-                          containerColor = Purple80, contentColor = Color.White)) {
+                          containerColor = LightBrown, contentColor = CoffeeBrown)) {
                     Text(taste.name.replace("_", " "), modifier = Modifier.padding(4.dp))
                   }
             } else {
@@ -302,7 +373,7 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
                   Icon(
                       imageVector = Icons.Filled.Star,
                       contentDescription = "Filled Star $i",
-                      tint = Color(0xFFFFD700), // Gold color for filled star
+                      tint = Gold, // Gold color for filled star
                       modifier =
                           Modifier.size(40.dp).testTag("FilledStar$i").clickable {
                             // Update the coffeeRate when the star is clicked
@@ -324,22 +395,55 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateField(date: String, onDateChange: (String) -> Unit) {
-  Column {
-    // Label Text
+fun DateField(date: Timestamp, onDateChange: (Timestamp) -> Unit) {
+  var showDatePicker by remember { mutableStateOf(false) }
+  var selectedDate by remember { mutableStateOf(date) }
+  val datePickerState =
+      rememberDatePickerState(
+          initialSelectedDateMillis = date.toDate().time, initialDisplayMode = DisplayMode.Picker)
+  val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+  // Trigger the DatePickerDialog
+  if (showDatePicker) {
+    DatePickerDialog(
+        onDismissRequest = { showDatePicker = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                val selectedMillis = datePickerState.selectedDateMillis
+                if (selectedMillis != null) {
+                  val calendar = GregorianCalendar()
+                  calendar.timeInMillis = selectedMillis
+                  val timestamp = Timestamp(calendar.time)
+                  selectedDate = timestamp
+                  onDateChange(timestamp)
+                }
+                showDatePicker = false
+              }) {
+                Text("OK", fontWeight = FontWeight.Bold)
+              }
+        },
+        dismissButton = {
+          TextButton(onClick = { showDatePicker = false }) {
+            Text("Cancel", fontWeight = FontWeight.Bold)
+          }
+        },
+        modifier = Modifier.testTag("datePickerDialog")) {
+          DatePicker(state = datePickerState)
+        }
+  }
+
+  Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
     Text(
         text = "Date",
-        modifier = Modifier.padding(bottom = 20.dp),
         fontSize = 16.sp,
-        fontWeight = FontWeight.Bold)
-
-    // Date Text
-    TextField(
-        value = date,
-        onValueChange = { onDateChange(it) },
-        label = { Text("DD/MM/YYYY") },
-        placeholder = { Text(date) },
-        modifier = Modifier.fillMaxWidth().testTag("inputDate"))
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.testTag("dateTitle"))
+    // UI element to open the DatePickerDialog
+    TextButton(onClick = { showDatePicker = true }, modifier = Modifier.testTag("dateButton")) {
+      Text(text = selectedDate.let { dateFormat.format(it.toDate()) }, fontSize = 14.sp)
+    }
   }
 }

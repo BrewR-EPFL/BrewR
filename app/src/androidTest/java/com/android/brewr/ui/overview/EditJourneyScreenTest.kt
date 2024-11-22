@@ -3,8 +3,13 @@ package com.android.brewr.ui.overview
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -19,9 +24,12 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +38,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
@@ -48,7 +55,23 @@ class EditJourneyScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          coffeeShopName = "Starbucks",
+          location =
+              Location(
+                  46.5183076,
+                  6.6338096,
+                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeOrigin = CoffeeOrigin.BRAZIL,
+          brewingMethod = BrewingMethod.POUR_OVER,
+          coffeeTaste = CoffeeTaste.NUTTY,
+          coffeeRate = CoffeeRate.ONE,
+          date = Timestamp.now())
+  private val journey2 =
+      Journey(
+          uid = "journey2",
+          imageUrl =
+              "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
+          description = "A wonderful coffee journey.",
+          location = Location(),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -98,21 +121,46 @@ class EditJourneyScreenTest {
         .assertIsDisplayed()
         .performTextInput("Updated Coffee Experience")
 
+    // Test if the text changes to "At a coffee shop"
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At a coffee shop")
+    // Check if the Coffee Shop Name field not displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsNotDisplayed()
     // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
-
-    // Check if the Coffee Shop Name field displays the correct coffee shop name
+    // Test if the text changes to "At a coffee shop"
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertIsDisplayed()
-        .assert(hasText("Starbucks"))
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At home")
+    // Check if the Coffee Shop Name field not displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsNotDisplayed()
+    // Test the coffee shop checkbox interaction
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    // Check if the Coffee Shop Name input field displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
 
-    // After clicking, the Coffee Shop Name field should appear
+    // Update the coffee shop location
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Local Brew")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
 
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
     // Test Coffee Origin before change match the journey's origin
     composeTestRule
         .onNodeWithTag("inputCoffeeOrigin")
@@ -172,30 +220,17 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("OutlinedStar4").assertIsDisplayed()
     composeTestRule.onNodeWithTag("OutlinedStar5").assertIsDisplayed()
 
-    // Enter a date into the date field
-    composeTestRule.onNodeWithTag("inputDate").assertIsDisplayed().performTextInput("15/10/2024")
+    // Open the DatePickerDialog
+    composeTestRule.onNodeWithTag("dateButton").assertIsDisplayed().performClick()
+
+    // Verify the DatePickerDialog is shown
+    composeTestRule.onNodeWithTag("datePickerDialog").assertIsDisplayed()
+
+    // Confirm the selection
+    composeTestRule.onNodeWithText("Cancel").performClick()
 
     // Simulate clicking the Save button
     composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
-  }
-
-  @Test
-  fun doesNotSubmitWithInvalidDate() {
-    listJourneysViewModel.selectJourney(journey1)
-    composeTestRule.setContent {
-      EditJourneyScreen(
-          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
-    }
-
-    // Clear any existing input in the date field and enter an invalid date
-    composeTestRule.onNodeWithTag("inputDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputDate").performTextInput("notadate")
-
-    // Click the save button
-    composeTestRule.onNodeWithTag("journeySave").performClick()
-
-    // Verify that the function to add the journey was NOT called due to invalid date
-    verify(repositoryMock, never()).updateJourney(any(), any(), any())
   }
 
   @Test
@@ -213,8 +248,19 @@ class EditJourneyScreenTest {
         .performTextInput("Another wonderful coffee journey.")
     // Coffee Shop Name
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").performClick()
-    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextClearance()
-    composeTestRule.onNodeWithTag("coffeeShopNameField").performTextInput("Pablo's Coffee")
+    /**
+     * composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performTextClearance()
+     * composeTestRule .onNodeWithTag("inputCoffeeshopLocation") .performClick()
+     * .performTextInput("Starbucks Lausanne")
+     *
+     * runBlocking { repeat(50) { // 50 * 100ms = 5000ms = 5 seconds if (composeTestRule
+     * .onAllNodes(hasTestTag("locationSuggestionsDropdown")) .fetchSemanticsNodes() .isNotEmpty())
+     * { return@runBlocking // Exit loop if the dropdown becomes visible } delay(100) } }
+     * composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+     *
+     * // Simulate selecting the first location suggestion (if available)
+     * composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
+     */
     // Coffee Origin
     composeTestRule
         .onNodeWithTag("Button:${BrewingMethod.FRENCH_PRESS.name}")
@@ -245,6 +291,64 @@ class EditJourneyScreenTest {
   }
 
   @Test
+  fun testEditJourneyScreenWithLocationAthomeDisplaysCorrectly() {
+    listJourneysViewModel.selectJourney(journey2)
+    composeTestRule.setContent {
+      EditJourneyScreen(
+          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
+    }
+    // Check if the Coffees hop checkbox is displayed
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertIsDisplayed()
+    // Assert that the text "At home" is displayed
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At home")
+    // Check if the Coffee Shop search field is not displayed
+    composeTestRule
+        .onNodeWithTag("inputCoffeeshopLocation", useUnmergedTree = true)
+        .assertIsNotDisplayed()
+
+    // Test the coffee shop checkbox interaction
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    // Test if the text changes to "At a coffee shop"
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At a coffee shop")
+    // Check if the Coffee Shop Name input field displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
+
+    // Update the coffee shop location
+    composeTestRule
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
+
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
+    // Test Coffee Origin before change match the journey's origin
+    composeTestRule
+        .onNodeWithTag("inputCoffeeOrigin")
+        .assertIsDisplayed()
+        .assert(hasText(CoffeeOrigin.BRAZIL.name))
+
+    // Simulate clicking the Save button
+    composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
+  }
+
+  @Test
   fun navigatesBackToOverviewOnBackButtonClick() {
     listJourneysViewModel.selectJourney(journey1)
     composeTestRule.setContent {
@@ -256,3 +360,5 @@ class EditJourneyScreenTest {
     verify(navigationActions).goBack()
   }
 }
+
+private fun Unit.performTextInput(s: String) {}

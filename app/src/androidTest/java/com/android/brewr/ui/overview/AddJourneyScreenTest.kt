@@ -10,6 +10,8 @@ import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,8 +19,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
@@ -58,14 +58,53 @@ class AddJourneyScreenTest {
         .assertIsDisplayed()
         .performTextInput("Amazing Coffee Experience")
 
+    // Check if the location input field is displayed
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckboxIcon", useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At a coffee shop")
+    // Check if the Coffee Shop Name input field displays
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
+
+    // Test the coffee shop checkbox interaction
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    // Assert that the text "At home" is displayed
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At home")
+    // Check if the Coffee Shop Name input field not display
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsNotDisplayed()
+
     // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
 
-    // After clicking, the Coffee Shop Name field should appear
+    // After clicking, the coffee shop location input field should appear
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
+
+    // Interact with the dropdown for coffee shop location suggestions
     composeTestRule
-        .onNodeWithTag("coffeeShopNameField")
-        .assertExists()
-        .performTextInput("Starbucks")
+        .onNodeWithTag("inputCoffeeshopLocation")
+        .performClick()
+        .performTextInput("Starbucks Lausanne")
+
+    runBlocking {
+      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+        if (composeTestRule
+            .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
+            .fetchSemanticsNodes()
+            .isNotEmpty()) {
+          return@runBlocking // Exit loop if the dropdown becomes visible
+        }
+        delay(100)
+      }
+    }
+    composeTestRule.onNodeWithTag("locationSuggestionsDropdown").assertIsDisplayed()
+
+    // Simulate selecting the first location suggestion (if available)
+    composeTestRule.onAllNodesWithTag("locationSuggestionsDropdown").onFirst().performClick()
 
     // Test Coffee Origin dropdown (click and select an option)
     composeTestRule.onNodeWithTag("inputCoffeeOrigin").assertIsDisplayed().performClick()
@@ -120,29 +159,17 @@ class AddJourneyScreenTest {
     composeTestRule.onNodeWithTag("FilledStar4").assertIsDisplayed()
     composeTestRule.onNodeWithTag("FilledStar5").assertIsDisplayed()
 
-    // Enter a date into the date field
-    composeTestRule.onNodeWithTag("inputDate").assertIsDisplayed().performTextInput("12/12/2024")
+    // Open the DatePickerDialog
+    composeTestRule.onNodeWithTag("dateButton").assertIsDisplayed().performClick()
+
+    // Verify the DatePickerDialog is shown
+    composeTestRule.onNodeWithTag("datePickerDialog").assertIsDisplayed()
+
+    // Confirm the selection
+    composeTestRule.onNodeWithText("Cancel").performClick()
 
     // Simulate clicking the Save button
     composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
-  }
-
-  @Test
-  fun doesNotSubmitWithInvalidDate() {
-    composeTestRule.setContent {
-      AddJourneyScreen(
-          listJourneysViewModel = listJourneysViewModel, navigationActions = navigationActions)
-    }
-
-    // Clear any existing input in the date field and enter an invalid date
-    composeTestRule.onNodeWithTag("inputDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputDate").performTextInput("notadate")
-
-    // Click the save button
-    composeTestRule.onNodeWithTag("journeySave").performClick()
-
-    // Verify that the function to add the journey was NOT called due to invalid date
-    verify(repositoryMock, never()).addJourney(any(), any(), any())
   }
 
   @Test

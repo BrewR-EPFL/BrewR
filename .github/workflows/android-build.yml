@@ -47,10 +47,12 @@ jobs:
     - name: Decode google-services.json
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
       run: |
         echo $GOOGLE_SERVICES_JSON | base64 --decode > ./app/google-services.json
+        echo "$MAPS_API_KEY" | base64 --decode > ./local.properties      
 
-    # Debug: Check if google-services.json is correctly decoded
+      # Debug: Check if google-services.json is correctly decoded
     - name: Debug google-services.json
       run: cat ./app/google-services.json
       
@@ -61,14 +63,51 @@ jobs:
     # Download and cache dependencies
     - name: Download dependencies
       run: ./gradlew build --no-daemon --stacktrace
+    # Create a signing key for the release build
+    - name: Create Release Keystore for Signing
+      run: |
+        keytool -genkey -v -keystore ~/release.keystore -alias appkey \
+          -storepass appkey123 -keypass appkey123 -keyalg RSA -validity 4200 \
+          -dname "CN=App Release,O=Company,C=US"
 
-    # Assemble APK (you can add `assembleRelease` for release builds)
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    # Determine the absolute path of the keystore file for later use
+    - name: Locate Keystore File Path
+      id: keystore_path
+      run: |
+        KS_FILE=$(readlink -f ~/release.keystore)
+        echo "KS_FILE=$KS_FILE" >> $GITHUB_ENV
+
+    # Compile the APK in release mode, ensuring it's signed with the keystore
+    - name: Build Signed APK for Release
+      env:
+        KS_PW: appkey123
+        KEY_ALIAS: appkey
+        KEY_PW: appkey123
+      run: |
+        ./gradlew assembleRelease --info
+
+    # Extract the SHA-1 fingerprint of the keystore, which is often used for OAuth or API integrations
+    - name: Extract Keystore SHA-1 Fingerprint
+      id: sha
+      run: |
+        SHA1=$(keytool -list -v \
+            -keystore ~/release.keystore \
+            -alias appkey \
+            -storepass appkey123 | grep 'SHA1' | awk '{print $2}')
+        echo "SHA1 fingerprint: ${SHA1}"
+
+    # Verify the generated APKs to ensure they were built successfully
+    - name: List Generated APK Files
+      run: |
+        find app/build/outputs/apk -type f
+
+#    # Assemble APK (you can add `assembleRelease` for release builds)
+#    - name: Build Debug APK
+#      run: ./gradlew assembleDebug
 
     # Upload the generated APK to GitHub Artifacts
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: BrewR-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/release/app-release.apk

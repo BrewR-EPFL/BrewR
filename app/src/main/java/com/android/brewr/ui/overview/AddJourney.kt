@@ -1,6 +1,5 @@
 package com.android.brewr.ui.overview
 
-import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,7 +39,9 @@ import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
@@ -48,22 +50,20 @@ import com.google.firebase.Timestamp
 fun AddJourneyScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
 ) {
   val uid = listJourneysViewModel.getNewUid()
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf("") }
-  var coffeeShopName by remember {
-    mutableStateOf("")
-  } // Will change to Location once it's implemented
+  var selectedLocation by remember { mutableStateOf(Location()) }
   var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
   var brewingMethod by remember { mutableStateOf(BrewingMethod.DEFAULT) }
   var coffeeTaste by remember { mutableStateOf(CoffeeTaste.DEFAULT) }
   var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
-  val date by remember { mutableStateOf("") } // Using Firebase Timestamp for now
+  val date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
   val context = LocalContext.current
-  var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(false) }
+  var expanded by remember { mutableStateOf(true) } // State for the dropdown menu
+  var isYesSelected by remember { mutableStateOf(true) }
 
   val getImageLauncher =
       rememberLauncherForActivityResult(
@@ -120,15 +120,16 @@ fun AddJourneyScreen(
                         description = description, onDescriptionChange = { description = it })
                   }
               // CoffeeShop Dropdown Menu below the row
-              CoffeeShopCheckRow(
-                  isYesSelected = isYesSelected,
-                  onCheckChange = {
-                    isYesSelected = !isYesSelected
-                    expanded = isYesSelected
-                  },
-                  expanded = expanded,
-                  coffeeShopName = coffeeShopName,
-                  onCoffeeShopNameChange = { coffeeShopName = it })
+              selectedLocation.let {
+                CoffeeShopCheckRow(
+                    isYesSelected = isYesSelected,
+                    onCheckChange = {
+                      isYesSelected = !isYesSelected
+                      expanded = isYesSelected
+                    },
+                    coffeeshopExpanded = expanded,
+                    onSelectedLocationChange = { selectedLocation = it })
+              }
 
               // Coffee Origin Dropdown Menu
               CoffeeOriginDropdownMenu(
@@ -153,43 +154,24 @@ fun AddJourneyScreen(
               DateField(selectedDate) { selectedDate = it }
 
               Button(
+                  colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
                       uploadPicture(imageUri!!) { imageUrl ->
-                        val calendar = GregorianCalendar()
-                        val parts = selectedDate.split("/")
-                        if (parts.size == 3) {
-                          try {
-                            calendar.set(
-                                parts[2].toInt(),
-                                parts[1].toInt() - 1, // Months are 0-based
-                                parts[0].toInt(),
-                                0,
-                                0,
-                                0)
-
-                            // Create a new journey with the uploaded image URL
-                            val newJourney =
-                                Journey(
-                                    uid = uid,
-                                    imageUrl = imageUrl, // Use the downloaded URL from Firebase
-                                    description = description,
-                                    coffeeShopName = coffeeShopName,
-                                    coffeeOrigin = coffeeOrigin,
-                                    brewingMethod = brewingMethod,
-                                    coffeeTaste = coffeeTaste,
-                                    coffeeRate = coffeeRate,
-                                    date = Timestamp(calendar.time))
-                            listJourneysViewModel.addJourney(newJourney)
-                            navigationActions.goBack()
-                            return@uploadPicture
-                          } catch (_: NumberFormatException) {}
-                          Toast.makeText(
-                                  context,
-                                  "Invalid format, date must be DD/MM/YYYY.",
-                                  Toast.LENGTH_SHORT)
-                              .show()
-                        }
+                        val newJourney =
+                            Journey(
+                                uid = uid,
+                                imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                description = description,
+                                location = selectedLocation,
+                                coffeeOrigin = coffeeOrigin,
+                                brewingMethod = brewingMethod,
+                                coffeeTaste = coffeeTaste,
+                                coffeeRate = coffeeRate,
+                                date = selectedDate)
+                        listJourneysViewModel.addJourney(newJourney)
+                        navigationActions.goBack()
+                        return@uploadPicture
                       }
                     } else {
                       Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()

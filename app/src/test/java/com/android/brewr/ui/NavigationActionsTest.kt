@@ -1,4 +1,4 @@
-package com.android.brewr.ui.navigation
+package com.android.brewr.ui
 
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
@@ -6,6 +6,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.PopUpToBuilder
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Route
+import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.navigation.TopLevelDestinations
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before

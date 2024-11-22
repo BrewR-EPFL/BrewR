@@ -1,15 +1,34 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
+    // Necessary for Kotlin 2.0
+    alias(libs.plugins.compose.compiler)
+
     id("jacoco")
-    id("com.google.gms.google-services") // Ensure this is present
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) // Ensure this is present
 }
 
 android {
     namespace = "com.android.brewr"
     compileSdk = 34
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+    // Load the API key from local.properties
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val keyPW = System.getenv("KEY_PW") ?: localProperties.getProperty("KEY_PW")
+    val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
+    val ksFile = System.getenv("KS_FILE") ?: localProperties.getProperty("KS_FILE") // KS = keystore
+    val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW")
 
     defaultConfig {
         applicationId = "com.android.brewr"
@@ -22,6 +41,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -31,6 +51,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (ksFile != null && keyPW != null && keyAlias != null && ksPW != null) {
+                println("we are here") // debug print
+                signingConfig = signingConfigs.create("release") {
+                    storeFile(file(ksFile)) // Path to your keystore
+                    storePassword(ksPW) // Keystore
+                    keyAlias(keyAlias) // Alias for the key to
+                    keyPassword(keyPW) // Password for the key
+                }
+            }
         }
 
         debug {
@@ -45,10 +74,12 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig=true
+        viewBinding = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.2"
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
 
     compileOptions {
@@ -119,9 +150,14 @@ dependencies {
     // Firebase authentication
     implementation(libs.google.firebase.auth.ktx)
 
+    // Credential Manager dependencies
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.identity.googleid)
+
+
     // Play Services Auth (for Google Sign-In)
     implementation(libs.play.services.auth.v2050)
-
     implementation(libs.coil.compose)
 
 
@@ -134,6 +170,9 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.location)
+    implementation(libs.places)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -166,13 +205,19 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
 
 
-
     // --------- Kaspresso test framework ----------
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
 
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.auth)
+    implementation(libs.play.services.maps)
+
+    // MockK
+    testImplementation(libs.mockk)
 }
 
 tasks.withType<Test> {
