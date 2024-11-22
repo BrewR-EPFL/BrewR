@@ -21,8 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-
 fun fetchNearbyCoffeeShops(
     scope: CoroutineScope,
     context: Context,
@@ -54,55 +52,59 @@ fun fetchNearbyCoffeeShops(
   val request =
       SearchNearbyRequest.builder(circle, placeFields)
           .setIncludedTypes(type)
-          .setMaxResultCount(1) // change it to 20 for real showcase
+          .setMaxResultCount(1)
           .build()
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
       PackageManager.PERMISSION_GRANTED) {
-    placesClient
-        .searchNearby(request)
-        .addOnSuccessListener { response ->
-          val coffeeShops = mutableListOf<Coffee>()
-          scope.launch {
-            response.places.map { place ->
-              place.location?.let {
-                coffeeShops.add(
-                    Coffee(
-                        id = place.id ?: "Undefined",
-                        coffeeShopName = place.displayName ?: "Undefined",
-                        location =
-                            Location(
-                                it.latitude, it.longitude, place.formattedAddress ?: "Undefined"),
-                        rating = place.rating ?: 0.0,
-                        hours = getHours(place.openingHours?.weekdayText),
-                        reviews =
-                            place.reviews?.map { review ->
-                              Review(
-                                  authorName = review.authorAttribution.name,
-                                  review = review.text ?: "Undefined",
-                                  rating = review.rating)
-                            },
-                        //                         use this image to avoid using API to fetch photos
-                        // as it is very expensive
-                        imagesUrls =
-                            listOf(
-                                "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                //                        imagesUrls = fetchAllPhotoUris(place, placesClient)))
+    try {
+      placesClient
+          .searchNearby(request)
+          .addOnSuccessListener { response ->
+            val coffeeShops = mutableListOf<Coffee>()
+            scope.launch {
+              response.places.map { place ->
+                place.location?.let {
+                  coffeeShops.add(
+                      Coffee(
+                          id = place.id ?: "Undefined",
+                          coffeeShopName = place.displayName ?: "Undefined",
+                          location =
+                              Location(
+                                  it.latitude, it.longitude, place.formattedAddress ?: "Undefined"),
+                          rating = place.rating ?: 0.0,
+                          hours = getHours(place.openingHours?.weekdayText),
+                          reviews =
+                              place.reviews?.map { review ->
+                                Review(
+                                    authorName = review.authorAttribution.name,
+                                    review = review.text ?: "Undefined",
+                                    rating = review.rating)
+                              },
+                          // use this image to avoid using API to fetch photos as it is very
+                          // expensive
+                          //                        imagesUrls =
+                          //                            listOf(
+                          // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                          imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                }
               }
+              if (coffeeShops.isNotEmpty()) {
+                Log.d(
+                    "PlacesAPI",
+                    "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+              } else {
+                Log.d("PlacesAPI", "No coffee shops found.")
+              }
+              onSuccess(coffeeShops)
             }
-            if (coffeeShops.isNotEmpty()) {
-              Log.d(
-                  "PlacesAPI",
-                  "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
-            } else {
-              Log.d("PlacesAPI", "No coffee shops found.")
-            }
-            onSuccess(coffeeShops)
           }
-        }
-        .addOnFailureListener { exception ->
-          Log.e("PlacesAPI", "Place not found: ${exception.message}")
-        }
+          .addOnFailureListener { exception ->
+            Log.e("PlacesAPI", "Place not found: ${exception.message}")
+          }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
   } else {
     return
   }
@@ -110,14 +112,19 @@ fun fetchNearbyCoffeeShops(
 
 private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
   val metadata = place.photoMetadatas?.get(0)
-  metadata?.let {
-    val photoUriRequest =
-        FetchResolvedPhotoUriRequest.builder(it).setMaxWidth(500).setMaxHeight(300).build()
-    // Fetch the URI and wait for the result
-    val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
-    return listOf(result)
+  try {
+    metadata?.let {
+      val photoUriRequest =
+          FetchResolvedPhotoUriRequest.builder(it).setMaxWidth(500).setMaxHeight(300).build()
+      // Fetch the URI and wait for the result
+      val result = placesClient.fetchResolvedPhotoUri(photoUriRequest).await()?.uri.toString()
+      return listOf(result)
+    }
+    return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
+  } catch (e: Exception) {
+    e.printStackTrace()
+    return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
   }
-  return listOf("https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")
 }
 
 private fun getHours(weekdayText: List<String>?): List<Hours> {
@@ -126,7 +133,6 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
         // Split by colon to separate the day name from the time range
         val (_, timeRange) = dayText.split(": ", limit = 2)
         // Split the time range by "–" to get the opening and closing times
-
         val (openTime, closeTime) =
             if (timeRange == "Closed" || "–" !in timeRange) {
               "Undefined" to "Undefined"

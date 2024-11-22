@@ -25,6 +25,10 @@ android {
     }
     // Load the API key from local.properties
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val keyPW = System.getenv("KEY_PW") ?: localProperties.getProperty("KEY_PW")
+    val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
+    val ksFile = System.getenv("KS_FILE") ?: localProperties.getProperty("KS_FILE") // KS = keystore
+    val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW")
 
     defaultConfig {
         applicationId = "com.android.brewr"
@@ -47,6 +51,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (ksFile != null && keyPW != null && keyAlias != null && ksPW != null) {
+                println("we are here") // debug print
+                signingConfig = signingConfigs.create("release") {
+                    storeFile(file(ksFile)) // Path to your keystore
+                    storePassword(ksPW) // Keystore
+                    keyAlias(keyAlias) // Alias for the key to
+                    keyPassword(keyPW) // Password for the key
+                }
+            }
         }
 
         debug {

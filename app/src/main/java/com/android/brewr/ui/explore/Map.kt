@@ -24,15 +24,20 @@ import kotlinx.coroutines.tasks.await
 fun MapScreen(coffees: List<Coffee>) {
   val context = LocalContext.current
   var userLocation by remember { mutableStateOf<LatLng?>(null) }
-
-  LaunchedEffect(Unit) { userLocation = getCurrentLocation(context) }
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(LatLng(46.5197, 6.6323), 14f)
+  }
+  LaunchedEffect(Unit) {
+    getCurrentLocation(
+        context,
+        onSuccess = {
+          userLocation = it
+          cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 14f)
+        })
+  }
 
   Scaffold(
       content = { paddingValues ->
-        val cameraPositionState = rememberCameraPositionState {
-          position = CameraPosition.fromLatLngZoom(userLocation ?: LatLng(46.5197, 6.6323), 14f)
-        }
-
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
@@ -54,20 +59,24 @@ fun MapScreen(coffees: List<Coffee>) {
               userLocation?.let {
                 Log.d(
                     "MapScreen", "Adding user location marker at (${it.latitude}, ${it.longitude})")
-                Marker(state = MarkerState(position = it), title = "User Location")
+                Marker(state = MarkerState(position = it), title = "Current Location")
               }
             }
       })
 }
 
 @SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context): LatLng? {
-  return try {
+private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
+  try {
     val locationClient = LocationServices.getFusedLocationProviderClient(context)
     val location = locationClient.lastLocation.await()
-    location?.let { LatLng(it.latitude, it.longitude) }
+    if (location != null) {
+      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
+    } else {
+      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
+    }
   } catch (e: Exception) {
     e.printStackTrace()
-    null
+    onSuccess(LatLng(46.5197, 6.6323))
   }
 }
