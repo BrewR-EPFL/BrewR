@@ -73,13 +73,13 @@ class CoffeeInformationScreenTest {
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffee.location.address)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours:1")
+        .onNodeWithTag("coffeeShopHours")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
                 "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
-        .onNodeWithTag("coffeeShopRating:1")
+        .onNodeWithTag("coffeeShopRating")
         .assertIsDisplayed()
         .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffee.rating)))
   }
