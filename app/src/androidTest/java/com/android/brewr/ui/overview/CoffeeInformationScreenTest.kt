@@ -65,11 +65,11 @@ class CoffeeInformationScreenTest {
   @Test
   fun displayAllComponentsValidCoffee() {
     composeTestRule
-        .onNodeWithTag("coffeeShopName")
+        .onNodeWithTag("coffeeShopName:1")
         .assertIsDisplayed()
         .assertTextEquals(mockCoffee.coffeeShopName)
     composeTestRule
-        .onNodeWithTag("coffeeShopAddress")
+        .onNodeWithTag("coffeeShopAddress:1")
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffee.location.address)
     composeTestRule

@@ -1,8 +1,10 @@
 package com.android.brewr.ui
 
 import android.Manifest
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -12,6 +14,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,13 +36,13 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.UserRepository
 import com.android.brewr.model.user.UserViewModel
+import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.navigation.Screen.EXPLORE
 import com.android.brewr.ui.overview.AddJourneyScreen
 import com.android.brewr.ui.overview.EditJourneyScreen
-import com.android.brewr.ui.overview.ExploreScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
@@ -96,7 +100,18 @@ class E2ETest {
               4.5,
               listOf(Hours("10", "20"), Hours("10", "20")),
               listOf(Review("Lei", "good", 5.0)),
-              listOf("test.jpg")))
+              listOf(
+                  "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")),
+          Coffee(
+              "2",
+              "Coffee2",
+              com.android.brewr.model.location.Location(
+                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
+              5.0,
+              listOf(Hours("10", "20"), Hours("10", "20")),
+              listOf(Review("Jaeyi", "perfect", 5.0)),
+              listOf(
+                  "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
 
   @Before
   fun setUp() {
@@ -125,7 +140,10 @@ class E2ETest {
           composable(Screen.JOURNEY_RECORD) {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
-          composable(EXPLORE) { ExploreScreen(sampleCoffees) }
+          composable(EXPLORE) {
+            ExploreScreen(
+                sampleCoffees, curatedCoffees = sampleCoffees.sortedByDescending { it.rating })
+          }
         }
         navigation(
             startDestination = Screen.ADD_JOURNEY,
@@ -219,8 +237,40 @@ class E2ETest {
     // go to menu screen
     composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
 
+    // Verify the bottom sheet is displayed
+    composeTestRule.onNodeWithTag("exploreBottomSheet").assertIsDisplayed()
+
+    // Verify the toggle button and switch to the curated list
+    composeTestRule.onNodeWithTag("toggleListButton").assertIsDisplayed().performClick()
+
+    // Verify the curated list title is displayed
+    composeTestRule.onNodeWithTag("listTitle").assertIsDisplayed().assertTextEquals("Curated List")
+
+    // Switch back to the nearby coffee list
+    composeTestRule.onNodeWithTag("toggleListButton").performClick()
+
+    // Verify the nearby list title is displayed
+    composeTestRule
+        .onNodeWithTag("listTitle")
+        .assertIsDisplayed()
+        .assertTextEquals("Nearby Coffeeshops")
     // check the bottomSheet and coffee shop information existence
-    composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeImage").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
+      swipe(center, Offset(center.x, center.y - 800)) // scroll down
+    }
+    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
+    // Verify the coffee shop name
+    composeTestRule
+        .onNodeWithTag("coffeeShopName:1")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .assertTextEquals("Coffee1")
+    // Verify the second coffee shop name
+    composeTestRule
+        .onNodeWithTag("coffeeShopName:2")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .assertTextEquals("Coffee2")
+    composeTestRule.onNodeWithTag("coffeeImage:2").assertIsDisplayed()
   }
 }
