@@ -256,7 +256,7 @@ class E2ETest {
         .assertTextEquals("Nearby Coffeeshops")
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
-        swipe(center, Offset(center.x, center.y - 800)) // scroll down
+      swipe(center, Offset(center.x, center.y - 800)) // scroll down
     }
     composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
     // Verify the coffee shop name
