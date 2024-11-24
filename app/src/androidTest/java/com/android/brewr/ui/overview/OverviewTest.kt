@@ -145,8 +145,7 @@ class OverviewScreenTest {
     }
 
     composeTestRule.onNodeWithTag("Explore").performClick()
-    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("menuButton").performClick()
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
   }
 
   @Test

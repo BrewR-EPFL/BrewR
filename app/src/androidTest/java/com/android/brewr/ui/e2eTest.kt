@@ -248,7 +248,7 @@ class E2ETest {
     composeTestRule
         .onNodeWithTag("listTitle")
         .assertIsDisplayed()
-        .assertTextEquals("Nearby Coffeeshops")
+        .assertTextEquals("Nearby Coffee Shops")
 
     // Verify the toggle button and switch to the curated list
     composeTestRule.onNodeWithTag("toggleListButton").assertIsDisplayed().performClick()
