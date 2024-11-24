@@ -129,11 +129,7 @@ fun OverviewScreen(
                       }
                 }
               })
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(1.dp)
-                      .background(Color.LightGray))
+          Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
