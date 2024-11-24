@@ -83,10 +83,10 @@ fun fetchNearbyCoffeeShops(
                               },
                           // use this image to avoid using API to fetch photos as it is very
                           // expensive
-                          //                        imagesUrls =
-                          //                            listOf(
-                          // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                          imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                          imagesUrls =
+                              listOf(
+                                  "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                  // imagesUrls = fetchAllPhotoUris(place, placesClient)))
                 }
                 if (coffeeShops.isNotEmpty()) {
                   Log.d(
