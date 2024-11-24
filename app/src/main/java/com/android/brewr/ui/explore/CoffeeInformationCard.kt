@@ -50,7 +50,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                 .clickable(onClick = onClick))
     Text(
         text = coffee.coffeeShopName,
-        fontSize = 20.sp,
+        fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.testTag("coffeeShopName"))
     Column(
