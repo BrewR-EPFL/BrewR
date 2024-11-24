@@ -44,7 +44,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
         contentDescription = "Selected Image",
         contentScale = ContentScale.Crop,
         modifier =
-            Modifier.testTag("coffeeImage")
+            Modifier.testTag("coffeeImage:${coffee.id}")
                 .fillMaxWidth()
                 .heightIn(min = 180.dp, max = 300.dp)
                 .clickable(onClick = onClick))
@@ -52,7 +52,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
         text = coffee.coffeeShopName,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.testTag("coffeeShopName"))
+        modifier = Modifier.testTag("coffeeShopName:${coffee.id}"))
     Column(
         modifier = Modifier.fillMaxWidth().padding(start = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -64,7 +64,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                     append(coffee.location.address)
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopAddress"))
+              modifier = Modifier.testTag("coffeeShopAddress:${coffee.id}"))
 
           Text(
               text =
@@ -84,7 +84,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                     }
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopHours"))
+              modifier = Modifier.testTag("coffeeShopHours:${coffee.id}"))
 
           Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -97,7 +97,7 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                           append(String.format("%.1f/5", coffee.rating))
                         },
                     fontSize = 16.sp,
-                    modifier = Modifier.testTag("coffeeShopRating"))
+                    modifier = Modifier.testTag("coffeeShopRating:${coffee.id}"))
               }
         }
   }

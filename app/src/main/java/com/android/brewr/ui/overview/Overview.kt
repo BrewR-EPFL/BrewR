@@ -28,7 +28,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
+import com.android.brewr.model.coffee.fetchAndSortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
@@ -52,6 +54,7 @@ fun OverviewScreen(
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
+  var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -93,6 +96,10 @@ fun OverviewScreen(
                   context,
                   it,
                   onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
+              // Sort coffee shops by rating to generate curated list
+              fetchAndSortCoffeeShopsByRating(coroutineScope, context, it) { sortedCoffees ->
+                curatedCoffees = sortedCoffees
+              }
             })
       }
       isFetched = true
@@ -122,7 +129,11 @@ fun OverviewScreen(
                       }
                 }
               })
-          Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray))
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(1.dp)
+                      .background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
@@ -133,7 +144,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeesViewModel)
+          ExploreScreen(coffeesViewModel, curatedCoffees)
         }
       })
 }

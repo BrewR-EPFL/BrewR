@@ -72,21 +72,21 @@ class CoffeeInformationCardTest {
   @Test
   fun displayAllComponentsValidCoffee() {
     composeTestRule
-        .onNodeWithTag("coffeeShopName")
+        .onNodeWithTag("coffeeShopName:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(mockCoffee.coffeeShopName)
     composeTestRule
-        .onNodeWithTag("coffeeShopAddress")
+        .onNodeWithTag("coffeeShopAddress:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffee.location.address)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours")
+        .onNodeWithTag("coffeeShopHours:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
                 "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
-        .onNodeWithTag("coffeeShopRating")
+        .onNodeWithTag("coffeeShopRating:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffee.rating)))
   }
