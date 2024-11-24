@@ -261,6 +261,8 @@ class E2ETest {
       swipe(center, Offset(center.x, center.y - 800)) // scroll down
     }
 
+    composeTestRule.waitForIdle()
+
     // Verify the coffee shop name
     composeTestRule
         .onNodeWithTag("coffeeShopName:${sampleCoffees[0].id}")
