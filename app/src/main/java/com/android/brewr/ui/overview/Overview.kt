@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.fetchAndSortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.explore.ExploreScreen
@@ -48,11 +49,11 @@ import kotlinx.coroutines.tasks.await
 fun OverviewScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
+    coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var coffeeShops by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
   var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
@@ -84,22 +85,20 @@ fun OverviewScreen(
     }
   }
 
-  // Fetch coffee shops and curate them by rating
   LaunchedEffect(permissionGranted) {
     if (permissionGranted && !isFetched) {
       coroutineScope.launch {
         getCurrentLocation(
             context,
-            onSuccess = { currentLocation ->
-              fetchNearbyCoffeeShops(coroutineScope, context, currentLocation) { fetchedCoffeeShops
-                ->
-                coffeeShops = fetchedCoffeeShops
-
-                // Sort coffee shops by rating to generate curated list
-                fetchAndSortCoffeeShopsByRating(coroutineScope, context, currentLocation) {
-                    sortedCoffees ->
-                  curatedCoffees = sortedCoffees
-                }
+            onSuccess = {
+              fetchNearbyCoffeeShops(
+                  coroutineScope,
+                  context,
+                  it,
+                  onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
+              // Sort coffee shops by rating to generate curated list
+              fetchAndSortCoffeeShopsByRating(coroutineScope, context, it) { sortedCoffees ->
+                curatedCoffees = sortedCoffees
               }
             })
       }
@@ -141,7 +140,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeeShops, curatedCoffees)
+          ExploreScreen(coffeesViewModel, curatedCoffees)
         }
       })
 }

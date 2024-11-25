@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -12,19 +12,22 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.CoffeeInformationScreen
+import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
-class CoffeeInformationScreenTest {
+class CoffeeInformationCardTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var uiDevice: UiDevice
+  private lateinit var navigationActions: NavigationActions
 
   // Set up a mock Coffee object
   private val mockCoffee =
@@ -38,13 +41,13 @@ class CoffeeInformationScreenTest {
           rating = 4.9,
           hours =
               listOf(
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM"),
-                  Hours(open = "8:00 AM", close = "5:00 PM")),
+                  Hours("Monday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Tuesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Wednesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Thursday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Friday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Saturday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Sunday", open = "8:00 AM", close = "5:00 PM")),
           reviews = listOf(Review("Pablo", "Best coffee in the 10th arrondissement of Paris", 5.0)),
           imagesUrls =
               listOf(
@@ -56,7 +59,11 @@ class CoffeeInformationScreenTest {
     uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     // Set content to CoffeeInformationScreen
-    composeTestRule.setContent { CoffeeInformationScreen(coffee = mockCoffee) }
+    navigationActions = mock(NavigationActions::class.java)
+    composeTestRule.setContent {
+      CoffeeInformationCardScreen(
+          coffee = mockCoffee, onClick = { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
+    }
 
     // Handle location permission if prompted
     runBlocking { grantLocationPermission() }
@@ -65,21 +72,21 @@ class CoffeeInformationScreenTest {
   @Test
   fun displayAllComponentsValidCoffee() {
     composeTestRule
-        .onNodeWithTag("coffeeShopName:1")
+        .onNodeWithTag("coffeeShopName:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(mockCoffee.coffeeShopName)
     composeTestRule
-        .onNodeWithTag("coffeeShopAddress:1")
+        .onNodeWithTag("coffeeShopAddress:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffee.location.address)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours")
+        .onNodeWithTag("coffeeShopHours:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
                 "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
-        .onNodeWithTag("coffeeShopRating")
+        .onNodeWithTag("coffeeShopRating:${mockCoffee.id}")
         .assertIsDisplayed()
         .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffee.rating)))
   }
