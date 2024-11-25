@@ -1,6 +1,5 @@
 package com.android.brewr.ui.explore
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
@@ -96,9 +95,6 @@ class CoffeeInformationScreenTest {
         .onNodeWithTag("coffeeShopAddress")
         .assertIsDisplayed()
         .assertTextEquals(mockCoffee.location.address)
-    Log.e(
-        "CoffeeShop Hour",
-        "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")
     composeTestRule
         .onNodeWithTag(
             "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")

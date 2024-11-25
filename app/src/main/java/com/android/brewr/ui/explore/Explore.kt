@@ -43,41 +43,48 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
           onDismissRequest = { showBottomSheet = false },
           sheetState = sheetState,
           modifier = Modifier.testTag("exploreBottomSheet")) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("exploreListToggleRow"),
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = if (showCuratedList) "Curated List" else "Nearby Coffee Shops",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
+            if (!showCoffeeInfos) {
+              Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth().padding(16.dp).testTag("exploreListToggleRow"),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                      Text(
+                          text = if (showCuratedList) "Curated List" else "Nearby Coffee Shops",
+                          style = MaterialTheme.typography.titleMedium,
+                          modifier =
+                              Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
 
-                    Button(
-                        onClick = { showCuratedList = !showCuratedList },
-                        colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
-                        shape = RoundedCornerShape(15.dp),
-                        modifier =
-                            Modifier.padding(start = 8.dp)
-                                .height(40.dp)
-                                .wrapContentWidth()
-                                .testTag("toggleListButton")) {
-                          Text(
-                              text = if (showCuratedList) "Show Nearby" else "Show Curated",
-                              style = MaterialTheme.typography.bodySmall,
-                              color = Color.White)
-                        }
-                  }
-
+                      Button(
+                          onClick = { showCuratedList = !showCuratedList },
+                          colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
+                          shape = RoundedCornerShape(15.dp),
+                          modifier =
+                              Modifier.padding(start = 8.dp)
+                                  .height(40.dp)
+                                  .wrapContentWidth()
+                                  .testTag("toggleListButton")) {
+                            Text(
+                                text = if (showCuratedList) "Show Nearby" else "Show Curated",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White)
+                          }
+                    }
+              }
               LazyColumn(modifier = Modifier.fillMaxHeight(0.9f).testTag("bottomSheet")) {
                 items(if (showCuratedList) curatedCoffees else coffees) { coffee ->
                   CoffeeInformationCardScreen(
                       coffee = coffee,
                       onClick = {
                         coffeesViewModel.selectCoffee(coffee)
+
                         showCoffeeInfos = true
                       })
                 }
               }
+            } else {
+              CoffeeInformationScreen(
+                  coffeesViewModel = coffeesViewModel, onBack = { showCoffeeInfos = false })
             }
           }
     }
