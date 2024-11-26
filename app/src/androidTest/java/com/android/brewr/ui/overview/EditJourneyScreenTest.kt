@@ -129,7 +129,7 @@ class EditJourneyScreenTest {
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsNotDisplayed()
     // Test the coffee shop checkbox interaction
     composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
-    // Test if the text changes to "At a coffee shop"
+    // Test if the text changes to "At home"
     composeTestRule
         .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
         .assertTextEquals("At home")

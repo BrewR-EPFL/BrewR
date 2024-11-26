@@ -28,19 +28,31 @@ import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 
 class MainActivity : ComponentActivity() {
   private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     FirebaseApp.initializeApp(this)
+    // Configure Firestore settings for offline persistence
+    val settings = firestoreSettings {
+      setLocalCacheSettings(persistentCacheSettings {}) // Enable persistent disk cache
+    }
+
+    Firebase.firestore.firestoreSettings = settings
 
     auth = FirebaseAuth.getInstance()
     auth.currentUser?.let { auth.signOut() }
+
+    // Configure Firestore offline persistence
+
     setContent {
       BrewRAppTheme {
         Surface(
@@ -52,6 +64,7 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
+
 
 @Composable
 fun BrewRApp() {

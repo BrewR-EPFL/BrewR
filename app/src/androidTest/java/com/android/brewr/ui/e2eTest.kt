@@ -102,7 +102,8 @@ class E2ETest {
   fun setUp() {
     // Initialize mocks and spies
     journeyRepositoryMock = mock(JourneysRepository::class.java)
-    listJourneysViewModel = spy(ListJourneysViewModel(journeyRepositoryMock))
+    listJourneysViewModel = ListJourneysViewModel(journeyRepositoryMock)
+    //      listJourneysViewModel = spy(ListJourneysViewModel(journeyRepositoryMock))
     userRepositoryMock = mock(UserRepository::class.java)
     userViewModel = spy(UserViewModel(userRepositoryMock))
     // Mock the behavior of `getJourneys` to simulate fetching journeys
@@ -111,6 +112,7 @@ class E2ETest {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
         }
+
     composeTestRule.setContent {
       navController = rememberNavController()
       navigationActions = NavigationActions(navController)
@@ -207,6 +209,31 @@ class E2ETest {
 
     // Step 4: Back to Overview
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+    // Step 5: Edit the journey
+    composeTestRule.onNodeWithTag("journeyListItem").performClick()
+    composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("editButton").performClick()
+    composeTestRule.onNodeWithTag("editJourneyScreen").assertIsDisplayed()
+    composeTestRule
+    composeTestRule
+        .onNodeWithTag("inputJourneyDescription")
+        .assertIsDisplayed()
+        .performTextInput("Amazing Coffee Experience Edited")
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At a coffee shop")
+    composeTestRule.onNodeWithTag("coffeeShopCheckRow").assertHasClickAction().performClick()
+    composeTestRule
+        .onNodeWithTag("coffeeShopCheckText", useUnmergedTree = true)
+        .assertTextEquals("At home")
+    composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
+    composeTestRule.runOnIdle { navController.popBackStack() }
+
+    // Step 6: Back to Journey Record
+    composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName").assertTextEquals("At home")
+    composeTestRule.onNodeWithTag("backButton").performClick()
   }
 
   @Test
