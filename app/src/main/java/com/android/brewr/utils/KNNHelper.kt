@@ -27,9 +27,7 @@ class KNNHelper {
    * @throws IllegalArgumentException if the points do not have the same number of dimensions.
    */
   fun euclideanDistance(point1: List<Double>, point2: List<Double>): Double {
-    if (point1.size != point2.size) {
-      throw IllegalArgumentException("Points must have the same number of dimensions")
-    }
+    require(point1.size == point2.size) { "Points must have the same number of dimensions" }
     return sqrt(point1.zip(point2).sumOf { (a, b) -> (a - b).pow(2) })
   }
 
@@ -43,9 +41,7 @@ class KNNHelper {
   fun meanOfSubLists(featuresLists: List<List<Double>>): List<Double> {
     val size = featuresLists[0].size
     for (featuresList in featuresLists) {
-      if (featuresList.size != size) {
-        throw IllegalArgumentException("Lists must have the same size")
-      }
+      require(featuresList.size == size) { "Lists must have the same size" }
     }
     return List(size) { index -> featuresLists.map { it[index] }.average() }
   }
