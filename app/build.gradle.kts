@@ -16,7 +16,7 @@ plugins {
 
 android {
     namespace = "com.android.brewr"
-    compileSdk = 34
+    compileSdk = 35
 
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -31,9 +31,10 @@ android {
     val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW")
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.android.brewr"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
