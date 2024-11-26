@@ -10,6 +10,15 @@ class KNNHelper {
   private var predictedUid = ""
 
   /**
+   * Returns the predicted user ID from the KNN algorithm.
+   *
+   * @return The predicted user ID.
+   */
+  fun getKNNResult(): String {
+    return this.predictedUid
+  }
+
+  /**
    * Calculates the Euclidean distance between two points.
    *
    * @param point1 The first point as a list of doubles.
@@ -39,41 +48,6 @@ class KNNHelper {
       }
     }
     return List(size) { index -> featuresLists.map { it[index] }.average() }
-  }
-
-  /**
-   * Predicts the user ID using the K-Nearest Neighbors (KNN) algorithm.
-   *
-   * @param features A list of feature vectors for each user.
-   * @param labels A list of user IDs corresponding to the feature vectors.
-   * @param userJourneys The feature vector of the user to predict.
-   * @param k The number of nearest neighbors to consider (default is 1).
-   * @return The predicted user ID.
-   */
-  fun predictKNN(
-      features: List<List<Double>>,
-      labels: List<String>,
-      userJourneys: List<Double>,
-      k: Int = 1
-  ): String {
-    val distances =
-        features
-            .mapIndexed { index, feature ->
-              euclideanDistance(feature, userJourneys) to labels[index]
-            }
-            .sortedBy { it.first }
-
-    predictedUid = distances[k].second // not sure if the nearest one is the best one
-    return predictedUid
-  }
-
-  /**
-   * Returns the predicted user ID from the KNN algorithm.
-   *
-   * @return The predicted user ID.
-   */
-  fun getKNNResult(): String {
-    return this.predictedUid
   }
 
   /**
@@ -118,5 +92,31 @@ class KNNHelper {
     }
 
     return Pair(processedJourneys, userIds)
+  }
+
+  /**
+   * Predicts the user ID using the K-Nearest Neighbors (KNN) algorithm.
+   *
+   * @param features A list of feature vectors for each user.
+   * @param labels A list of user IDs corresponding to the feature vectors.
+   * @param userJourneys The feature vector of the user to predict.
+   * @param k The number of nearest neighbors to consider (default is 1).
+   * @return The predicted user ID.
+   */
+  fun predictKNN(
+      features: List<List<Double>>,
+      labels: List<String>,
+      userJourneys: List<Double>,
+      k: Int = 1
+  ): String {
+    val distances =
+        features
+            .mapIndexed { index, feature ->
+              euclideanDistance(feature, userJourneys) to labels[index]
+            }
+            .sortedBy { it.first }
+
+    predictedUid = distances[k].second // not sure if the nearest one is the best one
+    return predictedUid
   }
 }
