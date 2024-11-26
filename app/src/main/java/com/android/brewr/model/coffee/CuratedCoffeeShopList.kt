@@ -3,6 +3,8 @@ package com.android.brewr.model.coffee
 import android.content.Context
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.maps.model.LatLng
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CoroutineScope
 
 // Function to fetch and sort coffee shops by rating
@@ -51,4 +53,29 @@ fun fetchAndSortCoffeeShopsByRating(
         val sortedCoffeeShops = coffeeShops.sortedByDescending { it.rating }
         onSuccess(sortedCoffeeShops)
       }
+}
+
+/**
+ * Filters a list of coffee shops to include only those that are currently open based on their
+ * opening and closing hours.
+ *
+ * @param coffeeShops A [List] of [Coffee] objects representing coffee shops. Each [Coffee] object
+ *   contains details such as its name, location, and a list of [Hours] objects. The [Hours] objects
+ *   specify the opening and closing times of the coffee shop.
+ * @return A [List] of [Coffee] objects that are currently open. Coffee shops with invalid or
+ *   missing time information are excluded.
+ */
+fun filterOpenCoffeeShops(coffeeShops: List<Coffee>): List<Coffee> {
+  val currentTime = LocalTime.now() // Bring Current time
+  return coffeeShops.filter { coffee ->
+    coffee.hours.any { hour ->
+      try {
+        val openTime = LocalTime.parse(hour.open, DateTimeFormatter.ofPattern("h:mm a"))
+        val closeTime = LocalTime.parse(hour.close, DateTimeFormatter.ofPattern("h:mm a"))
+        currentTime.isAfter(openTime) && currentTime.isBefore(closeTime)
+      } catch (e: Exception) {
+        false
+      }
+    }
+  }
 }
