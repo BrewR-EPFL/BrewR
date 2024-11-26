@@ -399,6 +399,18 @@ class KNNHelperTest {
   }
 
   @Test
+  fun testMeanOfSubLists_differentSizes() {
+    val feature =
+        listOf(
+            listOf(1.0, 3.0, 5.0),
+            listOf(3.0, 2.0, 1.0, 4.0),
+            listOf(7.0, 5.0, 4.0, 5.0),
+            listOf(4.0, 4.0, 6.0, 1.0),
+            listOf(18.0, 5.0, 5.0, 4.0))
+    assertThrows(IllegalArgumentException::class.java) { knn.meanOfSubLists(feature) }
+  }
+
+  @Test
   fun testJourneysPreProcessing() {
     val expectedFeatures = listOf(8.2, 3.4, 4.8, 4.2)
     val result = knn.journeysPreProcessing(user.first, user.second)
