@@ -226,6 +226,9 @@ tasks.withType<Test> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
     }
+    //open the java.time module for LocalTime tests
+    jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {

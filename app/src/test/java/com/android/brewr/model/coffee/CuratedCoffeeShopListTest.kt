@@ -179,7 +179,7 @@ class CuratedCoffeeShopListTest {
             createCoffeeShopWithHours(
                 "2", "Coffee Shop 2", listOf(Hours("Monday", "Invalid Time", "12:00 PM"))),
             createCoffeeShopWithHours(
-                "3", "Coffee Shop 3", listOf(Hours("Monday", "9:00 AM", "10:00 AM"))))
+                "3", "Coffee Shop 3", listOf(Hours("Monday", "9:00 AM", "11:00 AM"))))
 
     val result = filterOpenCoffeeShops(coffeeShops)
     println("Filtered Result: ${result.size}")
