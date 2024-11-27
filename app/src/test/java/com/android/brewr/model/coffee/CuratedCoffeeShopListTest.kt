@@ -5,6 +5,7 @@ import com.android.brewr.model.location.Location
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.*
+import java.time.LocalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -16,7 +17,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CuratedCoffeeShopListTest {
@@ -142,10 +142,11 @@ class CuratedCoffeeShopListTest {
     val testTime = LocalTime.of(10, 0) // 10:00 AM
 
     mockkStatic(LocalTime::class)
-    every { LocalTime.now() } answers {
-        println("Mocked LocalTime.now(): $testTime")
-        testTime
-    }
+    every { LocalTime.now() } answers
+        {
+          println("Mocked LocalTime.now(): $testTime")
+          testTime
+        }
 
     val coffeeShops =
         listOf(
