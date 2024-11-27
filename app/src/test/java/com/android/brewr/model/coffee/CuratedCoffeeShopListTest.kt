@@ -142,7 +142,10 @@ class CuratedCoffeeShopListTest {
     val testTime = LocalTime.of(10, 0) // 10:00 AM
 
     mockkStatic(LocalTime::class)
-    every { LocalTime.now() } returns testTime
+    every { LocalTime.now() } answers {
+        println("Mocked LocalTime.now(): $testTime")
+        testTime
+    }
 
     val coffeeShops =
         listOf(
@@ -178,7 +181,8 @@ class CuratedCoffeeShopListTest {
                 "3", "Coffee Shop 3", listOf(Hours("Monday", "9:00 AM", "10:00 AM"))))
 
     val result = filterOpenCoffeeShops(coffeeShops)
-
+    println("Filtered Result: ${result.size}")
+    result.forEach { println("Valid Coffee Shop: ${it.coffeeShopName}") }
     assertEquals(1, result.size)
     assertEquals("Coffee Shop 3", result[0].coffeeShopName)
   }
