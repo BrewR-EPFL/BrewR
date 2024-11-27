@@ -9,8 +9,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
 import androidx.test.rule.GrantPermissionRule
 import com.android.brewr.model.coffee.CoffeesViewModel
@@ -31,11 +37,10 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class OverviewScreenTest {
 
@@ -72,7 +77,7 @@ class OverviewScreenTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
+    MockitoAnnotations.openMocks(this)
     navigationActions = mock(NavigationActions::class.java)
     journeysRepository = mock(JourneysRepository::class.java)
     listJourneysViewModel = spy(ListJourneysViewModel(journeysRepository))
@@ -87,13 +92,11 @@ class OverviewScreenTest {
   @Test
   fun testPermissionGranted() {
     // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
-    whenever(
-            ContextCompat.checkSelfPermission(
-                mockContext, Manifest.permission.ACCESS_FINE_LOCATION))
+    `when`(ContextCompat.checkSelfPermission(mockContext, Manifest.permission.ACCESS_FINE_LOCATION))
         .thenReturn(PackageManager.PERMISSION_GRANTED)
 
     // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
-    whenever(
+    `when`(
             ContextCompat.checkSelfPermission(
                 mockContext, Manifest.permission.ACCESS_COARSE_LOCATION))
         .thenReturn(PackageManager.PERMISSION_GRANTED)

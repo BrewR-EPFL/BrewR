@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -193,6 +192,7 @@ dependencies {
     testImplementation(libs.mockito.kotlin) // Mockito Kotlin
     testImplementation(libs.robolectric) // Robolectric
     androidTestImplementation(libs.mockito.android) // Mockito Android
+    androidTestImplementation(libs.mockito.kotlin) // Mockito Kotlin
 
     // ------------- Compose Testing -----------------
     globalTestImplementation(platform(libs.compose.bom))
