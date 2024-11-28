@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -11,7 +11,6 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.MapScreen
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
