@@ -50,7 +50,7 @@ fun MapScreen(coffees: List<Coffee>) {
                 Log.d(
                     "MapScreen",
                     "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")
-                  val markerIcon= getMarkerIcon(coffee.coffeeShopName)
+                val markerIcon = getMarkerIcon(coffee.coffeeShopName)
                 Marker(
                     state =
                         remember {
@@ -90,18 +90,20 @@ private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> 
 
 @Composable
 private fun getMarkerIcon(shopName: String): BitmapDescriptor {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    // Helper function to load and resize the icon
-    fun loadAndResizeIcon(resourceId: Int): BitmapDescriptor {
-        val originalBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
-        val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
-        return BitmapDescriptorFactory.fromBitmap(resizedBitmap)
-    }
+  // Helper function to load and resize the icon
+  fun loadAndResizeIcon(resourceId: Int): BitmapDescriptor {
+    val originalBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+    val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
+    return BitmapDescriptorFactory.fromBitmap(resizedBitmap)
+  }
 
-    return when{
-        shopName.contains("Starbucks", ignoreCase = true) -> loadAndResizeIcon(R.drawable.starbucks_icon)
-        shopName.contains("McDonald's", ignoreCase = true) -> loadAndResizeIcon(R.drawable.mcdonald_icon)
-        else -> loadAndResizeIcon(R.drawable.default_coffee_icon) // Default icon
-    }
+  return when {
+    shopName.contains("Starbucks", ignoreCase = true) ->
+        loadAndResizeIcon(R.drawable.starbucks_icon)
+    shopName.contains("McDonald's", ignoreCase = true) ->
+        loadAndResizeIcon(R.drawable.mcdonald_icon)
+    else -> loadAndResizeIcon(R.drawable.default_coffee_icon) // Default icon
+  }
 }
