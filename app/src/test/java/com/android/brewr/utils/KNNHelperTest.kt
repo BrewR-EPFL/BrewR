@@ -384,38 +384,63 @@ class KNNHelperTest {
   }
 
   @Test
-  fun testMeanOfSubLists_nonEmptyLists() {
-    val feature =
+  fun testGetRatingValue() {
+    val expectedValues = listOf(1.0, 2.0, 3.0, 4.0, 5.0, 0.0)
+    val rates =
         listOf(
-            listOf(1.0, 3.0, 5.0, 3.0),
-            listOf(3.0, 2.0, 1.0, 4.0),
-            listOf(7.0, 5.0, 4.0, 5.0),
-            listOf(4.0, 4.0, 6.0, 1.0),
-            listOf(18.0, 5.0, 5.0, 4.0))
-    val expected = listOf(6.6, 3.8, 4.2, 3.4)
+            CoffeeRate.ONE,
+            CoffeeRate.TWO,
+            CoffeeRate.THREE,
+            CoffeeRate.FOUR,
+            CoffeeRate.FIVE,
+            CoffeeRate.DEFAULT)
 
-    val result = knn.meanOfSubLists(feature)
-    assertEquals(expected, result)
-  }
-
-  @Test
-  fun testMeanOfSubLists_differentSizes() {
-    val feature =
-        listOf(
-            listOf(1.0, 3.0, 5.0),
-            listOf(3.0, 2.0, 1.0, 4.0),
-            listOf(7.0, 5.0, 4.0, 5.0),
-            listOf(4.0, 4.0, 6.0, 1.0),
-            listOf(18.0, 5.0, 5.0, 4.0))
-    assertThrows(IllegalArgumentException::class.java) { knn.meanOfSubLists(feature) }
+    rates.forEachIndexed { index, rate ->
+      val result = knn.getRatingValue(rate)
+      assertEquals(expectedValues[index], result)
+    }
   }
 
   @Test
   fun testJourneysPreProcessing() {
-    val expectedFeatures = listOf(8.2, 3.4, 4.8, 4.2)
-    val result = knn.journeysPreProcessing(user.first, user.second)
-    assert(result.first == expectedFeatures)
-    assert(result.second == user.second)
+    val expectedFeatures =
+        listOf(
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.23809523809523808,
+            0.19047619047619047,
+            0.0,
+            0.47619047619047616,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.09523809523809523,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.19047619047619047,
+            0.0,
+            0.0,
+            0.8095238095238095,
+            0.0,
+            0.0,
+            0.19047619047619047,
+            0.23809523809523808,
+            0.0,
+            0.0,
+            0.47619047619047616,
+            0.09523809523809523,
+            0.84)
+
+    val result = knn.journeysPreProcessing(user.first)
+    assert(result == expectedFeatures)
   }
 
   @Test
@@ -423,11 +448,176 @@ class KNNHelperTest {
     val expectedFeatures =
         Pair(
             listOf(
-                listOf(6.6, 3.8, 4.2, 3.4),
-                listOf(10.4, 2.8, 4.0, 3.0),
-                listOf(17.4, 3.0, 3.0, 3.0),
-                listOf(11.2, 3.2, 3.8, 3.0),
-                listOf(5.4, 3.2, 3.6, 4.0)),
+                listOf(
+                    0.17647058823529413,
+                    0.0,
+                    0.23529411764705882,
+                    0.058823529411764705,
+                    0.0,
+                    0.0,
+                    0.29411764705882354,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.23529411764705882,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.23529411764705882,
+                    0.17647058823529413,
+                    0.058823529411764705,
+                    0.5294117647058824,
+                    0.23529411764705882,
+                    0.0,
+                    0.0,
+                    0.29411764705882354,
+                    0.4117647058823529,
+                    0.058823529411764705,
+                    0.0,
+                    0.68),
+                listOf(
+                    0.0,
+                    0.2,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.26666666666666666,
+                    0.13333333333333333,
+                    0.0,
+                    0.0,
+                    0.3333333333333333,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.06666666666666667,
+                    0.0,
+                    0.0,
+                    0.13333333333333333,
+                    0.2,
+                    0.06666666666666667,
+                    0.6,
+                    0.0,
+                    0.3333333333333333,
+                    0.26666666666666666,
+                    0.13333333333333333,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.26666666666666666,
+                    0.6),
+                listOf(
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.26666666666666666,
+                    0.3333333333333333,
+                    0.2,
+                    0.0,
+                    0.13333333333333333,
+                    0.06666666666666667,
+                    0.3333333333333333,
+                    0.26666666666666666,
+                    0.2,
+                    0.13333333333333333,
+                    0.06666666666666667,
+                    0.26666666666666666,
+                    0.3333333333333333,
+                    0.2,
+                    0.06666666666666667,
+                    0.13333333333333333,
+                    0.0,
+                    0.0,
+                    0.6),
+                listOf(
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.06666666666666667,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.3333333333333333,
+                    0.26666666666666666,
+                    0.2,
+                    0.13333333333333333,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.06666666666666667,
+                    0.0,
+                    0.6,
+                    0.13333333333333333,
+                    0.2,
+                    0.13333333333333333,
+                    0.0,
+                    0.06666666666666667,
+                    0.3333333333333333,
+                    0.26666666666666666,
+                    0.2,
+                    0.0,
+                    0.6),
+                listOf(
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.6,
+                    0.4,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.25,
+                    0.15,
+                    0.0,
+                    0.35,
+                    0.25,
+                    0.15,
+                    0.5,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.2,
+                    0.15,
+                    0.8)),
             listOf("uid2", "uid3", "uid4", "uid5", "uid6"))
 
     val result = knn.featuresPreProcessing(otherUsers)
@@ -437,9 +627,7 @@ class KNNHelperTest {
   @Test
   fun testPredictKNN() {
     val expectedPredict = "uid3"
-    val userProcessed = knn.journeysPreProcessing(user.first, user.second)
-    val otherUsersProcessed = knn.featuresPreProcessing(otherUsers)
-    knn.predictKNN(otherUsersProcessed.first, otherUsersProcessed.second, userProcessed.first)
+    knn.predictKNN(knn.featuresPreProcessing(otherUsers), knn.journeysPreProcessing(user.first))
     val result = knn.getKNNResult()
     assertEquals(expectedPredict, result)
   }
