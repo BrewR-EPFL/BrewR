@@ -1,4 +1,4 @@
-package com.android.brewr.ui.overview
+package com.android.brewr.ui.explore
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -11,7 +11,6 @@ import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.MapScreen
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -35,8 +34,24 @@ class MapScreenTest {
         listOf(
             Coffee(
                 "1",
-                "Coffee1",
+                "Starbucks",
                 Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+                4.5,
+                listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                listOf(Review("Lei", "good", 5.0)),
+                listOf("test.jpg")),
+            Coffee(
+                "2",
+                "McDonald's",
+                Location(latitude = 46.5228, longitude = 6.7285, address = "Lausanne 1"),
+                4.5,
+                listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                listOf(Review("Lei", "good", 5.0)),
+                listOf("test.jpg")),
+            Coffee(
+                "3",
+                "default",
+                Location(latitude = 46.5228, longitude = 6.7285, address = "Lausanne 1"),
                 4.5,
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
