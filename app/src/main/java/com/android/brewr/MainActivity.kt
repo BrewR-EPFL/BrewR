@@ -65,7 +65,6 @@ class MainActivity : ComponentActivity() {
   }
 }
 
-
 @Composable
 fun BrewRApp() {
   val navController = rememberNavController()

@@ -155,22 +155,22 @@ fun CoffeeShopCheckRow(
                       .fillMaxWidth()
                       .testTag("inputCoffeeshopLocation")
                       .onKeyEvent { keyEvent ->
-                          if (keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Enter) {
-                              // Handle Enter key
-                              onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
-                              true // Consume the event
-                          } else {
-                              false // Pass the event further
-                          }
+                        if (keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Enter) {
+                          // Handle Enter key
+                          onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
+                          true // Consume the event
+                        } else {
+                          false // Pass the event further
+                        }
                       },
               singleLine = true,
               keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-              keyboardActions = KeyboardActions(
-                  onDone = {
-                      // Handle IME "Done" action
-                      onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
-                  }
-              ))
+              keyboardActions =
+                  KeyboardActions(
+                      onDone = {
+                        // Handle IME "Done" action
+                        onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
+                      }))
 
           // Dropdown menu for location suggestions
           ExposedDropdownMenu(
