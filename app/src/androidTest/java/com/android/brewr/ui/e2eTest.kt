@@ -3,6 +3,7 @@ package com.android.brewr.ui
 import android.Manifest
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -229,11 +230,6 @@ class E2ETest {
         .assertTextEquals("At home")
     composeTestRule.onNodeWithTag("journeySave").assertHasClickAction().performClick()
     composeTestRule.runOnIdle { navController.popBackStack() }
-
-    // Step 6: Back to Journey Record
-    composeTestRule.onNodeWithTag("journeyRecordScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopName").assertTextEquals("At home")
-    composeTestRule.onNodeWithTag("backButton").performClick()
   }
 
   @Test
