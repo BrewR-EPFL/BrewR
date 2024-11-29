@@ -54,6 +54,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -148,8 +153,24 @@ fun CoffeeShopCheckRow(
               modifier =
                   Modifier.menuAnchor() // Anchor the dropdown to this text field
                       .fillMaxWidth()
-                      .testTag("inputCoffeeshopLocation"),
-              singleLine = true)
+                      .testTag("inputCoffeeshopLocation")
+                      .onKeyEvent { keyEvent ->
+                          if (keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Enter) {
+                              // Handle Enter key
+                              onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
+                              true // Consume the event
+                          } else {
+                              false // Pass the event further
+                          }
+                      },
+              singleLine = true,
+              keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+              keyboardActions = KeyboardActions(
+                  onDone = {
+                      // Handle IME "Done" action
+                      onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
+                  }
+              ))
 
           // Dropdown menu for location suggestions
           ExposedDropdownMenu(
