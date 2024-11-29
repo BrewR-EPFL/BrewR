@@ -9,10 +9,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
 import androidx.test.rule.GrantPermissionRule
+import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -30,17 +37,17 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class OverviewScreenTest {
 
   private lateinit var navigationActions: NavigationActions
   private lateinit var journeysRepository: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
+  private lateinit var coffeesViewModel: CoffeesViewModel
   @Mock lateinit var mockContext: Context
   private val journey =
       Journey(
@@ -70,10 +77,11 @@ class OverviewScreenTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
+    MockitoAnnotations.openMocks(this)
     navigationActions = mock(NavigationActions::class.java)
     journeysRepository = mock(JourneysRepository::class.java)
     listJourneysViewModel = spy(ListJourneysViewModel(journeysRepository))
+    coffeesViewModel = spy(CoffeesViewModel::class.java)
 
     // Start the OverviewScreen composable for testing
     `when`(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
@@ -84,13 +92,11 @@ class OverviewScreenTest {
   @Test
   fun testPermissionGranted() {
     // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
-    whenever(
-            ContextCompat.checkSelfPermission(
-                mockContext, Manifest.permission.ACCESS_FINE_LOCATION))
+    `when`(ContextCompat.checkSelfPermission(mockContext, Manifest.permission.ACCESS_FINE_LOCATION))
         .thenReturn(PackageManager.PERMISSION_GRANTED)
 
     // Mock ContextCompat.checkSelfPermission to return PERMISSION_GRANTED
-    whenever(
+    `when`(
             ContextCompat.checkSelfPermission(
                 mockContext, Manifest.permission.ACCESS_COARSE_LOCATION))
         .thenReturn(PackageManager.PERMISSION_GRANTED)
@@ -124,7 +130,9 @@ class OverviewScreenTest {
 
   @Test
   fun overviewScreen_displaysTitleAndButtons() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
     // Assert that the app title is displayed
     composeTestRule.onNodeWithTag("appTitle").assertIsDisplayed()
     composeTestRule.onNodeWithText("BrewR").assertExists().assertIsDisplayed()
@@ -135,16 +143,19 @@ class OverviewScreenTest {
 
   @Test
   fun exploreScreen_displayCorrectly() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("Explore").performClick()
-    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("menuButton").performClick()
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
   }
 
   @Test
   fun overviewScreen_clickSubNavigationButtons() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
 
     // Assert that the sub-navigation buttons are displayed
     composeTestRule.onNodeWithTag("Gallery").assertIsDisplayed()
@@ -159,14 +170,18 @@ class OverviewScreenTest {
 
   @Test
   fun overviewScreen_clickAddButton() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
     composeTestRule.onNodeWithTag("addButton").performClick()
     // check navigation
   }
 
   @Test
   fun overviewScreen_clickAccountButton() {
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
     composeTestRule.onNodeWithTag("accountButton").performClick()
     // check navigation
   }
@@ -178,7 +193,9 @@ class OverviewScreenTest {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(listOf(journey)) // Simulate return list of journeys
     }
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
     listJourneysViewModel.getJourneys()
     // Wait for UI state to settle
     composeTestRule.waitForIdle() // or mainClock.advanceUntilIdle()
@@ -196,7 +213,9 @@ class OverviewScreenTest {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(emptyList()) // Simulate return list of journeys
     }
-    composeTestRule.setContent { OverviewScreen(listJourneysViewModel, navigationActions) }
+    composeTestRule.setContent {
+      OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+    }
     listJourneysViewModel.getJourneys()
     // Then
     composeTestRule

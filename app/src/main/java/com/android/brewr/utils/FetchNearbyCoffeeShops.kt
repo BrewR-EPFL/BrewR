@@ -83,20 +83,20 @@ fun fetchNearbyCoffeeShops(
                               },
                           // use this image to avoid using API to fetch photos as it is very
                           // expensive
-                          //                        imagesUrls =
-                          //                            listOf(
-                          // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                          imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                          imagesUrls =
+                              listOf(
+                                  "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                  // imagesUrls = fetchAllPhotoUris(place, placesClient)))
                 }
+                if (coffeeShops.isNotEmpty()) {
+                  Log.d(
+                      "PlacesAPI",
+                      "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+                } else {
+                  Log.d("PlacesAPI", "No coffee shops found.")
+                }
+                onSuccess(coffeeShops)
               }
-              if (coffeeShops.isNotEmpty()) {
-                Log.d(
-                    "PlacesAPI",
-                    "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
-              } else {
-                Log.d("PlacesAPI", "No coffee shops found.")
-              }
-              onSuccess(coffeeShops)
             }
           }
           .addOnFailureListener { exception ->
@@ -131,7 +131,7 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
   val listHour =
       weekdayText?.map { dayText ->
         // Split by colon to separate the day name from the time range
-        val (_, timeRange) = dayText.split(": ", limit = 2)
+        val (day, timeRange) = dayText.split(": ", limit = 2)
         // Split the time range by "–" to get the opening and closing times
         val (openTime, closeTime) =
             if (timeRange == "Closed" || "–" !in timeRange) {
@@ -140,7 +140,7 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
               timeRange.split("–").let { it[0].trim() to it.getOrElse(1) { "Undefined" }.trim() }
             }
         // Return the Hours object with the parsed values
-        Hours(openTime.trim(), closeTime.trim())
+        Hours(day, openTime.trim(), closeTime.trim())
       } ?: emptyList()
-  return listHour.ifEmpty { listOf(Hours("Undefined", "Undefined")) }
+  return listHour.ifEmpty { listOf(Hours("Undefined", "Undefined", "Undefined")) }
 }

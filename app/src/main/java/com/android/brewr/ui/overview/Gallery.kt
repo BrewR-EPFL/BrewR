@@ -39,7 +39,6 @@ fun GalleryScreen(
     navigationActions: NavigationActions
 ) {
   val journeys = listJourneysViewModel.journeys.collectAsState().value
-  val context = LocalContext.current
 
   if (journeys.isNotEmpty()) {
     LazyVerticalStaggeredGrid(
