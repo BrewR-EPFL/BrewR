@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -16,7 +15,7 @@ plugins {
 
 android {
     namespace = "com.android.brewr"
-    compileSdk = 34
+    compileSdk = 35
 
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -31,9 +30,10 @@ android {
     val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW")
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.android.brewr"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -144,84 +144,74 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
-    // Firebase BoM (Bill of Materials)
-    implementation(platform(libs.firebase.bom.v3200)) // Add this for Firebase
+    // ------------------- Firebase -------------------
+    implementation(platform(libs.firebase.bom.v3200)) // Firebase BoM
+    implementation(libs.google.firebase.auth.ktx) // Authentication
+    implementation(libs.firebase.firestore.ktx) // Firestore
+    implementation(libs.firebase.storage.ktx) // Storage
 
-    // Firebase authentication
-    implementation(libs.google.firebase.auth.ktx)
+    // -------------- Google Play Services --------------
+    implementation(libs.play.services.auth.v2050) // Auth (Google Sign-In)
+    implementation(libs.play.services.location) // Location Services
+    implementation(libs.play.services.maps) // Maps
 
-    // Credential Manager dependencies
+    // ------------------- Credential Manager -------------------
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.identity.googleid)
 
-
-    // Play Services Auth (for Google Sign-In)
-    implementation(libs.play.services.auth.v2050)
-    implementation(libs.coil.compose)
-
-
+    // ------------------- Jetpack -------------------
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.play.services.auth)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.storage.ktx)
-    implementation(libs.play.services.location)
-    implementation(libs.places)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
+    implementation(libs.androidx.navigation.compose) // Navigation Component
+
+    // -------------- Jetpack Compose ------------------
+    implementation(platform(libs.compose.bom)) // Compose BoM
+    implementation(libs.compose.ui) // Core UI
+    implementation(libs.compose.ui.graphics) // Graphics
+    implementation(libs.compose.material3) // Material Design 3
+    implementation(libs.compose.activity) // Activity integration
+    implementation(libs.compose.viewmodel) // ViewModel integration
+    implementation(libs.compose.preview) // Preview support
+    debugImplementation(libs.compose.tooling) // Debug tooling
+
+    // -------------------- Maps --------------------
+    implementation(libs.maps.compose) // Compose Maps
+    implementation(libs.places) // Places API
+
+    // ------------------- Image Loading -------------------
+    implementation(libs.coil.compose) // Coil for Compose
+
+    // -------------------- Testing --------------------
+    testImplementation(libs.junit) // JUnit
+    testImplementation(libs.mockk) // MockK
+    testImplementation(libs.mockito.core) // Mockito Core
+    testImplementation(libs.mockito.kotlin) // Mockito Kotlin
+    testImplementation(libs.robolectric) // Robolectric
+    androidTestImplementation(libs.mockito.android) // Mockito Android
+    androidTestImplementation(libs.mockito.kotlin) // Mockito Kotlin
+
+    // ------------- Compose Testing -----------------
+    globalTestImplementation(platform(libs.compose.bom))
+    globalTestImplementation(libs.compose.test.junit)
+    debugImplementation(libs.compose.test.manifest)
+
+    // --------------- AndroidX Testing ----------------
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
-
-    // ------------- Jetpack Compose ------------------
-    val composeBom = platform(libs.compose.bom)
-    implementation(composeBom)
-    globalTestImplementation(composeBom)
-
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    // Material Design 3
-    implementation(libs.compose.material3)
-    // Integration with activities
-    implementation(libs.compose.activity)
-    // Integration with ViewModels
-    implementation(libs.compose.viewmodel)
-    // Android Studio Preview support
-    implementation(libs.compose.preview)
-    debugImplementation(libs.compose.tooling)
-    // UI Tests
-    globalTestImplementation(libs.compose.test.junit)
-    debugImplementation(libs.compose.test.manifest)
-    testImplementation(libs.mockito.core)
-    androidTestImplementation(libs.mockito.android)
-    testImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.kotlin)
-
-
-    // --------- Kaspresso test framework ----------
+    // ----------- Kaspresso Test Framework -----------
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
-
-    // ----------       Robolectric     ------------
-    testImplementation(libs.robolectric)
-
-    implementation(libs.maps.compose)
-    implementation(libs.play.services.auth)
-    implementation(libs.play.services.maps)
-
-    // MockK
-    testImplementation(libs.mockk)
 }
 
 tasks.withType<Test> {
     // Configure Jacoco for each tests
+    description = "Configure Jacoco to include no-location classes and exclude JDK internal classes"
+    group = "Verification"
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
