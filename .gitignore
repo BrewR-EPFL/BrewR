@@ -27,6 +27,7 @@ replay_pid*
 # Config and build files / folders
 .idea/
 .vscode/
+.kotlin/
 **/build
 local.properties
 keystore.properties

@@ -54,11 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -108,7 +103,6 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
       modifier = Modifier.fillMaxWidth().height(150.dp).testTag("inputJourneyDescription"))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
@@ -116,12 +110,23 @@ fun CoffeeShopCheckRow(
     coffeeshopExpanded: Boolean,
     onSelectedLocationChange: (Location) -> Unit
 ) {
-  var showDropdown by remember { mutableStateOf(false) }
   val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
   val locationQuery by locationViewModel.query.collectAsState()
 
+  CoffeeShopCheckboxRow(isYesSelected, onCheckChange)
+
+  if (coffeeshopExpanded) {
+    LocationDropdown(
+        locationSuggestions, locationQuery, onSelectedLocationChange, locationViewModel)
+  } else if (!isYesSelected) {
+    onSelectedLocationChange(Location())
+  }
+}
+
+@Composable
+fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
   Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.testTag("coffeeShopCheckRow").clickable { onCheckChange() }) {
@@ -136,77 +141,66 @@ fun CoffeeShopCheckRow(
             color = Color.Black,
             modifier = Modifier.testTag("coffeeShopCheckText"))
       }
+}
 
-  if (coffeeshopExpanded) {
-    ExposedDropdownMenuBox(
-        expanded = showDropdown && locationSuggestions.isNotEmpty(),
-        onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility
-        modifier = Modifier.testTag("exposedDropdownMenuBox")) {
-          OutlinedTextField(
-              value = locationQuery,
-              onValueChange = {
-                locationViewModel.setQuery(it)
-                showDropdown = true // Show dropdown when user starts typing
-              },
-              label = { Text("Coffeeshop") },
-              placeholder = { Text("Enter the Coffeeshop") },
-              modifier =
-                  Modifier.menuAnchor() // Anchor the dropdown to this text field
-                      .fillMaxWidth()
-                      .testTag("inputCoffeeshopLocation")
-                      .onKeyEvent { keyEvent ->
-                        if (keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Enter) {
-                          // Handle Enter key
-                          onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
-                          true // Consume the event
-                        } else {
-                          false // Pass the event further
-                        }
-                      },
-              singleLine = true,
-              keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-              keyboardActions =
-                  KeyboardActions(
-                      onDone = {
-                        // Handle IME "Done" action
-                        onSelectedLocationChange(Location(0.0, 0.0, locationQuery))
-                      }))
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LocationDropdown(
+    locationSuggestions: List<Location?>,
+    locationQuery: String,
+    onSelectedLocationChange: (Location) -> Unit,
+    locationViewModel: LocationViewModel
+) {
+  var showDropdown by remember { mutableStateOf(false) }
+  ExposedDropdownMenuBox(
+      expanded = showDropdown && locationSuggestions.isNotEmpty(),
+      onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility
+      modifier = Modifier.testTag("exposedDropdownMenuBox")) {
+        OutlinedTextField(
+            value = locationQuery,
+            onValueChange = {
+              locationViewModel.setQuery(it)
+              showDropdown = true // Show dropdown when user starts typing
+            },
+            label = { Text("Coffeeshop") },
+            placeholder = { Text("Enter the Coffeeshop") },
+            modifier =
+                Modifier.menuAnchor() // Anchor the dropdown to this text field
+                    .fillMaxWidth()
+                    .testTag("inputCoffeeshopLocation"),
+            singleLine = true)
 
-          // Dropdown menu for location suggestions
-          ExposedDropdownMenu(
-              expanded = showDropdown && locationSuggestions.isNotEmpty(),
-              onDismissRequest = { showDropdown = false },
-              modifier = Modifier.testTag("locationSuggestionsDropdown")) {
-                locationSuggestions.filterNotNull().take(3).forEach { location ->
-                  DropdownMenuItem(
-                      text = {
-                        Text(
-                            text =
-                                location.name.take(30) +
-                                    if (location.name.length > 30) "..."
-                                    else "", // Limit name length
-                            maxLines = 1 // Ensure name doesn't overflow
-                            )
-                      },
-                      onClick = {
-                        locationViewModel.setQuery(location.name)
-                        onSelectedLocationChange(location)
-                        showDropdown = false // Close dropdown on selection
-                      },
-                      modifier = Modifier.padding(8.dp))
-                }
-
-                if (locationSuggestions.size > 3) {
-                  DropdownMenuItem(
-                      text = { Text("More...") },
-                      onClick = { /* Optionally show more results */},
-                      modifier = Modifier.padding(8.dp))
-                }
+        // Dropdown menu for location suggestions
+        ExposedDropdownMenu(
+            expanded = showDropdown && locationSuggestions.isNotEmpty(),
+            onDismissRequest = { showDropdown = false },
+            modifier = Modifier.testTag("locationSuggestionsDropdown")) {
+              locationSuggestions.filterNotNull().take(3).forEach { location ->
+                DropdownMenuItem(
+                    text = {
+                      Text(
+                          text =
+                              location.name.take(30) +
+                                  if (location.name.length > 30) "..." else "", // Limit name length
+                          maxLines = 1 // Ensure name doesn't overflow
+                          )
+                    },
+                    onClick = {
+                      locationViewModel.setQuery(location.name)
+                      onSelectedLocationChange(location)
+                      showDropdown = false // Close dropdown on selection
+                    },
+                    modifier = Modifier.padding(8.dp))
               }
-        }
-  } else if (!isYesSelected) {
-    onSelectedLocationChange(Location())
-  }
+
+              if (locationSuggestions.size > 3) {
+                DropdownMenuItem(
+                    text = { Text("More...") },
+                    onClick = { /* Optionally show more results */},
+                    modifier = Modifier.padding(8.dp))
+              }
+            }
+      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -255,7 +249,7 @@ fun CoffeeOriginDropdownMenu(
                     .focusRequester(focusRequester) // Attach the FocusRequester
                     .testTag("dropdownMenuCoffeeOrigin") // Add a test tag for testing
             ) {
-              CoffeeOrigin.values().drop(1).forEach { origin ->
+              CoffeeOrigin.entries.drop(1).forEach { origin ->
                 DropdownMenuItem(
                     text = { Text(origin.name) },
                     onClick = {
@@ -285,7 +279,7 @@ fun BrewingMethodField(
         )
 
         FlowRow(modifier = Modifier.padding(16.dp)) {
-          BrewingMethod.values().drop(1).forEach { method ->
+          BrewingMethod.entries.drop(1).forEach { method ->
             // Determine if this method is the currently selected one
             val isSelected = brewingMethod == method
 
@@ -333,7 +327,7 @@ fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste
         )
 
         FlowRow(modifier = Modifier.padding(16.dp)) {
-          CoffeeTaste.values().drop(1).forEach { taste ->
+          CoffeeTaste.entries.drop(1).forEach { taste ->
             // Determine if this method is the currently selected one
             val isSelected = coffeeTaste == taste
 
@@ -398,7 +392,7 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
                       modifier =
                           Modifier.size(40.dp).testTag("FilledStar$i").clickable {
                             // Update the coffeeRate when the star is clicked
-                            onCoffeeRateChange(CoffeeRate.values()[i])
+                            onCoffeeRateChange(CoffeeRate.entries[i])
                           })
                 } else {
                   Icon(
@@ -408,7 +402,7 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
                       modifier =
                           Modifier.size(40.dp).testTag("OutlinedStar$i").clickable {
                             // Update the coffeeRate when the star is clicked
-                            onCoffeeRateChange(CoffeeRate.values()[i])
+                            onCoffeeRateChange(CoffeeRate.entries[i])
                           })
                 }
               }

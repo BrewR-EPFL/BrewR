@@ -12,6 +12,11 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
 
   private val collectionPath = "journeys"
 
+  /**
+   * Generates a new unique identifier (UID) for a journey.
+   *
+   * @return A new UID as a String.
+   */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
@@ -24,36 +29,48 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       }
     }
   }
+
   /**
-   * override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
-   * Log.d("JourneysRepositoryFirestore", "getjourneys")
-   * db.collection(collectionPath).get().addOnCompleteListener { task -> if (task.isSuccessful) {
-   * val journeys = task.result?.mapNotNull { document -> documentTojourney(document) } ?:
-   * emptyList() onSuccess(journeys) } else { task.exception?.let { e ->
-   * Log.e("JourneysRepositoryFirestore", "Error getting documents", e) onFailure(e) } } } }
+   * Retrieves all journeys from the Firestore database.
+   *
+   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
    */
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(collectionPath).addSnapshotListener { snapshot, error ->
-      if (error != null) {
-        Log.e("JourneysRepositoryFirestore", "Error listening to snapshots", error)
-        onFailure(error)
-        return@addSnapshotListener
-      }
-
-      if (snapshot != null && !snapshot.isEmpty) {
-        val journeys = snapshot.documents.mapNotNull { document -> documentTojourney(document) }
+    Log.d("JourneysRepositoryFirestore", "getjourneys")
+    db.collection(collectionPath).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val journeys =
+            task.result?.mapNotNull { document -> documentTojourney(document) } ?: emptyList()
         onSuccess(journeys)
       } else {
-        onSuccess(emptyList()) // Pass an empty list if there are no documents
+        task.exception?.let { e ->
+          Log.e("JourneysRepositoryFirestore", "Error getting documents", e)
+          onFailure(e)
+        }
       }
     }
   }
 
+  /**
+   * Adds a new journey to the Firestore database.
+   *
+   * @param journey The journey object to add.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
   }
 
+  /**
+   * Updates an existing journey in the Firestore database.
+   *
+   * @param journey The journey object to update.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun updateJourney(
       journey: Journey,
       onSuccess: () -> Unit,
@@ -63,6 +80,13 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
   }
 
+  /**
+   * Deletes a journey by its ID.
+   *
+   * @param id The ID of the journey to delete.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun deleteJourneyById(
       id: String,
       onSuccess: () -> Unit,
@@ -107,7 +131,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       val uid = document.id
       val imageUrl = document.getString("imageUrl") ?: return null
       val description = document.getString("description") ?: return null
-      val locationData = document.get("location") as? Map<*, *> ?: return null
+      val locationData = document["location"] as? Map<*, *> ?: return null
       val location =
           locationData.let {
             Location(

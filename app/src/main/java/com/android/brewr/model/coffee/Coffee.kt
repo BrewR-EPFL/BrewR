@@ -12,4 +12,4 @@ data class Coffee(
     val imagesUrls: List<String>
 )
 
-data class Hours(val open: String, val close: String)
+data class Hours(val day: String, val open: String, val close: String)

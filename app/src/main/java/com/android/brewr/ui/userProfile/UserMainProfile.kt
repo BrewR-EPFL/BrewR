@@ -52,6 +52,8 @@ import com.google.firebase.ktx.Firebase
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
+  val NOT_YET_IMPLEMENTED = "Feature not yet developed"
+
   val context = LocalContext.current
 
   // Collect username, userEmail, and user profile picture url from ViewModel
@@ -129,8 +131,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
                       onClick = {
-                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
                       },
                       Modifier.testTag("Preference button")) {
                         Icon(
@@ -141,8 +142,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
                       onClick = {
-                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
                       },
                       Modifier.testTag("Notification button")) {
                         Icon(
@@ -154,8 +154,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
                       onClick = {
-                        Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
                       },
                       Modifier.testTag("TBD button")) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "TBD")
@@ -169,7 +168,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                   icon = Icons.Default.MoreVert,
                   label = "anything",
                   onClick = {
-                    Toast.makeText(context, "Feature not yet developed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
                   },
                   testTag = "anything")
 
