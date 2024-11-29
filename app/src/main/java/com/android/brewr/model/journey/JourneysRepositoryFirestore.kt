@@ -37,17 +37,18 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
    * @param onFailure The callback to call if the operation fails.
    */
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
-    Log.d("JourneysRepositoryFirestore", "getjourneys")
-    db.collection(collectionPath).get().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        val journeys =
-            task.result?.mapNotNull { document -> documentTojourney(document) } ?: emptyList()
+    db.collection(collectionPath).addSnapshotListener { snapshot, error ->
+      if (error != null) {
+        Log.e("JourneysRepositoryFirestore", "Error listening to snapshots", error)
+        onFailure(error)
+        return@addSnapshotListener
+      }
+
+      if (snapshot != null && !snapshot.isEmpty) {
+        val journeys = snapshot.documents.mapNotNull { document -> documentTojourney(document) }
         onSuccess(journeys)
       } else {
-        task.exception?.let { e ->
-          Log.e("JourneysRepositoryFirestore", "Error getting documents", e)
-          onFailure(e)
-        }
+        onSuccess(emptyList()) // Pass an empty list if there are no documents
       }
     }
   }
