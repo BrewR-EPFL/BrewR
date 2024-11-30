@@ -151,7 +151,7 @@ fun OverviewScreen(
 fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) {
   Row(
       modifier =
-          Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp).testTag("Explore")) {
+          Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp)) {
         SubNavigationButton(
             text = "Gallery",
             isSelected = currentSection == "Gallery",
