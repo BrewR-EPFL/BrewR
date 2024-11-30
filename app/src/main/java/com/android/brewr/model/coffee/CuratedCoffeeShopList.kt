@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
  * @param coffeeShops A [List] of [Coffee] objects representing coffee shops to be sorted.
  * @return A [List] of [Coffee] objects sorted by rating in descending order.
  */
-fun fetchAndSortCoffeeShopsByRating(coffeeShops: List<Coffee>): List<Coffee> {
+fun sortCoffeeShopsByRating(coffeeShops: List<Coffee>): List<Coffee> {
   return coffeeShops.sortedByDescending { it.rating }
 }
 

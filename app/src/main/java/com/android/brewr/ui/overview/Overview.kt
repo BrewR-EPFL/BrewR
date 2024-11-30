@@ -30,7 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.fetchAndSortCoffeeShopsByRating
+import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
@@ -100,7 +100,7 @@ fun OverviewScreen(
                     coffeesViewModel.addCoffees(coffees)
 
                     // Sort fetched coffee shops by rating
-                    curatedCoffees = fetchAndSortCoffeeShopsByRating(coffees)
+                    curatedCoffees = sortCoffeeShopsByRating(coffees)
                   })
             })
       }
