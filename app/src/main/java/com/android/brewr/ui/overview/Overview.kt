@@ -149,17 +149,19 @@ fun OverviewScreen(
 
 @Composable
 fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) {
-  Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp)) {
-    SubNavigationButton(
-        text = "Gallery",
-        isSelected = currentSection == "Gallery",
-        onClick = { onSectionChange("Gallery") })
-    Spacer(modifier = Modifier.width(6.dp))
-    SubNavigationButton(
-        text = "Explore",
-        isSelected = currentSection == "Explore",
-        onClick = { onSectionChange("Explore") })
-  }
+  Row(
+      modifier =
+          Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp).testTag("Explore")) {
+        SubNavigationButton(
+            text = "Gallery",
+            isSelected = currentSection == "Gallery",
+            onClick = { onSectionChange("Gallery") })
+        Spacer(modifier = Modifier.width(6.dp))
+        SubNavigationButton(
+            text = "Explore",
+            isSelected = currentSection == "Explore",
+            onClick = { onSectionChange("Explore") })
+      }
 }
 
 @Composable
