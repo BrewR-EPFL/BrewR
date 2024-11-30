@@ -30,7 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.fetchAndSortCoffeeShopsByRating
+import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
@@ -90,16 +90,18 @@ fun OverviewScreen(
       coroutineScope.launch {
         getCurrentLocation(
             context,
-            onSuccess = {
+            onSuccess = { location ->
+              // Fetch coffee shops once
               fetchNearbyCoffeeShops(
-                  coroutineScope,
-                  context,
-                  it,
-                  onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
-              // Sort coffee shops by rating to generate curated list
-              fetchAndSortCoffeeShopsByRating(coroutineScope, context, it) { sortedCoffees ->
-                curatedCoffees = sortedCoffees
-              }
+                  scope = coroutineScope,
+                  context = context,
+                  currentLocation = location,
+                  onSuccess = { coffees ->
+                    coffeesViewModel.addCoffees(coffees)
+
+                    // Sort fetched coffee shops by rating
+                    curatedCoffees = sortCoffeeShopsByRating(coffees)
+                  })
             })
       }
       isFetched = true
@@ -151,17 +153,24 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
     SubNavigationButton(
         text = "Gallery",
         isSelected = currentSection == "Gallery",
-        onClick = { onSectionChange("Gallery") })
+        onClick = { onSectionChange("Gallery") },
+        modifier = Modifier.testTag("Gallery"))
     Spacer(modifier = Modifier.width(6.dp))
     SubNavigationButton(
         text = "Explore",
         isSelected = currentSection == "Explore",
-        onClick = { onSectionChange("Explore") })
+        onClick = { onSectionChange("Explore") },
+        modifier = Modifier.testTag("Explore"))
   }
 }
 
 @Composable
-fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
+fun SubNavigationButton(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {},
+    modifier: Modifier
+) {
   Text(
       text = text,
       color = if (isSelected) Color.White else CoffeeBrown,

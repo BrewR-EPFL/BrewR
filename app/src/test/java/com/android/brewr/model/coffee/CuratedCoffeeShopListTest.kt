@@ -3,14 +3,11 @@ package com.android.brewr.model.coffee
 import android.content.Context
 import com.android.brewr.model.location.Location
 import com.android.brewr.utils.fetchNearbyCoffeeShops
-import com.google.android.gms.maps.model.LatLng
 import io.mockk.*
 import java.time.LocalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -21,8 +18,6 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class CuratedCoffeeShopListTest {
   private lateinit var context: Context
-  private val currentLocation = LatLng(37.7749, -122.4194)
-  private val testScope = TestScope()
   private val testDispatcher = StandardTestDispatcher()
 
   @Before
@@ -38,7 +33,7 @@ class CuratedCoffeeShopListTest {
   }
 
   @Test
-  fun `fetchAndSortCoffeeShopsByRating sorts coffee shops by rating in descending order`() {
+  fun `sortCoffeeShopsByRating sorts coffee shops by rating in descending order`() {
     // Set up test dispatcher
     Dispatchers.setMain(testDispatcher)
 
@@ -50,90 +45,27 @@ class CuratedCoffeeShopListTest {
             createCoffeeShop("3", "Coffee Shop 3", 2.5),
             createCoffeeShop("4", "Coffee Shop 4", 5.0))
 
-    // Mock fetchNearbyCoffeeShops to immediately call onSuccess with our test data
-    every {
-      fetchNearbyCoffeeShops(
-          scope = any(),
-          context = any(),
-          currentLocation = any(),
-          radius = any(),
-          onSuccess = any())
-    } answers { lastArg<(List<Coffee>) -> Unit>().invoke(unsortedCoffeeShops) }
-
-    // Collect results
-    var result = listOf<Coffee>()
-    fetchAndSortCoffeeShopsByRating(
-        scope = testScope, context = context, currentLocation = currentLocation) {
-          result = it
-        }
-
-    // Advance coroutines
-    testScope.advanceUntilIdle()
+    // Sort coffee shops
+    val sortedCoffeeShops = sortCoffeeShopsByRating(unsortedCoffeeShops)
 
     // Verify results
-    assertEquals(4, result.size)
-    assertEquals(5.0, result[0].rating, 0.01)
-    assertEquals(4.5, result[1].rating, 0.01)
-    assertEquals(3.5, result[2].rating, 0.01)
-    assertEquals(2.5, result[3].rating, 0.01)
+    assertEquals(4, sortedCoffeeShops.size)
+    assertEquals(5.0, sortedCoffeeShops[0].rating, 0.01)
+    assertEquals(4.5, sortedCoffeeShops[1].rating, 0.01)
+    assertEquals(3.5, sortedCoffeeShops[2].rating, 0.01)
+    assertEquals(2.5, sortedCoffeeShops[3].rating, 0.01)
   }
 
   @Test
-  fun `fetchAndSortCoffeeShopsByRating handles empty list`() {
-    // Set up test dispatcher
-    Dispatchers.setMain(testDispatcher)
+  fun `sortCoffeeShopsByRating handles empty list`() {
+    // Create an empty list
+    val emptyCoffeeShops = emptyList<Coffee>()
 
-    // Mock fetchNearbyCoffeeShops to return empty list
-    every {
-      fetchNearbyCoffeeShops(
-          scope = any(),
-          context = any(),
-          currentLocation = any(),
-          radius = any(),
-          onSuccess = any())
-    } answers { lastArg<(List<Coffee>) -> Unit>().invoke(emptyList()) }
+    // Sort the empty list
+    val result = sortCoffeeShopsByRating(emptyCoffeeShops)
 
-    // Collect results
-    var result = listOf<Coffee>()
-    fetchAndSortCoffeeShopsByRating(
-        scope = testScope, context = context, currentLocation = currentLocation) {
-          result = it
-        }
-
-    // Advance coroutines
-    testScope.advanceUntilIdle()
-
-    // Verify results
+    // Verify the result is also an empty list
     assertEquals(0, result.size)
-  }
-
-  @Test
-  fun `fetchAndSortCoffeeShopsByRating uses custom radius`() {
-    // Set up test dispatcher
-    Dispatchers.setMain(testDispatcher)
-
-    val customRadius = 5000.0
-
-    // Mock and capture parameters
-    val radiusSlot = slot<Double>()
-    every {
-      fetchNearbyCoffeeShops(
-          scope = any(),
-          context = any(),
-          currentLocation = any(),
-          radius = capture(radiusSlot),
-          onSuccess = any())
-    } answers { lastArg<(List<Coffee>) -> Unit>().invoke(emptyList()) }
-
-    // Call function with custom radius
-    fetchAndSortCoffeeShopsByRating(
-        scope = testScope,
-        context = context,
-        currentLocation = currentLocation,
-        radius = customRadius) {}
-
-    // Verify custom radius was passed through
-    assertEquals(customRadius, radiusSlot.captured, 0.01)
   }
 
   @Test
