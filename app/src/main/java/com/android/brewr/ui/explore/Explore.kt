@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
+import com.android.brewr.model.coffee.filterOpenCoffeeShops
 import com.android.brewr.ui.theme.CoffeeBrown
 import kotlinx.coroutines.launch
 
@@ -33,75 +34,114 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
-  var showCuratedList by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf("Nearby") } // Default to "Nearby"
 
   // Collect coffees list
   val coffees = coffeesViewModel.coffees.collectAsState().value
+  val filteredOpenedCoffees = filterOpenCoffeeShops(coffees) // Apply filtering for "Opened"
 
   // State for controlling the current view in the bottom sheet
   var showCoffeeInfos by remember { mutableStateOf(false) }
 
-  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    MapScreen(coffees)
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        MapScreen(coffees)
 
-    if (showBottomSheet) {
-      ModalBottomSheet(
-          onDismissRequest = { showBottomSheet = false },
-          sheetState = sheetState,
-          modifier = Modifier.testTag("exploreBottomSheet")) {
-            if (!showCoffeeInfos) {
-              Column(modifier = Modifier.fillMaxWidth()) {
-                ListToggleRow(showCuratedList) { showCuratedList = !showCuratedList }
-                CoffeeList(if (showCuratedList) curatedCoffees else coffees) {
-                  coffeesViewModel.selectCoffee(it)
-                  showCoffeeInfos = true
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
+                modifier = Modifier.testTag("exploreBottomSheet")
+            ) {
+                if (!showCoffeeInfos) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        ListToggleRow(selectedOption = selectedOption) { option ->
+                            selectedOption = option
+                        }
+
+                        val listToShow = when (selectedOption) {
+                            "Curated" -> curatedCoffees
+                            "Opened" -> filteredOpenedCoffees
+                            else -> coffees
+                        }
+
+                        CoffeeList(listToShow) {
+                            coffeesViewModel.selectCoffee(it)
+                            showCoffeeInfos = true
+                        }
+                    }
+                } else {
+                    CoffeeInformationScreen(
+                        coffeesViewModel = coffeesViewModel,
+                        onBack = { showCoffeeInfos = false }
+                    )
                 }
-              }
-            } else {
-              CoffeeInformationScreen(
-                  coffeesViewModel = coffeesViewModel, onBack = { showCoffeeInfos = false })
             }
-          }
+        }
+
+        ShowMenuButton { showBottomSheet = true }
+
+        LaunchedEffect(Unit) { coroutineScope.launch { sheetState.show() } }
     }
-
-    ShowMenuButton { showBottomSheet = true }
-
-    LaunchedEffect(Unit) { coroutineScope.launch { sheetState.show() } }
-  }
 }
 
 /**
- * A composable function that displays a row with a toggle button to switch between showing a
- * curated list and nearby coffee shops.
+ * A composable function that displays a row with a dropdown menu to allow users to toggle between
+ * different list views such as "Nearby", "Curated", and "Opened".
  *
- * @param showCuratedList A boolean indicating whether the curated list is currently shown.
- * @param onToggle A lambda function to be executed when the toggle button is clicked.
+ * @param selectedOption A [String] representing the currently selected option (e.g., "Nearby", "Curated", "Opened").
+ * @param onOptionSelected A callback function that is invoked when the user selects an option from the dropdown menu.
+ *        The selected option is passed as a parameter to this function.
  */
 @Composable
-fun ListToggleRow(showCuratedList: Boolean, onToggle: () -> Unit) {
-  Row(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("exploreListToggleRow"),
-      horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text = if (showCuratedList) "Curated List" else "Nearby Coffee Shops",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
+fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
 
-        Button(
-            onClick = onToggle,
-            colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
-            shape = RoundedCornerShape(15.dp),
-            modifier =
-                Modifier.padding(start = 8.dp)
-                    .height(40.dp)
-                    .wrapContentWidth()
-                    .testTag("toggleListButton")) {
-              Text(
-                  text = if (showCuratedList) "Show Nearby" else "Show Curated",
-                  style = MaterialTheme.typography.bodySmall,
-                  color = Color.White)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .testTag("exploreListToggleRow"),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = selectedOption,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .testTag("listTitle")
+        )
+
+        Box {
+            Button(
+                onClick = { expanded = true },
+                colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier.testTag("toggleDropdownMenu")
+            ) {
+                Text(
+                    text = "Choose View",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White
+                )
             }
-      }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.testTag("dropdownMenu")
+            ) {
+                listOf("Nearby", "Curated", "Opened").forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -112,12 +152,31 @@ fun ListToggleRow(showCuratedList: Boolean, onToggle: () -> Unit) {
  */
 @Composable
 fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
-  LazyColumn(modifier = Modifier.fillMaxHeight(0.9f).testTag("bottomSheet")) {
-    items(coffees) { coffee ->
-      CoffeeInformationCardScreen(coffee = coffee, onClick = { onCoffeeClick(coffee) })
+    if (coffees.isEmpty()) {
+        // Display a message when there are no coffee shops in the list
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Everywhere is closed! I guess Coffee will disturb your sleep at this time ",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Gray,
+                modifier = Modifier.testTag("noOpenCoffeeShopsMessage")
+            )
+        }
+    } else {
+        // Display the list of coffee shops
+        LazyColumn(modifier = Modifier.fillMaxHeight(0.9f).testTag("bottomSheet")) {
+            items(coffees) { coffee ->
+                CoffeeInformationCardScreen(coffee = coffee, onClick = { onCoffeeClick(coffee) })
+            }
+        }
     }
-  }
 }
+
 
 /**
  * A composable function that displays a menu button.
