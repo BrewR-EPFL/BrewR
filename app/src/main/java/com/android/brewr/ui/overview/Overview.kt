@@ -90,16 +90,18 @@ fun OverviewScreen(
       coroutineScope.launch {
         getCurrentLocation(
             context,
-            onSuccess = {
+            onSuccess = { location ->
+              // Fetch coffee shops once
               fetchNearbyCoffeeShops(
-                  coroutineScope,
-                  context,
-                  it,
-                  onSuccess = { coffees -> coffeesViewModel.addCoffees(coffees) })
-              // Sort coffee shops by rating to generate curated list
-              fetchAndSortCoffeeShopsByRating(coroutineScope, context, it) { sortedCoffees ->
-                curatedCoffees = sortedCoffees
-              }
+                  scope = coroutineScope,
+                  context = context,
+                  currentLocation = location,
+                  onSuccess = { coffees ->
+                    coffeesViewModel.addCoffees(coffees)
+
+                    // Sort fetched coffee shops by rating
+                    curatedCoffees = fetchAndSortCoffeeShopsByRating(coffees)
+                  })
             })
       }
       isFetched = true
