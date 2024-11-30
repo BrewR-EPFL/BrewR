@@ -5,12 +5,16 @@ import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysRepository {
+class JourneysRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
+) : JourneysRepository {
 
   private val collectionPath = "journeys"
   private val userPath = "users"
@@ -22,10 +26,11 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
 
   // Clearly ask TODO it
   override fun init(onSuccess: () -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      if (it.currentUser != null) {
-        currentUserUid = Firebase.auth.currentUser?.uid ?: ""
-        val currentUserName = Firebase.auth.currentUser?.email ?: ""
+    firebaseAuth.addAuthStateListener {
+      val user = Firebase.auth.currentUser
+      if (user != null) {
+        currentUserUid = user.uid
+        val currentUserName = user.email ?: ""
         db.collection(userPath)
             .document(currentUserUid)
             .get()
@@ -53,7 +58,7 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
     Log.d("JourneysRepositoryFirestore", "getJourneys")
 
     db.collection(userPath)
-        .document(currentUserUid)
+        .document(getCurrentUserUid())
         .get()
         .addOnSuccessListener { document ->
           val journeyIds = document.get("journeys") as? List<String> ?: emptyList()
@@ -74,11 +79,10 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
   }
 
   override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
     val batch = db.batch()
 
     batch.update(
-        db.collection(userPath).document(currentUserUid),
+        db.collection(userPath).document(getCurrentUserUid()),
         "journeys",
         FieldValue.arrayUnion(journey.uid))
     batch.set(db.collection(collectionPath).document(journey.uid), journey)
@@ -104,10 +108,8 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       onFailure: (Exception) -> Unit
   ) {
     val batch = db.batch()
-    val userRef = currentUserUid?.let { db.collection("users").document(it) }
-    if (userRef != null) {
+    val userRef = db.collection("users").document(getCurrentUserUid())
       batch.update(userRef, "journeys", FieldValue.arrayRemove(id))
-    }
     batch.delete(db.collection(collectionPath).document(id))
     batch
         .commit()
@@ -181,5 +183,11 @@ class JourneysRepositoryFirestore(private val db: FirebaseFirestore) : JourneysR
       Log.e("JourneysRepositoryFirestore", "Error converting document to Journey", e)
       null
     }
+  }
+
+  private fun getCurrentUserUid(): String {
+    val user = firebaseAuth.currentUser ?: throw IllegalStateException("User not logged in")
+    val uid = user.uid
+    return uid
   }
 }
