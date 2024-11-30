@@ -147,7 +147,7 @@ class OverviewScreenTest {
       OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
     }
 
-    //    composeTestRule.onNodeWithTag("Explore").performClick()
+    composeTestRule.onNodeWithTag("Explore").performClick()
     composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
   }
 

@@ -153,17 +153,24 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
     SubNavigationButton(
         text = "Gallery",
         isSelected = currentSection == "Gallery",
-        onClick = { onSectionChange("Gallery") })
+        onClick = { onSectionChange("Gallery") },
+        modifier = Modifier.testTag("Gallery"))
     Spacer(modifier = Modifier.width(6.dp))
     SubNavigationButton(
         text = "Explore",
         isSelected = currentSection == "Explore",
-        onClick = { onSectionChange("Explore") })
+        onClick = { onSectionChange("Explore") },
+        modifier = Modifier.testTag("Explore"))
   }
 }
 
 @Composable
-fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
+fun SubNavigationButton(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {},
+    modifier: Modifier
+) {
   Text(
       text = text,
       color = if (isSelected) Color.White else CoffeeBrown,
