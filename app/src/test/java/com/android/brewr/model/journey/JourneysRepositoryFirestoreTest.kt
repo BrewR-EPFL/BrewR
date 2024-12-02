@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.User
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -22,6 +24,7 @@ import org.mockito.Mock
 import org.mockito.MockedStatic
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -39,6 +42,7 @@ class JourneysRepositoryFirestoreTest {
   @Mock private lateinit var mockUserDocumentReference: DocumentReference
   @Mock private lateinit var mockJourneyDocumentReference: DocumentReference
   @Mock private lateinit var mockUserDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var mockJourneysQuerySnapshot: QuerySnapshot
 
   private lateinit var journeysRepository: JourneysRepositoryFirestore
 
@@ -94,6 +98,37 @@ class JourneysRepositoryFirestoreTest {
     `when`(mockJourneyDocumentReference.id).thenReturn("1")
     val uid = journeysRepository.getNewUid()
     assert(uid == "1")
+  }
+
+  @Test
+  fun `test getJourneys success`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
+    // Arrange
+
+    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask )
+    `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      `when`(mockUserDocumentSnapshot.get("journeys")).thenReturn(listOf("id1", "id2"))
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask // Chain the task
+    }
+    `when`(mockJourneyCollectionReference.whereIn(anyString(), anyList()))
+        .thenReturn(mockJourneyCollectionReference)
+    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask )
+    `when`(mockJourneysTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
+      `when`(mockJourneysQuerySnapshot.documents)
+          .thenReturn(
+              listOf(mock(DocumentSnapshot::class.java), mock(DocumentSnapshot::class.java)))
+      listener.onSuccess(mockJourneysQuerySnapshot)
+      mockJourneysTask // Chain the task
+    }
+
+    val successCaptor = argumentCaptor<List<Journey>>()
+
+    // Act
+    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
   }
 
   @Test
