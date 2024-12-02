@@ -98,7 +98,6 @@ class JourneysRepositoryFirestoreTest {
 
   @Test
   fun addJourney_shouldCommitBatchSuccessfully() {
-
     // Mock Firestore batch
     val mockBatch = mock(WriteBatch::class.java)
     val fieldValue = FieldValue.arrayUnion(journey.uid)
