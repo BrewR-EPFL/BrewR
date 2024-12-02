@@ -10,6 +10,11 @@ class UserRepositoryFirestore(
     private val db: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth
 ) : UserRepository {
+  companion object {
+    const val LOG_TAG = "UserRepository"
+    const val LOG_MSG = "User not found"
+    const val EXCEPTION_MSG = "User is not logged in"
+  }
 
   /**
    * Retrieves the current user's Gmail address.
@@ -22,8 +27,8 @@ class UserRepositoryFirestore(
     if (user != null) {
       onSuccess(user.email)
     } else {
-      Log.e("UserRepository", "User not found")
-      onFailure(Exception("User is not logged in"))
+      Log.e(LOG_TAG, LOG_MSG)
+      onFailure(Exception(EXCEPTION_MSG))
     }
   }
 
@@ -38,8 +43,8 @@ class UserRepositoryFirestore(
     if (user != null) {
       onSuccess(user.displayName)
     } else {
-      Log.e("UserRepository", "User not found")
-      onFailure(Exception("User is not logged in"))
+      Log.e(LOG_TAG, LOG_MSG)
+      onFailure(Exception(EXCEPTION_MSG))
     }
   }
 
@@ -56,8 +61,8 @@ class UserRepositoryFirestore(
     if (user != null) {
       onSuccess(user.photoUrl)
     } else {
-      Log.e("UserRepository", "User not found")
-      onFailure(Exception("User is not logged in"))
+      Log.e(LOG_TAG, LOG_MSG)
+      onFailure(Exception(EXCEPTION_MSG))
     }
   }
 }

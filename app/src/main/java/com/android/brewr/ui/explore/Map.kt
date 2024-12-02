@@ -2,6 +2,8 @@ package com.android.brewr.ui.explore
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,8 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import com.android.brewr.R
 import com.android.brewr.model.coffee.Coffee
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -45,6 +50,7 @@ fun MapScreen(coffees: List<Coffee>) {
                 Log.d(
                     "MapScreen",
                     "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")
+                val markerIcon = getMarkerIcon(coffee.coffeeShopName)
                 Marker(
                     state =
                         remember {
@@ -53,6 +59,7 @@ fun MapScreen(coffees: List<Coffee>) {
                                   LatLng(coffee.location.latitude, coffee.location.longitude))
                         },
                     title = coffee.coffeeShopName,
+                    icon = markerIcon,
                     snippet = "Address: ${coffee.location.address}")
               }
 
@@ -78,5 +85,25 @@ private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> 
   } catch (e: Exception) {
     e.printStackTrace()
     onSuccess(LatLng(46.5197, 6.6323))
+  }
+}
+
+@Composable
+private fun getMarkerIcon(shopName: String): BitmapDescriptor {
+  val context = LocalContext.current
+
+  // Helper function to load and resize the icon
+  fun loadAndResizeIcon(resourceId: Int): BitmapDescriptor {
+    val originalBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+    val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
+    return BitmapDescriptorFactory.fromBitmap(resizedBitmap)
+  }
+
+  return when {
+    shopName.contains("Starbucks", ignoreCase = true) ->
+        loadAndResizeIcon(R.drawable.starbucks_icon)
+    shopName.contains("McDonald's", ignoreCase = true) ->
+        loadAndResizeIcon(R.drawable.mcdonald_icon)
+    else -> loadAndResizeIcon(R.drawable.default_coffee_icon) // Default icon
   }
 }

@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeesViewModel
+import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -46,11 +49,12 @@ import kotlinx.coroutines.tasks.await
 fun OverviewScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
+    coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var coffeeShops by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
+  var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -86,8 +90,18 @@ fun OverviewScreen(
       coroutineScope.launch {
         getCurrentLocation(
             context,
-            onSuccess = {
-              fetchNearbyCoffeeShops(coroutineScope, context, it, onSuccess = { coffeeShops = it })
+            onSuccess = { location ->
+              // Fetch coffee shops once
+              fetchNearbyCoffeeShops(
+                  scope = coroutineScope,
+                  context = context,
+                  currentLocation = location,
+                  onSuccess = { coffees ->
+                    coffeesViewModel.addCoffees(coffees)
+
+                    // Sort fetched coffee shops by rating
+                    curatedCoffees = sortCoffeeShopsByRating(coffees)
+                  })
             })
       }
       isFetched = true
@@ -117,11 +131,7 @@ fun OverviewScreen(
                       }
                 }
               })
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(1.dp)
-                      .background(androidx.compose.ui.graphics.Color.LightGray))
+          Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray))
           Spacer(modifier = Modifier.height(8.dp))
           SubNavigationBar(
               currentSection = currentSection,
@@ -132,7 +142,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeeShops)
+          ExploreScreen(coffeesViewModel, curatedCoffees)
         }
       })
 }
@@ -143,17 +153,24 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
     SubNavigationButton(
         text = "Gallery",
         isSelected = currentSection == "Gallery",
-        onClick = { onSectionChange("Gallery") })
+        onClick = { onSectionChange("Gallery") },
+        modifier = Modifier.testTag("Gallery"))
     Spacer(modifier = Modifier.width(6.dp))
     SubNavigationButton(
         text = "Explore",
         isSelected = currentSection == "Explore",
-        onClick = { onSectionChange("Explore") })
+        onClick = { onSectionChange("Explore") },
+        modifier = Modifier.testTag("Explore"))
   }
 }
 
 @Composable
-fun SubNavigationButton(text: String, isSelected: Boolean = false, onClick: () -> Unit = {}) {
+fun SubNavigationButton(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {},
+    modifier: Modifier
+) {
   Text(
       text = text,
       color = if (isSelected) Color.White else CoffeeBrown,

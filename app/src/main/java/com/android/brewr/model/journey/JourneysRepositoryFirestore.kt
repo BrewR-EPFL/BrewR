@@ -20,6 +20,11 @@ class JourneysRepositoryFirestore(
   private val userPath = "users"
   private var currentUserUid = ""
 
+  /**
+   * Generates a new unique identifier (UID) for a journey.
+   *
+   * @return A new UID as a String.
+   */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
@@ -54,6 +59,12 @@ class JourneysRepositoryFirestore(
     }
   }
 
+  /**
+   * Retrieves all journeys from the Firestore database.
+   *
+   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
     Log.d("JourneysRepositoryFirestore", "getJourneys")
 
@@ -78,6 +89,13 @@ class JourneysRepositoryFirestore(
         .addOnFailureListener { onFailure(it) }
   }
 
+  /**
+   * Adds a new journey to the Firestore database.
+   *
+   * @param journey The journey object to add.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     val batch = db.batch()
 
@@ -93,6 +111,13 @@ class JourneysRepositoryFirestore(
         .addOnFailureListener { exception -> onFailure(exception) }
   }
 
+  /**
+   * Updates an existing journey in the Firestore database.
+   *
+   * @param journey The journey object to update.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun updateJourney(
       journey: Journey,
       onSuccess: () -> Unit,
@@ -102,6 +127,13 @@ class JourneysRepositoryFirestore(
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
   }
 
+  /**
+   * Deletes a journey by its ID.
+   *
+   * @param id The ID of the journey to delete.
+   * @param onSuccess The callback to call if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
   override fun deleteJourneyById(
       id: String,
       onSuccess: () -> Unit,
@@ -152,7 +184,7 @@ class JourneysRepositoryFirestore(
       val uid = document.id
       val imageUrl = document.getString("imageUrl") ?: return null
       val description = document.getString("description") ?: return null
-      val locationData = document.get("location") as? Map<*, *> ?: return null
+      val locationData = document["location"] as? Map<*, *> ?: return null
       val location =
           locationData.let {
             Location(

@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.resources.C
@@ -61,6 +62,7 @@ fun BrewRApp() {
   val listJourneysViewModel: ListJourneysViewModel =
       viewModel(factory = ListJourneysViewModel.Factory)
   val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+  val coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory)
 
   NavHost(navController, Route.AUTH) {
     navigation(
@@ -73,7 +75,9 @@ fun BrewRApp() {
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.OVERVIEW) { OverviewScreen(listJourneysViewModel, navigationActions) }
+      composable(Screen.OVERVIEW) {
+        OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+      }
       composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
       composable(Screen.JOURNEY_RECORD) {
         JourneyRecordScreen(listJourneysViewModel, navigationActions)
