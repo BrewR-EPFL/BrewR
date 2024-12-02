@@ -26,6 +26,12 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function to display a map screen with coffee shop markers and user location.
+ *
+ * @param coffees List of Coffee objects representing coffee shops to be displayed on the map.
+ * @param listJourneysViewModel ViewModel containing the list of journeys.
+ */
 @Composable
 fun MapScreen(coffees: List<Coffee>, listJourneysViewModel: ListJourneysViewModel) {
   val context = LocalContext.current
@@ -73,6 +79,13 @@ fun MapScreen(coffees: List<Coffee>, listJourneysViewModel: ListJourneysViewMode
       })
 }
 
+/**
+ * Retrieves the current location of the user.
+ *
+ * @param context The context used to access the location services.
+ * @param onSuccess A callback function to be invoked with the user's current location as a LatLng
+ *   object.
+ */
 @SuppressLint("MissingPermission")
 private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
   try {
@@ -89,6 +102,13 @@ private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> 
   }
 }
 
+/**
+ * Composable function to get the appropriate marker icon for a coffee shop.
+ *
+ * @param coffee The coffee object containing details about the coffee shop.
+ * @param listJourneysViewModel The ViewModel containing the list of journeys.
+ * @return A BitmapDescriptor representing the marker icon.
+ */
 @Composable
 private fun getMarkerIcon(
     coffee: Coffee,
@@ -113,6 +133,13 @@ private fun getMarkerIcon(
   }
 }
 
+/**
+ * Checks if the given coffee location is part of any journey in the listJourneysViewModel.
+ *
+ * @param coffee The coffee object containing the location to check.
+ * @param listJourneysViewModel The ViewModel containing the list of journeys.
+ * @return True if the coffee location is part of any journey, false otherwise.
+ */
 @Composable
 private fun isJourney(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): Boolean {
   val epsilon = 0.01
