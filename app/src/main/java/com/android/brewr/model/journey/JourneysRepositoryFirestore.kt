@@ -109,7 +109,7 @@ class JourneysRepositoryFirestore(
   ) {
     val batch = db.batch()
     val userRef = db.collection("users").document(getCurrentUserUid())
-      batch.update(userRef, "journeys", FieldValue.arrayRemove(id))
+    batch.update(userRef, "journeys", FieldValue.arrayRemove(id))
     batch.delete(db.collection(collectionPath).document(id))
     batch
         .commit()
