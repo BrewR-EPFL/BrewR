@@ -66,8 +66,6 @@ class JourneysRepositoryFirestore(
    * @param onFailure The callback to call if the operation fails.
    */
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
-    Log.d("JourneysRepositoryFirestore", "getJourneys")
-
     db.collection(userPath)
         .document(getCurrentUserUid())
         .get()
@@ -98,7 +96,6 @@ class JourneysRepositoryFirestore(
    */
   override fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     val batch = db.batch()
-
     batch.update(
         db.collection(userPath).document(getCurrentUserUid()),
         "journeys",
