@@ -106,7 +106,7 @@ class JourneysRepositoryFirestoreTest {
     val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
     // Arrange
 
-    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask )
+    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask)
     `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
       val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
       `when`(mockUserDocumentSnapshot.get("journeys")).thenReturn(listOf("id1", "id2"))
@@ -115,7 +115,7 @@ class JourneysRepositoryFirestoreTest {
     }
     `when`(mockJourneyCollectionReference.whereIn(anyString(), anyList()))
         .thenReturn(mockJourneyCollectionReference)
-    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask )
+    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask)
     `when`(mockJourneysTask.addOnSuccessListener(any())).thenAnswer { invocation ->
       val listener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
       `when`(mockJourneysQuerySnapshot.documents)
