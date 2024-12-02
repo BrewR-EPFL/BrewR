@@ -97,8 +97,7 @@ class E2ETest {
           Coffee(
               "1",
               "Coffee1",
-              com.android.brewr.model.location.Location(
-                  latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+              Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
               4.5,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Lei", "good", 5.0)),
@@ -106,8 +105,7 @@ class E2ETest {
           Coffee(
               "2",
               "Coffee2",
-              com.android.brewr.model.location.Location(
-                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
+              Location(latitude = 47.5228, longitude = 6.8385, name = "Lausanne 2"),
               5.0,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Jaeyi", "perfect", 5.0)),
