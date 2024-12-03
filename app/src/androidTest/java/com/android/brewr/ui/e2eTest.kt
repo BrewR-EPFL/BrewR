@@ -278,5 +278,31 @@ class E2ETest {
     composeTestRule.onNodeWithTag("coffeeImage:${sampleCoffees[1].id}").assertIsDisplayed()
 
        */
+
+  }
+
+  @Test
+  fun exploreScreenDropdownMenuIntegrationTest() {
+    // Go to the Explore screen
+    composeTestRule.onNodeWithTag("Explore").assertIsDisplayed().performClick()
+    composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // Open the bottom sheet
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("exploreBottomSheet").assertIsDisplayed()
+
+    // Select "Curated" from the dropdown menu
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
+    composeTestRule.onNodeWithText("Curated").performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated")
+
+    // Select "Opened" from the dropdown menu
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
+    composeTestRule.onNodeWithText("Opened").performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened")
+
+    // Assert the "closed" message is displayed if the list is empty
+    composeTestRule.onNodeWithTag("noOpenCoffeeShopsMessage").assertExists()
   }
 }
