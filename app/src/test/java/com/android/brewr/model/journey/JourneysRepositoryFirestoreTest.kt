@@ -280,50 +280,40 @@ class JourneysRepositoryFirestoreTest {
     logMock.close()
   }
 
-  //  @Test
-  //  fun initCallsOnSuccess() {
-  //    // Arrange
-  //    val firebaseAuthMock = mock<FirebaseAuth>()
-  //    val firebaseUserMock = mock<FirebaseUser>()
-  //
-  //    // Mock Firebase Auth static methods
-  //    val firebaseAuthStaticMock: MockedStatic<FirebaseAuth> =
-  // mockStatic(FirebaseAuth::class.java)
-  //
-  //    // Mock getting the auth instance and its behavior
-  //    whenever(FirebaseAuth.getInstance()).thenReturn(firebaseAuthMock)
-  //    whenever(firebaseAuthMock.currentUser).thenReturn(firebaseUserMock) // Simulate a signed-in
-  // user
-  //
-  //
-  //      whenever(firebaseUserMock.uid).thenReturn(user.uid)
-  //      whenever(firebaseUserMock.email).thenReturn(user.uid)
-  //
-  //
-  //
-  //
-  // whenever(mockUserCollectionReference.document(user.uid).get()).thenReturn(Tasks.forResult(mockUserDocumentSnapshot))
-  //      whenever(mockUserDocumentSnapshot.exists()).thenReturn(true)
-  //
-  //
-  //      val onSuccess: () -> Unit = mock()
-  //
-  //    // Create the repository
-  //    val repository = JourneysRepositoryFirestore(mockFirestore,firebaseAuthMock)
-  //
-  //    // Act
-  //    repository.init(onSuccess)
-  //
-  //    // Capture and simulate triggering the AuthStateListener
-  //    argumentCaptor<FirebaseAuth.AuthStateListener>().apply {
-  //      verify(firebaseAuthMock).addAuthStateListener(capture())
-  //      firstValue.onAuthStateChanged(firebaseAuthMock)
-  //    }
-  //
-  //    // Assert
-  //    verify(onSuccess).invoke() // Ensure onSuccess is called
-  //
-  //    // Clean up static mock
-  //    firebaseAuthStaticMock.close()
-  //  }
+  @Test
+  fun initCallsOnSuccess() {
+    // Arrange
+    val firebaseAuthMock = mock<FirebaseAuth>()
+    val firebaseUserMock = mock<FirebaseUser>()
+
+    // Mock Firebase Auth static methods
+    val firebaseAuthStaticMock: MockedStatic<FirebaseAuth> = mockStatic(FirebaseAuth::class.java)
+
+    // Mock getting the auth instance and its behavior
+    whenever(FirebaseAuth.getInstance()).thenReturn(firebaseAuthMock)
+    whenever(firebaseAuthMock.currentUser).thenReturn(firebaseUserMock) // Simulate a signed-in
+    user
+
+    whenever(firebaseUserMock.uid).thenReturn(user.uid)
+    whenever(firebaseUserMock.email).thenReturn(user.uid)
+
+    whenever(mockUserCollectionReference.document(user.uid).get())
+        .thenReturn(Tasks.forResult(mockUserDocumentSnapshot))
+    whenever(mockUserDocumentSnapshot.exists()).thenReturn(true)
+    val onSuccess: () -> Unit = mock()
+
+    // Create the repository
+    val repository = JourneysRepositoryFirestore(mockFirestore, firebaseAuthMock)
+
+    // Act
+    repository.init(onSuccess)
+
+    // Capture and simulate triggering the AuthStateListener
+    argumentCaptor<FirebaseAuth.AuthStateListener>().apply {
+      verify(firebaseAuthMock).addAuthStateListener(capture())
+      firstValue.onAuthStateChanged(firebaseAuthMock)
+    }
+    // Clean up static mock
+    firebaseAuthStaticMock.close()
+  }
 }
