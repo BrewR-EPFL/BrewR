@@ -83,11 +83,11 @@ class CuratedCoffeeShopListTest {
     val coffeeShops =
         listOf(
             createCoffeeShopWithHours(
-                "1", "Coffee Shop 1", listOf(Hours("Monday", "9:00 AM", "11:00 AM"))),
+                "1", "Coffee Shop 1", listOf(Hours("Monday", "9:00 AM", "11:00 AM"))),
             createCoffeeShopWithHours(
-                "2", "Coffee Shop 2", listOf(Hours("Monday", "11:00 AM", "12:00 PM"))),
+                "2", "Coffee Shop 2", listOf(Hours("Monday", "11:00 AM", "12:00 PM"))),
             createCoffeeShopWithHours(
-                "3", "Coffee Shop 3", listOf(Hours("Monday", "8:00 AM", "10:30 AM"))))
+                "3", "Coffee Shop 3", listOf(Hours("Monday", "8:00 AM", "10:30 AM"))))
 
     val result = filterOpenCoffeeShops(coffeeShops)
 
@@ -107,11 +107,11 @@ class CuratedCoffeeShopListTest {
     val coffeeShops =
         listOf(
             createCoffeeShopWithHours(
-                "1", "Coffee Shop 1", listOf(Hours("Monday", "9:00 AM", "Invalid Time"))),
+                "1", "Coffee Shop 1", listOf(Hours("Monday", "9:00 AM", "Invalid Time"))),
             createCoffeeShopWithHours(
-                "2", "Coffee Shop 2", listOf(Hours("Monday", "Invalid Time", "12:00 PM"))),
+                "2", "Coffee Shop 2", listOf(Hours("Monday", "Invalid Time", "12:00 PM"))),
             createCoffeeShopWithHours(
-                "3", "Coffee Shop 3", listOf(Hours("Monday", "9:00 AM", "11:00 AM"))))
+                "3", "Coffee Shop 3", listOf(Hours("Monday", "9:00 AM", "11:00 AM"))))
 
     val result = filterOpenCoffeeShops(coffeeShops)
     println("Filtered Result: ${result.size}")
@@ -126,7 +126,7 @@ class CuratedCoffeeShopListTest {
         coffeeShopName = name,
         location = Location(0.0, 0.0, "Test Address"),
         rating = rating,
-        hours = listOf(Hours("Monday", "9:00 AM", "5:00 PM")),
+        hours = listOf(Hours("Monday", "9:00 AM", "5:00 PM")),
         reviews = emptyList(),
         imagesUrls = emptyList())
   }
