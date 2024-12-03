@@ -132,6 +132,23 @@ class JourneysRepositoryFirestoreTest {
   }
 
   @Test
+  fun `test getJourneys success with no journeys`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    // Arrange
+    whenever(mockUserDocumentReference.get()).thenReturn(mockUserTask)
+
+    whenever(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      whenever(mockUserDocumentSnapshot.get("journeys")).thenReturn(null) // No journeys field
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask
+    }
+    val successCaptor = argumentCaptor<List<Journey>>()
+    // Act
+    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
+  }
+
+  @Test
   fun addJourney_shouldCommitBatchSuccessfully() {
     // Mock Firestore batch
     val mockBatch = mock(WriteBatch::class.java)
@@ -169,7 +186,6 @@ class JourneysRepositoryFirestoreTest {
 
   @Test
   fun deleteJourneyById_shouldCallDocumentReferenceDeleted() {
-
     // Mock Firestore batch
     val mockBatch = mock(WriteBatch::class.java)
     `when`(mockFirestore.batch()).thenReturn(mockBatch)
