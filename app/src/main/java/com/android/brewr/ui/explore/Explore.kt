@@ -38,7 +38,6 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
 
   // Collect coffees list
   val coffees = coffeesViewModel.coffees.collectAsState().value
-  val filteredOpenedCoffees = filterOpenCoffeeShops(coffees) // Apply filtering for "Opened"
 
   // State for controlling the current view in the bottom sheet
   var showCoffeeInfos by remember { mutableStateOf(false) }
@@ -58,7 +57,7 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
                 val listToShow =
                     when (selectedOption) {
                       "Curated" -> curatedCoffees
-                      "Opened" -> filteredOpenedCoffees
+                      "Opened" -> filterOpenCoffeeShops(coffees)
                       else -> coffees
                     }
 
