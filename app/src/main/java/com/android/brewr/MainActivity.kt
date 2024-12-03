@@ -29,6 +29,7 @@ import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
+import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -92,6 +93,13 @@ fun BrewRApp() {
       composable(Screen.EDIT_JOURNEY) {
         EditJourneyScreen(listJourneysViewModel, navigationActions)
       }
+    }
+
+    navigation(
+      startDestination = Screen.USERPROFILE,
+      route = Route.USER_PROFILE,
+    ) {
+      composable(Screen.USERPRIVATELIST) { UserPrivateListScreen(navigationActions) }
     }
   }
 }
