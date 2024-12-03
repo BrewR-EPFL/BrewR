@@ -250,11 +250,9 @@ class E2ETest {
         .assertIsDisplayed()
         .assertTextEquals("Nearby Coffee Shops")
 
-    // Verify the toggle button and switch to the curated list
-    composeTestRule.onNodeWithTag("toggleListButton").assertIsDisplayed().performClick()
-
-    // Verify the curated list title is displayed
-    composeTestRule.onNodeWithTag("listTitle").assertIsDisplayed().assertTextEquals("Curated List")
+    // Verify the dropdown menu functionality
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
 
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
