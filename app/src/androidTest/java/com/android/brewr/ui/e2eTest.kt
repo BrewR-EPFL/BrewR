@@ -295,12 +295,12 @@ class E2ETest {
     // Select "Curated" from the dropdown menu
     composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
     composeTestRule.onNodeWithText("Curated").performClick()
-    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated")
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated Coffee Shops")
 
     // Select "Opened" from the dropdown menu
     composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
     composeTestRule.onNodeWithText("Opened").performClick()
-    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened")
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened Coffee Shops")
 
     // Assert the "closed" message is displayed if the list is empty
     composeTestRule.onNodeWithTag("noOpenCoffeeShopsMessage").assertExists()
