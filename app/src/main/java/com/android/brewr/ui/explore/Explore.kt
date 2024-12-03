@@ -95,8 +95,16 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("exploreListToggleRow"),
       horizontalArrangement = Arrangement.SpaceBetween) {
+        // Add " Coffee Shops" to selected option to match the test expectation
+        val displayText =
+            when (selectedOption) {
+              "Nearby" -> "Nearby Coffee Shops"
+              "Curated" -> "Curated Coffee Shops"
+              "Opened" -> "Opened Coffee Shops"
+              else -> "Nearby Coffee Shops"
+            }
         Text(
-            text = selectedOption,
+            text = displayText,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
 
