@@ -55,6 +55,8 @@ class JourneysRepositoryFirestore(
               }
             }
             .addOnFailureListener { e -> Log.e("UserCheck", "Error getting user document", e) }
+      } else {
+        Log.e("UserCheck", "User is not logged in")
       }
     }
   }
