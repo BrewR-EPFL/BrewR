@@ -3,6 +3,7 @@ package com.android.brewr.model.journey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.*
 
@@ -24,7 +25,9 @@ open class ListJourneysViewModel(private val repository: JourneysRepository) : V
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ListJourneysViewModel(JourneysRepositoryFirestore(Firebase.firestore)) as T
+            return ListJourneysViewModel(
+                JourneysRepositoryFirestore(Firebase.firestore, FirebaseAuth.getInstance()))
+                as T
           }
         }
   }
