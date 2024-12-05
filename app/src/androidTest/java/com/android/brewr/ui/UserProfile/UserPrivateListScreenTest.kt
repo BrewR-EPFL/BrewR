@@ -1,12 +1,14 @@
-package com.android.brewr.ui.userProfile
+package com.android.brewr.ui.UserProfile
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 
 class UserPrivateListScreenTest {
 
@@ -16,7 +18,7 @@ class UserPrivateListScreenTest {
   @Before
   fun setUp() {
     // Mock NavController
-    navigationActions = mock()
+    navigationActions = mock(NavigationActions::class.java)
   }
 
   @Test
@@ -33,5 +35,6 @@ class UserPrivateListScreenTest {
   fun userPrivateListScreen_goBackButton() {
     composeTestRule.setContent { UserPrivateListScreen(navigationActions) }
     composeTestRule.onNodeWithTag("goBackButton").performClick()
+    verify(navigationActions).goBack()
   }
 }
