@@ -3,13 +3,10 @@ package com.android.brewr.ui.userProfile
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.ui.navigation.NavigationActions
-import com.android.brewr.ui.navigation.Screen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 
 class UserPrivateListScreenTest {
 
