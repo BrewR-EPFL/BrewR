@@ -77,7 +77,8 @@ class JourneysRepositoryFirestore(
   /**
    * Retrieves all journeys of users other than current user from the Firestore database.
    *
-   * @param onSuccess The callback to call with the map of user uid and list of journeys if the operation is successful.
+   * @param onSuccess The callback to call with the map of user uid and list of journeys if the
+   *   operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
   override fun getJourneysOfAllOtherUsers(
@@ -89,7 +90,8 @@ class JourneysRepositoryFirestore(
         .get()
         .addOnSuccessListener { querySnapshot ->
           // Extract all user IDs (UIDs) from the retrieved documents
-            val allUsers = querySnapshot.documents.mapNotNull { it.id }.filter { it != getCurrentUserUid() }
+          val allUsers =
+              querySnapshot.documents.mapNotNull { it.id }.filter { it != getCurrentUserUid() }
 
           // If there are no users, return an empty map and exit
           if (allUsers.isEmpty()) {
