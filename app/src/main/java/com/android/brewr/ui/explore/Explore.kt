@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -109,13 +110,19 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
             modifier = Modifier.align(Alignment.CenterVertically).testTag("listTitle"))
 
         Box {
-          Button(
+          TextButton(
               onClick = { expanded = true },
               colors = ButtonDefaults.buttonColors(containerColor = CoffeeBrown),
               shape = RoundedCornerShape(15.dp),
               modifier = Modifier.testTag("toggleDropdownMenu")) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Choose View",
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Choose View",
+                    text = "Filter",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White)
               }
