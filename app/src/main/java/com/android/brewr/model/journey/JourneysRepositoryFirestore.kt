@@ -71,7 +71,7 @@ class JourneysRepositoryFirestore(
       onSuccess: (List<Journey>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    getJourneysOfUser(getCurrentUserUid(), onSuccess, onFailure)
+    getJourneysOfTheUser(getCurrentUserUid(), onSuccess, onFailure)
   }
 
   /**
@@ -82,7 +82,7 @@ class JourneysRepositoryFirestore(
    * @param onFailure The callback to call if the operation fails.
    */
   override fun getJourneysOfAllOtherUsers(
-      onSuccess: (Map<String, List<Journey>>) -> Unit,
+      onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     // Fetch all user documents from the userPath collection
@@ -93,31 +93,31 @@ class JourneysRepositoryFirestore(
           val allUsers =
               querySnapshot.documents.mapNotNull { it.id }.filter { it != getCurrentUserUid() }
 
-          // If there are no users, return an empty map and exit
+          // If there are no users, return an empty list and exit
           if (allUsers.isEmpty()) {
-            onSuccess(emptyMap())
+            onSuccess(emptyList())
             return@addOnSuccessListener
           }
 
-          val resultMap =
-              mutableMapOf<String, List<Journey>>() // Map to store results for each user
+          val resultList =
+              mutableListOf<Pair<List<Journey>, String>>() // List to store results as pairs
           var completedCount = 0 // Counter to track how many requests have completed
           var hasErrorOccurred = false // Flag to track if any request has failed
 
           // Loop through each user UID and fetch their journeys
           allUsers.forEach { uid ->
-            getJourneysOfUser(
+            getJourneysOfTheUser(
                 uid,
                 onSuccess = { journeys ->
                   // Only process if no errors have occurred so far
                   if (!hasErrorOccurred) {
-                    synchronized(resultMap) {
-                      resultMap[uid] = journeys // Add the journeys to the result map
+                    synchronized(resultList) {
+                      resultList.add(journeys to uid) // Add the journeys and UID as a pair
                     }
                     completedCount++ // Increment the completed request count
-                    // If all requests are completed, invoke onSuccess with the result map
+                    // If all requests are completed, invoke onSuccess with the result list
                     if (completedCount == allUsers.size) {
-                      onSuccess(resultMap)
+                      onSuccess(resultList)
                     }
                   }
                 },
@@ -142,7 +142,7 @@ class JourneysRepositoryFirestore(
    * @param onSuccess The callback to call with the list of journeys if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  private fun getJourneysOfUser(
+  override fun getJourneysOfTheUser(
       uid: String,
       onSuccess: (List<Journey>) -> Unit,
       onFailure: (Exception) -> Unit

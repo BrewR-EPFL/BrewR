@@ -8,7 +8,13 @@ interface JourneysRepository {
   fun getJourneysOfCurrentUser(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit)
 
   fun getJourneysOfAllOtherUsers(
-      onSuccess: (Map<String, List<Journey>>) -> Unit,
+      onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+
+  fun getJourneysOfTheUser(
+      uid: String,
+      onSuccess: (List<Journey>) -> Unit,
       onFailure: (Exception) -> Unit
   )
 
