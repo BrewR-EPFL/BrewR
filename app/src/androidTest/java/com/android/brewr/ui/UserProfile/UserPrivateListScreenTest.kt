@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.verify
+import org.mockito.Mockito.verify
 
 class UserPrivateListScreenTest {
 
@@ -23,12 +23,17 @@ class UserPrivateListScreenTest {
   @Test
   fun userPrivateListScreen_displaysComponents() {
     composeTestRule.setContent { UserPrivateListScreen(navigationActions) }
-
     composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("coffeeImage:1").performClick()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+  }
+
+  @Test
+  fun userPrivateListScreen_goBackButton() {
+    composeTestRule.setContent { UserPrivateListScreen(navigationActions) }
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
     verify(navigationActions).goBack()
   }
 }
