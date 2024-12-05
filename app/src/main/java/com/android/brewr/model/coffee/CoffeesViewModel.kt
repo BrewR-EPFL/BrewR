@@ -39,4 +39,15 @@ open class CoffeesViewModel : ViewModel() {
   fun addCoffees(coffeesList: List<Coffee>) {
     viewModelScope.launch { coffees_.value = coffeesList }
   }
+
+  /**
+   * Clears the current list of coffees.
+   *
+   * This method sets the coffees state to an empty list, effectively removing all coffee entries.
+   * It can be used to reset the coffee data or simulate scenarios where no coffees are available.
+   * This operation is performed within a coroutine scope to ensure thread safety.
+   */
+  fun clearCoffees() {
+    viewModelScope.launch { coffees_.value = emptyList() }
+  }
 }
