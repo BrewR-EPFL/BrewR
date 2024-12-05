@@ -124,7 +124,9 @@ class E2ETest {
     coffeesViewModel = spy(CoffeesViewModel::class.java)
     coffeesViewModel.addCoffees(sampleCoffees)
     // Mock the behavior of `getJourneys` to simulate fetching journeys
-    `when`(journeyRepositoryMock.getJourneysOfCurrentUser(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
+    `when`(
+            journeyRepositoryMock.getJourneysOfCurrentUser(
+                org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
