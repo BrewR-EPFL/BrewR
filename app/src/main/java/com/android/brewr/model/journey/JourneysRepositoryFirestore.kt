@@ -62,14 +62,91 @@ class JourneysRepositoryFirestore(
   }
 
   /**
-   * Retrieves all journeys from the Firestore database.
+   * Retrieves all journeys of current user from the Firestore database.
    *
    * @param onSuccess The callback to call with the list of journeys if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getJourneysOfCurrentUser(
+      onSuccess: (List<Journey>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    getJourneysOfUser(getCurrentUserUid(), onSuccess, onFailure)
+  }
+
+  /**
+   * Retrieves all journeys of users other than current user from the Firestore database.
+   *
+   * @param onSuccess The callback to call with the map of user uid and list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
+  override fun getJourneysOfAllOtherUsers(
+      onSuccess: (Map<String, List<Journey>>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    // Fetch all user documents from the userPath collection
     db.collection(userPath)
-        .document(getCurrentUserUid())
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+          // Extract all user IDs (UIDs) from the retrieved documents
+            val allUsers = querySnapshot.documents.mapNotNull { it.id }.filter { it != getCurrentUserUid() }
+
+          // If there are no users, return an empty map and exit
+          if (allUsers.isEmpty()) {
+            onSuccess(emptyMap())
+            return@addOnSuccessListener
+          }
+
+          val resultMap =
+              mutableMapOf<String, List<Journey>>() // Map to store results for each user
+          var completedCount = 0 // Counter to track how many requests have completed
+          var hasErrorOccurred = false // Flag to track if any request has failed
+
+          // Loop through each user UID and fetch their journeys
+          allUsers.forEach { uid ->
+            getJourneysOfUser(
+                uid,
+                onSuccess = { journeys ->
+                  // Only process if no errors have occurred so far
+                  if (!hasErrorOccurred) {
+                    synchronized(resultMap) {
+                      resultMap[uid] = journeys // Add the journeys to the result map
+                    }
+                    completedCount++ // Increment the completed request count
+                    // If all requests are completed, invoke onSuccess with the result map
+                    if (completedCount == allUsers.size) {
+                      onSuccess(resultMap)
+                    }
+                  }
+                },
+                onFailure = { exception ->
+                  // If any request fails, set the error flag and invoke onFailure
+                  if (!hasErrorOccurred) {
+                    hasErrorOccurred = true
+                    onFailure(exception)
+                  }
+                })
+          }
+        }
+        .addOnFailureListener { exception ->
+          // Handle failure when fetching all users
+          onFailure(exception)
+        }
+  }
+
+  /**
+   * Retrieves all journeys of a specific user from the Firestore database.
+   *
+   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
+  private fun getJourneysOfUser(
+      uid: String,
+      onSuccess: (List<Journey>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(userPath)
+        .document(uid)
         .get()
         .addOnSuccessListener { document ->
           val journeyIds = document.get("journeys") as? List<String> ?: emptyList()
