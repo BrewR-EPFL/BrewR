@@ -132,13 +132,13 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
                       onClick = {
-                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
+                          navigationActions.navigateTo(Screen.USERPRIVATELIST)
                       },
-                      Modifier.testTag("Preference button")) {
+                      Modifier.testTag("Favorite button")) {
                         Icon(
                             imageVector = Icons.Default.Favorite, contentDescription = "Preference")
                       }
-                  Text("Preference")
+                  Text("Favorite")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
@@ -155,7 +155,6 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
                       onClick = {
-                        navigationActions.navigateTo(Screen.USERPRIVATELIST)
                         Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
                       },
                       Modifier.testTag("TBD button")) {
