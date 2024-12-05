@@ -41,22 +41,35 @@ class MapScreenTest {
     listJourneysViewModel = ListJourneysViewModel(mock(JourneysRepository::class.java))
 
     // Sample list of locations for testing
-    val sampleJourney =
-        Journey(
-            "1",
-            "",
-            "",
-            Location(
-                latitude = 46.5228,
-                longitude = 6.6285,
-                name =
-                    "Shoreline Golf Links, 2940, North Shoreline Boulevard, Mountain View, Santa Clara County, California, 94043, United States"),
-            CoffeeOrigin.DEFAULT,
-            BrewingMethod.DEFAULT,
-            CoffeeTaste.DEFAULT,
-            CoffeeRate.DEFAULT,
-            Timestamp.now())
-    listJourneysViewModel.addJourney(sampleJourney)
+    val sampleJourneys =
+        listOf(
+            Journey(
+                "1",
+                "",
+                "Display as a saved on the map",
+                Location(
+                    latitude = 46.5228,
+                    longitude = 6.6285,
+                    name =
+                        "Shoreline Golf Links, 2940, North Shoreline Boulevard, Mountain View, Santa Clara County, California, 94043, United States"),
+                CoffeeOrigin.DEFAULT,
+                BrewingMethod.DEFAULT,
+                CoffeeTaste.DEFAULT,
+                CoffeeRate.DEFAULT,
+                Timestamp.now()),
+            Journey(
+                "2",
+                "",
+                "Home Journey",
+                Location(),
+                CoffeeOrigin.DEFAULT,
+                BrewingMethod.DEFAULT,
+                CoffeeTaste.DEFAULT,
+                CoffeeRate.DEFAULT,
+                Timestamp.now()))
+    for (journey in sampleJourneys) {
+      listJourneysViewModel.addJourney(journey)
+    }
     val sampleCoffees =
         listOf(
             Coffee(
