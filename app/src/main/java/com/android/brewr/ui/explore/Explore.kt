@@ -118,8 +118,7 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Choose View",
-                    tint = Color.White
-                )
+                    tint = Color.White)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Filter",
