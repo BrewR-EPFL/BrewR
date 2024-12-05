@@ -131,7 +131,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
               ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
-                      onClick = { navigationActions.navigateTo(Screen.USERPRIVATELIST) },
+                      onClick = { navigationActions.navigateTo(Screen.USER_PRIVATE_LIST) },
                       Modifier.testTag("Favorite button")) {
                         Icon(
                             imageVector = Icons.Default.Favorite, contentDescription = "Preference")
