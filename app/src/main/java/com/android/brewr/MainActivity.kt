@@ -96,8 +96,8 @@ fun BrewRApp() {
     }
 
     navigation(
-      startDestination = Screen.USERPROFILE,
-      route = Route.USER_PROFILE,
+        startDestination = Screen.USERPROFILE,
+        route = Route.USER_PROFILE,
     ) {
       composable(Screen.USERPRIVATELIST) { UserPrivateListScreen(navigationActions) }
     }
