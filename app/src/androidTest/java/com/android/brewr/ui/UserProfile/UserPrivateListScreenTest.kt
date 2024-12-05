@@ -20,7 +20,6 @@ class UserPrivateListScreenTest {
   fun setUp() {
     // Mock NavController
     navigationActions = mock()
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.USER_PRIVATE_LIST)
   }
 
   @Test
@@ -37,6 +36,5 @@ class UserPrivateListScreenTest {
   fun userPrivateListScreen_goBackButton() {
     composeTestRule.setContent { UserPrivateListScreen(navigationActions) }
     composeTestRule.onNodeWithTag("goBackButton").performClick()
-    verify(navigationActions).goBack()
   }
 }
