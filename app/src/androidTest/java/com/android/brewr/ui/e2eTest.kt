@@ -286,18 +286,23 @@ class E2ETest {
     composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 
+    // Clear the coffee list to simulate an empty state
+    composeTestRule.runOnIdle { coffeesViewModel.clearCoffees() }
     // Open the bottom sheet
     composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("exploreBottomSheet").assertIsDisplayed()
 
+    // Verify the dropdown menu opens
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
+
     // Select "Curated" from the dropdown menu
-    composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
-    composeTestRule.onNodeWithText("Curated").performClick()
+    composeTestRule.onNodeWithText("Curated").assertExists().performClick()
     composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated Coffee Shops")
 
     // Select "Opened" from the dropdown menu
-    composeTestRule.onNodeWithTag("toggleDropdownMenu").performClick()
-    composeTestRule.onNodeWithText("Opened").performClick()
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Opened").assertExists().performClick()
     composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened Coffee Shops")
 
     // Assert the "closed" message is displayed if the list is empty
