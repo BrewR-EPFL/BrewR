@@ -100,7 +100,7 @@ class AddJourneyScreenTest {
         .performTextInput("Starbucks Lausanne")
 
     runBlocking {
-      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+      repeat(50) { // 50 * 100 ms = 5000ms = 5 seconds
         if (composeTestRule
             .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
             .fetchSemanticsNodes()
