@@ -4,7 +4,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.ui.navigation.NavigationActions
-import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import org.junit.Before
 import org.junit.Rule
@@ -19,7 +18,6 @@ class UserPrivateListScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var coffeesViewModel: CoffeesViewModel
 
-
   @Before
   fun setUp() {
     // Mock NavController
@@ -29,7 +27,7 @@ class UserPrivateListScreenTest {
 
   @Test
   fun userPrivateListScreen_displaysComponents() {
-    composeTestRule.setContent { UserPrivateListScreen(navigationActions,coffeesViewModel) }
+    composeTestRule.setContent { UserPrivateListScreen(navigationActions, coffeesViewModel) }
     composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
@@ -39,7 +37,7 @@ class UserPrivateListScreenTest {
 
   @Test
   fun userPrivateListScreen_goBackButton() {
-    composeTestRule.setContent { UserPrivateListScreen(navigationActions,coffeesViewModel) }
+    composeTestRule.setContent { UserPrivateListScreen(navigationActions, coffeesViewModel) }
     composeTestRule.onNodeWithTag("goBackButton").performClick()
     verify(navigationActions).goBack()
   }

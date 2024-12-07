@@ -29,6 +29,16 @@ import com.android.brewr.ui.explore.CoffeeList
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 
+/**
+ * Displays the user's private coffee list screen.
+ *
+ * This composable is responsible for showing a list of private coffee entries associated with the
+ * user. It interacts with the provided `CoffeesViewModel` to fetch and manage the data. Navigation
+ * to other screens is handled via the `navigationActions` parameter.
+ *
+ * @param navigationActions Handles navigation events to other screens.
+ * @param coffeesViewModel Provides data and business logic related to private coffee entries.
+ */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun UserPrivateListScreen(
