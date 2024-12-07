@@ -46,6 +46,7 @@ import coil.request.ImageRequest
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
+import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -130,14 +131,12 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
               ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
-                      onClick = {
-                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
-                      },
-                      Modifier.testTag("Preference button")) {
+                      onClick = { navigationActions.navigateTo(Screen.USER_PRIVATE_LIST) },
+                      Modifier.testTag("Favorite button")) {
                         Icon(
                             imageVector = Icons.Default.Favorite, contentDescription = "Preference")
                       }
-                  Text("Preference")
+                  Text("Favorite")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
