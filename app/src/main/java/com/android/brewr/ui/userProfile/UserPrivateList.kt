@@ -20,21 +20,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
-import com.android.brewr.ui.explore.CoffeeInformationScreen
 import com.android.brewr.ui.explore.CoffeeList
 import com.android.brewr.ui.navigation.NavigationActions
+import com.android.brewr.ui.navigation.Screen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun UserPrivateListScreen(navigationActions: NavigationActions) {
-  val coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory)
-  var showCoffeeInfos by remember { mutableStateOf(false) }
+fun UserPrivateListScreen(
+    navigationActions: NavigationActions,
+    coffeesViewModel: CoffeesViewModel
+) {
+  var showPrivateCoffeeInfos by remember { mutableStateOf(false) }
 
   val mockCoffee =
       Coffee(
@@ -90,14 +91,13 @@ fun UserPrivateListScreen(navigationActions: NavigationActions) {
             modifier =
                 Modifier.fillMaxSize().testTag("privateList").padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              if (!showCoffeeInfos) {
+              if (!showPrivateCoffeeInfos) {
                 CoffeeList(listOf(mockCoffee)) {
                   coffeesViewModel.selectCoffee(it)
-                  showCoffeeInfos = true
+                  showPrivateCoffeeInfos = true
                 }
               } else {
-                CoffeeInformationScreen(
-                    coffeesViewModel = coffeesViewModel, onBack = { showCoffeeInfos = false })
+                navigationActions.navigateTo(Screen.USER_PRIVATE_LIST_INFOS)
               }
             }
       })
