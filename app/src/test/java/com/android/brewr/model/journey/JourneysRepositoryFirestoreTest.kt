@@ -128,7 +128,8 @@ class JourneysRepositoryFirestoreTest {
     val successCaptor = argumentCaptor<List<Journey>>()
 
     // Act
-    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
+    journeysRepository.getJourneysOfCurrentUser(
+        onSuccess = { successCaptor.capture() }, onFailure = {})
   }
 
   @Test
@@ -145,7 +146,8 @@ class JourneysRepositoryFirestoreTest {
     }
     val successCaptor = argumentCaptor<List<Journey>>()
     // Act
-    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
+    journeysRepository.getJourneysOfCurrentUser(
+        onSuccess = { successCaptor.capture() }, onFailure = {})
   }
 
   @Test

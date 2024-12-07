@@ -41,9 +41,9 @@ open class ListJourneysViewModel(private val repository: JourneysRepository) : V
     return repository.getNewUid()
   }
 
-  /** Gets all Journey documents. */
+  /** Gets all Journey documents of current user. */
   fun getJourneys() {
-    repository.getJourneys(onSuccess = { journeys_.value = it }, onFailure = {})
+    repository.getJourneysOfCurrentUser(onSuccess = { journeys_.value = it }, onFailure = {})
   }
 
   /**
