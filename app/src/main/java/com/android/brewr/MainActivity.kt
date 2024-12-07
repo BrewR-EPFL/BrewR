@@ -30,10 +30,8 @@ import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
-import com.google.firebase.Firebase
-
 import com.android.brewr.ui.userProfile.UserPrivateListScreen
-
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
