@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.coffee.filterOpenCoffeeShops
+import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import kotlinx.coroutines.launch
 
