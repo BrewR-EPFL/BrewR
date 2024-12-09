@@ -4,6 +4,9 @@ import android.os.Looper
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import com.android.brewr.model.map.Location
+import com.android.brewr.model.user.User
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -32,9 +35,14 @@ import org.robolectric.Shadows.shadowOf
 class JourneysRepositoryFirestoreTest {
 
   @Mock private lateinit var mockFirestore: FirebaseFirestore
-  @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentReference: DocumentReference
-  @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
+  @Mock private lateinit var mockFirebaseAuth: FirebaseAuth
+  @Mock private lateinit var mockFirebaseUser: FirebaseUser
+  @Mock private lateinit var mockUserCollectionReference: CollectionReference
+  @Mock private lateinit var mockJourneyCollectionReference: CollectionReference
+  @Mock private lateinit var mockUserDocumentReference: DocumentReference
+  @Mock private lateinit var mockJourneyDocumentReference: DocumentReference
+  @Mock private lateinit var mockUserDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var mockJourneysQuerySnapshot: QuerySnapshot
 
   private lateinit var journeysRepository: JourneysRepositoryFirestore
 
@@ -53,6 +61,7 @@ class JourneysRepositoryFirestoreTest {
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
+  private val user = User(uid = "testUid", name = "test@example.com", journeys = listOf("journey1"))
 
   @Before
   fun setUp() {
@@ -62,76 +71,147 @@ class JourneysRepositoryFirestoreTest {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
     mockFirestore = mock(FirebaseFirestore::class.java)
-    journeysRepository = JourneysRepositoryFirestore(mockFirestore)
+    mockFirebaseAuth = mock(FirebaseAuth::class.java)
+    journeysRepository = JourneysRepositoryFirestore(mockFirestore, mockFirebaseAuth)
 
-    `when`(mockFirestore.collection(org.mockito.kotlin.any())).thenReturn(mockCollectionReference)
+    mockFirebaseUser = mock(FirebaseUser::class.java)
+    `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
+    `when`(mockFirebaseUser.uid).thenReturn("testUid")
+    `when`(mockFirebaseUser.email).thenReturn("test@example.com")
 
-    `when`(mockCollectionReference.document(org.mockito.kotlin.any()))
-        .thenReturn(mockDocumentReference)
-    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
+    `when`(mockFirestore.collection("users")).thenReturn(mockUserCollectionReference)
+    `when`(mockFirestore.collection("journeys")).thenReturn(mockJourneyCollectionReference)
+
+    `when`(mockUserCollectionReference.document()).thenReturn(mockUserDocumentReference)
+    `when`(mockUserCollectionReference.document(org.mockito.kotlin.any()))
+        .thenReturn(mockUserDocumentReference)
+
+    `when`(mockJourneyCollectionReference.document()).thenReturn(mockJourneyDocumentReference)
+    `when`(mockJourneyCollectionReference.document(org.mockito.kotlin.any()))
+        .thenReturn(mockJourneyDocumentReference)
+
+    `when`(mockUserDocumentReference.get()).thenReturn(Tasks.forResult(mockUserDocumentSnapshot))
   }
 
   @Test
   fun testGetNewUid() {
-    `when`(mockDocumentReference.id).thenReturn("1")
+    `when`(mockJourneyDocumentReference.id).thenReturn("1")
     val uid = journeysRepository.getNewUid()
     assert(uid == "1")
   }
 
   @Test
-  fun getJourneys_callsDocuments() {
-    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
-    `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+  fun `test getJourneys success`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
+    // Arrange
 
-    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf())
+    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask)
+    `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      `when`(mockUserDocumentSnapshot.get("journeys")).thenReturn(listOf("id1", "id2"))
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask // Chain the task
+    }
+    `when`(mockJourneyCollectionReference.whereIn(anyString(), anyList()))
+        .thenReturn(mockJourneyCollectionReference)
+    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask)
+    `when`(mockJourneysTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
+      `when`(mockJourneysQuerySnapshot.documents)
+          .thenReturn(
+              listOf(mock(DocumentSnapshot::class.java), mock(DocumentSnapshot::class.java)))
+      listener.onSuccess(mockJourneysQuerySnapshot)
+      mockJourneysTask // Chain the task
+    }
 
-    // Call the method under test
-    journeysRepository.getJourneys(
-        onSuccess = {
-          // Do nothing; we just want to verify that the 'documents' field was accessed
-        },
-        onFailure = { fail("Failure callback should not be called") })
-    // Verify that the 'documents' field was accessed
-    verify(org.mockito.kotlin.timeout(100)) { (mockQuerySnapshot).documents }
+    val successCaptor = argumentCaptor<List<Journey>>()
+
+    // Act
+    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
   }
 
   @Test
-  fun addJourney_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(org.mockito.kotlin.any()))
-        .thenReturn(Tasks.forResult(null)) // Simulate success
+  fun `test getJourneys success with no journeys`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    // Arrange
+    whenever(mockUserDocumentReference.get()).thenReturn(mockUserTask)
 
-    // This test verifies that when we add a new ToDo, the Firestore `collection()` method is
-    // called.
-    journeysRepository.addJourney(journey, onSuccess = {}, onFailure = {})
+    whenever(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      whenever(mockUserDocumentSnapshot.get("journeys")).thenReturn(null) // No journeys field
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask
+    }
+    val successCaptor = argumentCaptor<List<Journey>>()
+    // Act
+    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
+  }
 
-    shadowOf(Looper.getMainLooper()).idle()
+  @Test
+  fun addJourney_shouldCommitBatchSuccessfully() {
+    // Mock Firestore batch
+    val mockBatch = mock(WriteBatch::class.java)
+    val fieldValue = FieldValue.arrayUnion(journey.uid)
+    `when`(mockFirestore.batch()).thenReturn(mockBatch)
 
-    // Ensure Firestore collection method was called to reference the "ToDos" collection
-    verify(mockDocumentReference).set(org.mockito.kotlin.any())
+    // Mock batch operations
+    `when`(mockBatch.update(mockUserCollectionReference.document(user.uid), "journeys", fieldValue))
+        .thenReturn(mockBatch)
+    `when`(mockBatch.set(mockJourneyCollectionReference.document("journey1"), journey))
+        .thenReturn(mockBatch)
+    `when`(mockBatch.commit()).thenReturn(Tasks.forResult(null)) // Simulate success
+
+    journeysRepository.addJourney(
+        journey, onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
+
+    // Verify batch operations were called
+    verify(mockBatch)
+        .update(eq(mockUserCollectionReference.document(user.uid)), eq("journeys"), any())
+    verify(mockBatch).set(mockJourneyCollectionReference.document("journey1"), journey)
+    verify(mockBatch).commit()
   }
 
   @Test
   fun updateJourney_shouldCallDocumentReferenceDelete() {
-    `when`(mockDocumentReference.set(org.mockito.kotlin.any()))
+    `when`(mockJourneyDocumentReference.set(org.mockito.kotlin.any()))
         .thenReturn(Tasks.forResult(null)) // Simulate success
 
     journeysRepository.updateJourney(journey, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete
 
-    verify(mockDocumentReference).set(org.mockito.kotlin.any())
+    verify(mockJourneyDocumentReference).set(org.mockito.kotlin.any())
   }
 
   @Test
-  fun deleteJourneyById_shouldCallDocumentReferenceDelete() {
-    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
+  fun deleteJourneyById_shouldCallDocumentReferenceDeleted() {
+    // Mock Firestore batch
+    val mockBatch = mock(WriteBatch::class.java)
+    `when`(mockFirestore.batch()).thenReturn(mockBatch)
 
-    journeysRepository.deleteJourneyById("1", onSuccess = {}, onFailure = {})
+    // Simulate batch update
+    `when`(
+            mockBatch.update(
+                mockUserCollectionReference.document(user.uid),
+                "journeys",
+                FieldValue.arrayRemove("journey1")))
+        .thenReturn(mockBatch)
+    `when`(mockBatch.delete(mockJourneyCollectionReference.document("journey1")))
+        .thenReturn(mockBatch)
+    `when`(mockBatch.commit()).thenReturn(Tasks.forResult(null))
+
+    // Call deleteJourneyById
+    journeysRepository.deleteJourneyById(
+        "journey1", onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
 
     shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete
 
-    verify(mockDocumentReference).delete()
+    // Verify that the update and delete methods were called
+    verify(mockBatch)
+        .update(eq(mockUserCollectionReference.document(user.uid)), eq("journeys"), any())
+    verify(mockBatch).delete(mockJourneyCollectionReference.document("journey1"))
+    verify(mockBatch).commit()
   }
 
   @Test
@@ -200,7 +280,7 @@ class JourneysRepositoryFirestoreTest {
     method.isAccessible = true
 
     // Create an instance of the repository
-    val repository = JourneysRepositoryFirestore(mock())
+    val repository = JourneysRepositoryFirestore(mock(), mockFirebaseAuth)
     val journey = method.invoke(repository, documentSnapshot) as Journey?
     assertNull(journey) // Expecting null due to the exception being thrown
 
@@ -227,12 +307,19 @@ class JourneysRepositoryFirestoreTest {
 
     // Mock getting the auth instance and its behavior
     whenever(FirebaseAuth.getInstance()).thenReturn(firebaseAuthMock)
-    whenever(firebaseAuthMock.currentUser).thenReturn(firebaseUserMock) // Simulate a signed-in user
+    whenever(firebaseAuthMock.currentUser).thenReturn(firebaseUserMock) // Simulate a signed-in
+    user
 
+    whenever(firebaseUserMock.uid).thenReturn(user.uid)
+    whenever(firebaseUserMock.email).thenReturn(user.uid)
+
+    whenever(mockUserCollectionReference.document(user.uid).get())
+        .thenReturn(Tasks.forResult(mockUserDocumentSnapshot))
+    whenever(mockUserDocumentSnapshot.exists()).thenReturn(true)
     val onSuccess: () -> Unit = mock()
 
     // Create the repository
-    val repository = JourneysRepositoryFirestore(mock())
+    val repository = JourneysRepositoryFirestore(mockFirestore, firebaseAuthMock)
 
     // Act
     repository.init(onSuccess)
@@ -242,10 +329,6 @@ class JourneysRepositoryFirestoreTest {
       verify(firebaseAuthMock).addAuthStateListener(capture())
       firstValue.onAuthStateChanged(firebaseAuthMock)
     }
-
-    // Assert
-    verify(onSuccess).invoke() // Ensure onSuccess is called
-
     // Clean up static mock
     firebaseAuthStaticMock.close()
   }

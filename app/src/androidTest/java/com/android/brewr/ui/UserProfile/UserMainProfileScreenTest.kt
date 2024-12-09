@@ -49,7 +49,7 @@ class UserMainProfileScreenTest {
     composeTestRule.onNodeWithTag("User Profile Photo").assertIsDisplayed()
 
     // Test clicking unimplemented feature buttons
-    composeTestRule.onNodeWithTag("Preference button").performClick()
+    composeTestRule.onNodeWithTag("Favorite button").performClick()
     composeTestRule.onNodeWithTag("Notification button").performClick()
     composeTestRule.onNodeWithTag("TBD button").performClick()
     composeTestRule.onNodeWithTag("anything").performClick()

@@ -123,7 +123,12 @@ class CoffeeInformationScreenTest {
         composeTestRule
             .onNodeWithTag("button${review.authorName}")
             .assertTextEquals(
-                "- ${review.authorName}: \"${review.review}\" (${String.format("%.1f/5", review.rating)})")
+                "- ${review.authorName}: \"${review.review}\" (${
+                          String.format(
+                              "%.1f/5",
+                              review.rating
+                          )
+                      })")
       }
     }
     composeTestRule.onNodeWithTag("buttonWorst").assertExists().performClick()

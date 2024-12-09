@@ -84,6 +84,15 @@ class AddJourneyScreenTest {
     // After clicking, the coffee shop location input field should appear
     composeTestRule.onNodeWithTag("inputCoffeeshopLocation").assertIsDisplayed()
 
+    // Enter a coffee shop name directly
+    val coffeeShopName = "Starbucks Lausanne"
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performTextInput(coffeeShopName)
+    // Simulate the IME "Done" action
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performImeAction()
+
+    // Clear the text input
+    composeTestRule.onNodeWithTag("inputCoffeeshopLocation").performTextClearance()
+
     // Interact with the dropdown for coffee shop location suggestions
     composeTestRule
         .onNodeWithTag("inputCoffeeshopLocation")
@@ -91,7 +100,7 @@ class AddJourneyScreenTest {
         .performTextInput("Starbucks Lausanne")
 
     runBlocking {
-      repeat(50) { // 50 * 100ms = 5000ms = 5 seconds
+      repeat(50) { // 50 * 100 ms = 5000ms = 5 seconds
         if (composeTestRule
             .onAllNodes(hasTestTag("locationSuggestionsDropdown"))
             .fetchSemanticsNodes()
