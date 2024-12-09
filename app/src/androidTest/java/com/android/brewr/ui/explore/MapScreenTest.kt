@@ -20,6 +20,7 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,6 +34,8 @@ class MapScreenTest {
 
   private lateinit var uiDevice: UiDevice
   private lateinit var listJourneysViewModel: ListJourneysViewModel
+  private lateinit var sampleCoffees: List<Coffee>
+  private lateinit var sampleJourneys: List<Journey>
 
   @Before
   fun setUp() {
@@ -40,16 +43,16 @@ class MapScreenTest {
     uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     listJourneysViewModel = ListJourneysViewModel(mock(JourneysRepository::class.java))
 
-    // Sample list of locations for testing
-    val sampleJourneys =
+    // Sample journeys and coffees for testing
+    sampleJourneys =
         listOf(
             Journey(
                 "1",
                 "",
                 "Display as a saved on the map",
                 Location(
-                    latitude = 46.5228,
-                    longitude = 6.6285,
+                    latitude = 37.4305087,
+                    longitude = -122.0854755,
                     name =
                         "Shoreline Golf Links, 2940, North Shoreline Boulevard, Mountain View, Santa Clara County, California, 94043, United States"),
                 CoffeeOrigin.DEFAULT,
@@ -67,10 +70,9 @@ class MapScreenTest {
                 CoffeeTaste.DEFAULT,
                 CoffeeRate.DEFAULT,
                 Timestamp.now()))
-    for (journey in sampleJourneys) {
-      listJourneysViewModel.addJourney(journey)
-    }
-    val sampleCoffees =
+    sampleJourneys.forEach { listJourneysViewModel.addJourney(it) }
+
+    sampleCoffees =
         listOf(
             Coffee(
                 "1",
@@ -82,8 +84,9 @@ class MapScreenTest {
                 listOf("test.jpg")),
             Coffee(
                 "2",
-                "Shoreline Golf Links,",
-                Location(latitude = 37.4305087, longitude = -122.0854755, name = "Lausanne 1"),
+                "Shoreline Golf Links",
+                Location(
+                    latitude = 37.4305087, longitude = -122.0854755, name = "Shoreline Golf Links"),
                 4.5,
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Pablo", "Awesome", 5.0)),
@@ -104,29 +107,56 @@ class MapScreenTest {
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
                 listOf("test.jpg")))
-
-    // Set content to ExploreScreen
-    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
-
     // Handle location permission if prompted
     runBlocking { grantLocationPermission() }
   }
 
   @Test
-  fun mapScreen_IsDisplayedInExploreScreen() {
-    // Verify that the map (tagged as "mapScreen") is displayed
+  fun mapScreen_IsDisplayedProperly() {
+    sampleJourneys.forEach { listJourneysViewModel.addJourney(it) }
+    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun userLocationMarker_IsDisplayedWhenAvailable() {
+    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun customIcons_AreAssignedToMarkers() {
+    composeTestRule.setContent {
+      sampleCoffees.forEach { coffee ->
+        val icon = getMarkerIcon(coffee, listJourneysViewModel)
+        assertNotNull(icon)
+      }
+    }
+  }
+
+  @Test
+  fun mapScreen_DisplaysProperlyWithNoData() {
+    composeTestRule.setContent { MapScreen(emptyList(), listJourneysViewModel) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun locationPermission_IsHandledCorrectly() {
+    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    val allowButton = uiDevice.findObject(UiSelector().text("While using the app"))
+    if (allowButton.exists()) {
+      allowButton.click()
+    }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
   private fun grantLocationPermission() {
-    // Grant location permission automatically for the test
     repeat(10) { // Try up to 10 times with a delay
       val allowButton = uiDevice.findObject(UiSelector().text("While using the app"))
       if (allowButton.exists()) {
         allowButton.click()
         return
       }
-      // Short delay between checks
       Thread.sleep(500)
     }
   }

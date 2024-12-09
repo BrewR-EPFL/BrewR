@@ -87,7 +87,7 @@ fun MapScreen(coffees: List<Coffee>, listJourneysViewModel: ListJourneysViewMode
  *   object.
  */
 @SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
+suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
   try {
     val locationClient = LocationServices.getFusedLocationProviderClient(context)
     val location = locationClient.lastLocation.await()
@@ -110,10 +110,7 @@ private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> 
  * @return A BitmapDescriptor representing the marker icon.
  */
 @Composable
-private fun getMarkerIcon(
-    coffee: Coffee,
-    listJourneysViewModel: ListJourneysViewModel
-): BitmapDescriptor {
+fun getMarkerIcon(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): BitmapDescriptor {
   val context = LocalContext.current
 
   // Helper function to load and resize the icon
@@ -141,7 +138,7 @@ private fun getMarkerIcon(
  * @return True if the coffee location is part of any journey, false otherwise.
  */
 @Composable
-private fun isJourney(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): Boolean {
+fun isJourney(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): Boolean {
   val epsilon = 0.01
   listJourneysViewModel.journeys.collectAsState().value.forEach { journey ->
     if (journey.location.name != "At Home" &&
