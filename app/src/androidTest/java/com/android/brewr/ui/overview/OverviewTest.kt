@@ -189,7 +189,7 @@ class OverviewScreenTest {
   @Test
   fun overviewScreen_displaysJourneys() {
     // Define the behavior of getJourneys in the mock repository
-    `when`(journeysRepository.getJourneys(any(), any())).thenAnswer {
+    `when`(journeysRepository.getJourneysOfCurrentUser(any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(listOf(journey)) // Simulate return list of journeys
     }
@@ -209,7 +209,7 @@ class OverviewScreenTest {
   @Test
   fun overviewScreen_displaysNoJourneysMessage_whenJourneysListIsEmpty() {
     // Define the behavior of getJourneys in the mock repository
-    `when`(journeysRepository.getJourneys(any(), any())).thenAnswer {
+    `when`(journeysRepository.getJourneysOfAllOtherUsers(any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(emptyList()) // Simulate return list of journeys
     }
