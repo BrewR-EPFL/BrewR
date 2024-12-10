@@ -29,8 +29,8 @@ fun filterOpenCoffeeShops(coffeeShops: List<Coffee>): List<Coffee> {
   return coffeeShops.filter { coffee ->
     coffee.hours.any { hour ->
       try {
-        val openTime = LocalTime.parse(hour.open, DateTimeFormatter.ofPattern("h:mm a"))
-        val closeTime = LocalTime.parse(hour.close, DateTimeFormatter.ofPattern("h:mm a"))
+        val openTime = LocalTime.parse(hour.open, DateTimeFormatter.ofPattern("h:mm a"))
+        val closeTime = LocalTime.parse(hour.close, DateTimeFormatter.ofPattern("h:mm a"))
         currentTime.isAfter(openTime) && currentTime.isBefore(closeTime)
       } catch (e: Exception) {
         println("Invalid time for Coffee Shop: ${coffee.coffeeShopName}, Error: ${e.message}")

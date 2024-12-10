@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.brewr.R
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -42,6 +43,7 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.utils.isConnectedToInternet
 import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
@@ -157,11 +159,32 @@ fun AddJourneyScreen(
                   colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
-                      uploadPicture(imageUri!!) { imageUrl ->
+                      if (isConnectedToInternet(context)) {
+                        uploadPicture(imageUri!!) { imageUrl ->
+                          val newJourney =
+                              Journey(
+                                  uid = uid,
+                                  imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                  description = description,
+                                  location = selectedLocation,
+                                  coffeeOrigin = coffeeOrigin,
+                                  brewingMethod = brewingMethod,
+                                  coffeeTaste = coffeeTaste,
+                                  coffeeRate = coffeeRate,
+                                  date = selectedDate)
+                          listJourneysViewModel.addJourney(newJourney)
+                          navigationActions.goBack()
+                          return@uploadPicture
+                        }
+                      } else {
+                        // Use a predefined image URL when offline
+                        val predefinedImageUrl =
+                            "android.resource://${context.packageName}/${R.drawable.offlinemode}"
+
                         val newJourney =
                             Journey(
                                 uid = uid,
-                                imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                imageUrl = predefinedImageUrl, // Use the predefined URL
                                 description = description,
                                 location = selectedLocation,
                                 coffeeOrigin = coffeeOrigin,
@@ -170,8 +193,24 @@ fun AddJourneyScreen(
                                 coffeeRate = coffeeRate,
                                 date = selectedDate)
                         listJourneysViewModel.addJourney(newJourney)
-                        navigationActions.goBack()
-                        return@uploadPicture
+                        navigationActions
+                            .goBack() // Update the Journey with real image when connected to the
+                        // internet
+                        uploadPicture(imageUri!!) { imageUrl ->
+                          val journeyWithRealImage =
+                              Journey(
+                                  uid = uid,
+                                  imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                  description = description,
+                                  location = selectedLocation,
+                                  coffeeOrigin = coffeeOrigin,
+                                  brewingMethod = brewingMethod,
+                                  coffeeTaste = coffeeTaste,
+                                  coffeeRate = coffeeRate,
+                                  date = selectedDate)
+                          listJourneysViewModel.updateJourney(journeyWithRealImage)
+                          return@uploadPicture
+                        }
                       }
                     } else {
                       Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()

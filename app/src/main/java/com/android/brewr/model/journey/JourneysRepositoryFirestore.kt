@@ -147,25 +147,40 @@ class JourneysRepositoryFirestore(
       onSuccess: (List<Journey>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(userPath)
-        .document(uid)
-        .get()
-        .addOnSuccessListener { document ->
-          val journeyIds = document.get("journeys") as? List<String> ?: emptyList()
-          if (journeyIds.isEmpty()) {
-            onSuccess(emptyList())
-            return@addOnSuccessListener
-          }
-          db.collection(collectionPath)
-              .whereIn("uid", journeyIds)
-              .get()
-              .addOnSuccessListener { querySnapshot ->
-                val journeys = querySnapshot.documents.mapNotNull { documentTojourney(it) }
-                onSuccess(journeys)
-              }
-              .addOnFailureListener { onFailure(it) }
+    // Listen for changes in the user document
+    db.collection(userPath).document(uid).addSnapshotListener { documentSnapshot, userError ->
+      if (userError != null) {
+        Log.e("Firestore", "Error listening to user snapshots", userError)
+        onFailure(userError)
+        return@addSnapshotListener
+      }
+
+      // Retrieve the list of journey IDs
+      val journeyIds = documentSnapshot?.get("journeys") as? List<String> ?: emptyList()
+      if (journeyIds.isEmpty()) {
+        onSuccess(emptyList())
+        return@addSnapshotListener
+      }
+
+      // Listen for changes in all related journey documents
+      db.collection(collectionPath).whereIn("uid", journeyIds).addSnapshotListener {
+          querySnapshot,
+          journeyError ->
+        if (journeyError != null) {
+          Log.e("Firestore", "Error listening to journey snapshots", journeyError)
+          onFailure(journeyError)
+          return@addSnapshotListener
         }
-        .addOnFailureListener { onFailure(it) }
+
+        // Parse the returned documents into Journey objects
+        if (querySnapshot != null && !querySnapshot.isEmpty) {
+          val journeys = querySnapshot.documents.mapNotNull { documentTojourney(it) }
+          onSuccess(journeys)
+        } else {
+          onSuccess(emptyList()) // Return an empty list if no documents are found
+        }
+      }
+    }
   }
 
   /**
@@ -203,6 +218,7 @@ class JourneysRepositoryFirestore(
   ) {
     performFirestoreOperation(
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
+    Log.v("update journey", journey.toString())
   }
 
   /**

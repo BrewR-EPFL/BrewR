@@ -20,6 +20,7 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.resources.C
 import com.android.brewr.ui.authentication.SignInScreen
+import com.android.brewr.ui.explore.CoffeeInformationScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
@@ -29,8 +30,13 @@ import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
+import com.android.brewr.ui.userProfile.UserPrivateListScreen
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 
 class MainActivity : ComponentActivity() {
   private lateinit var auth: FirebaseAuth
@@ -39,6 +45,13 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
 
     FirebaseApp.initializeApp(this)
+
+    // Configure Firestore settings for offline persistence
+    val settings = firestoreSettings {
+      setLocalCacheSettings(persistentCacheSettings {}) // Enable persistent disk cache
+    }
+
+    Firebase.firestore.firestoreSettings = settings
 
     auth = FirebaseAuth.getInstance()
     auth.currentUser?.let { auth.signOut() }
@@ -63,6 +76,7 @@ fun BrewRApp() {
       viewModel(factory = ListJourneysViewModel.Factory)
   val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
   val coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory)
+  val privateCoffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory)
 
   NavHost(navController, Route.AUTH) {
     navigation(
@@ -91,6 +105,18 @@ fun BrewRApp() {
       composable(Screen.ADD_JOURNEY) { AddJourneyScreen(listJourneysViewModel, navigationActions) }
       composable(Screen.EDIT_JOURNEY) {
         EditJourneyScreen(listJourneysViewModel, navigationActions)
+      }
+    }
+
+    navigation(
+        startDestination = Screen.USERPROFILE,
+        route = Route.USER_PROFILE,
+    ) {
+      composable(Screen.USER_PRIVATE_LIST) {
+        UserPrivateListScreen(navigationActions, privateCoffeesViewModel)
+      }
+      composable(Screen.USER_PRIVATE_LIST_INFOS) {
+        CoffeeInformationScreen(privateCoffeesViewModel, onBack = { navigationActions.goBack() })
       }
     }
   }

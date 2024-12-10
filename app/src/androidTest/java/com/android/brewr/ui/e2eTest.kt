@@ -252,11 +252,9 @@ class E2ETest {
         .assertIsDisplayed()
         .assertTextEquals("Nearby Coffee Shops")
 
-    // Verify the toggle button and switch to the curated list
-    composeTestRule.onNodeWithTag("toggleListButton").assertIsDisplayed().performClick()
-
-    // Verify the curated list title is displayed
-    composeTestRule.onNodeWithTag("listTitle").assertIsDisplayed().assertTextEquals("Curated List")
+    // Verify the dropdown menu functionality
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
 
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
@@ -280,5 +278,36 @@ class E2ETest {
     composeTestRule.onNodeWithTag("coffeeImage:${sampleCoffees[1].id}").assertIsDisplayed()
 
        */
+
+  }
+
+  @Test
+  fun exploreScreenDropdownMenuIntegrationTest() {
+    // Go to the Explore screen
+    composeTestRule.onNodeWithTag("Explore").assertIsDisplayed().performClick()
+    composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // Clear the coffee list to simulate an empty state
+    composeTestRule.runOnIdle { coffeesViewModel.clearCoffees() }
+    // Open the bottom sheet
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("exploreBottomSheet").assertIsDisplayed()
+
+    // Verify the dropdown menu opens
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
+
+    // Select "Curated" from the dropdown menu
+    composeTestRule.onNodeWithText("Curated").assertExists().performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated Coffee Shops")
+
+    // Select "Opened" from the dropdown menu
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Opened").assertExists().performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened Coffee Shops")
+
+    // Assert the "closed" message is displayed if the list is empty
+    composeTestRule.onNodeWithTag("noOpenCoffeeShopsMessage").assertExists()
   }
 }
