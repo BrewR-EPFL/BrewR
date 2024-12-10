@@ -326,11 +326,11 @@ class E2ETest {
     composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
 
     // Check all elements in User Private List are displayed
-    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopName:1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopAddress:1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHours:1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopRating:1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeImage:1").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName:1").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopAddress:1").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHours:1").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopRating:1").performScrollTo().assertIsDisplayed()
 
     // Step 3: Click on the clickable image to navigate to the detailed info screen
     composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed().performClick()
@@ -342,12 +342,12 @@ class E2ETest {
     composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
 
     // Check Operating Hours are displayed
-    composeTestRule.onNodeWithTag("coffeeShopHourMonday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourTuesday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourWednesday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourThursday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourFriday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourSaturday").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourSunday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourMonday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourTuesday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourWednesday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourThursday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourFriday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourSaturday").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourSunday").performScrollTo().assertIsDisplayed()
   }
 }
