@@ -79,8 +79,7 @@ class E2ETest {
   private lateinit var coffeesViewModel: CoffeesViewModel
   private lateinit var privateCoffeesViewModel: CoffeesViewModel
 
-
-    private val journey =
+  private val journey =
       Journey(
           uid = "journey1",
           imageUrl =
@@ -129,7 +128,7 @@ class E2ETest {
     coffeesViewModel.addCoffees(sampleCoffees)
     privateCoffeesViewModel = spy(CoffeesViewModel::class.java)
 
-      // Mock the behavior of `getJourneys` to simulate fetching journeys
+    // Mock the behavior of `getJourneys` to simulate fetching journeys
     `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
@@ -170,12 +169,13 @@ class E2ETest {
             startDestination = Screen.USERPROFILE,
             route = Route.USER_PROFILE,
         ) {
-            composable(Screen.USER_PRIVATE_LIST) {
-                UserPrivateListScreen(navigationActions, privateCoffeesViewModel)
-            }
-            composable(Screen.USER_PRIVATE_LIST_INFOS) {
-                CoffeeInformationScreen(privateCoffeesViewModel, onBack = { navigationActions.goBack() })
-            }
+          composable(Screen.USER_PRIVATE_LIST) {
+            UserPrivateListScreen(navigationActions, privateCoffeesViewModel)
+          }
+          composable(Screen.USER_PRIVATE_LIST_INFOS) {
+            CoffeeInformationScreen(
+                privateCoffeesViewModel, onBack = { navigationActions.goBack() })
+          }
         }
       }
     }
@@ -309,45 +309,45 @@ class E2ETest {
 
   @Test
   fun userProfileScreenE2EFlowTest() {
-      // Step 1: Start from the Overview screen and navigate to the User Profile screen
-      composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().performClick()
+    // Step 1: Start from the Overview screen and navigate to the User Profile screen
+    composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().performClick()
 
-      // Verify User Profile screen is displayed
-      composeTestRule.onNodeWithTag("UserProfileScreen").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("Username").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("User Email").assertIsDisplayed()
+    // Verify User Profile screen is displayed
+    composeTestRule.onNodeWithTag("UserProfileScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Username").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("User Email").assertIsDisplayed()
 
-      // Step 2: Click on the "Favorite" button to navigate to the User Private List
-      composeTestRule.onNodeWithTag("Favorite button").assertIsDisplayed().performClick()
+    // Step 2: Click on the "Favorite" button to navigate to the User Private List
+    composeTestRule.onNodeWithTag("Favorite button").assertIsDisplayed().performClick()
 
-      // Verify User Private List screen is displayed
-      composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
+    // Verify User Private List screen is displayed
+    composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
 
-      // Check all elements in User Private List are displayed
-      composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopName:1").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopAddress:1").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHours:1").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopRating:1").assertIsDisplayed()
+    // Check all elements in User Private List are displayed
+    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName:1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopAddress:1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHours:1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopRating:1").assertIsDisplayed()
 
-      // Step 3: Click on the clickable image to navigate to the detailed info screen
-      composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed().performClick()
+    // Step 3: Click on the clickable image to navigate to the detailed info screen
+    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed().performClick()
 
-      // Verify the Coffee Information screen is displayed
-      composeTestRule.onNodeWithTag("coffeeInformationScreen").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopAddress").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
+    // Verify the Coffee Information screen is displayed
+    composeTestRule.onNodeWithTag("coffeeInformationScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopAddress").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
 
-      // Check Operating Hours are displayed
-      composeTestRule.onNodeWithTag("coffeeShopHourMonday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourTuesday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourWednesday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourThursday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourFriday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourSaturday").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("coffeeShopHourSunday").assertIsDisplayed()
+    // Check Operating Hours are displayed
+    composeTestRule.onNodeWithTag("coffeeShopHourMonday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourTuesday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourWednesday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourThursday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourFriday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourSaturday").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("coffeeShopHourSunday").assertIsDisplayed()
   }
 }
