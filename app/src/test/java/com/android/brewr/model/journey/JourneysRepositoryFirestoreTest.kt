@@ -101,7 +101,39 @@ class JourneysRepositoryFirestoreTest {
   }
 
   @Test
-  fun `test getJourneys success`() {
+  fun `test getJourneysOfTheUser success`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
+    // Arrange
+
+    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask)
+    `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      `when`(mockUserDocumentSnapshot.get("journeys")).thenReturn(listOf("id1", "id2"))
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask // Chain the task
+    }
+    `when`(mockJourneyCollectionReference.whereIn(anyString(), anyList()))
+        .thenReturn(mockJourneyCollectionReference)
+    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask)
+    `when`(mockJourneysTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
+      `when`(mockJourneysQuerySnapshot.documents)
+          .thenReturn(
+              listOf(mock(DocumentSnapshot::class.java), mock(DocumentSnapshot::class.java)))
+      listener.onSuccess(mockJourneysQuerySnapshot)
+      mockJourneysTask // Chain the task
+    }
+
+    val successCaptor = argumentCaptor<List<Journey>>()
+
+    // Act
+    journeysRepository.getJourneysOfTheUser(
+        user.uid, onSuccess = { successCaptor.capture() }, onFailure = {})
+  }
+
+  @Test
+  fun `test getJourneysOfCurrentUser success`() {
     val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
     val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
     // Arrange
@@ -133,7 +165,25 @@ class JourneysRepositoryFirestoreTest {
   }
 
   @Test
-  fun `test getJourneys success with no journeys`() {
+  fun `test getJourneysOfTheUser success with no journeys`() {
+    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
+    // Arrange
+    whenever(mockUserDocumentReference.get()).thenReturn(mockUserTask)
+
+    whenever(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
+      whenever(mockUserDocumentSnapshot.get("journeys")).thenReturn(null) // No journeys field
+      listener.onSuccess(mockUserDocumentSnapshot)
+      mockUserTask
+    }
+    val successCaptor = argumentCaptor<List<Journey>>()
+    // Act
+    journeysRepository.getJourneysOfTheUser(
+        user.uid, onSuccess = { successCaptor.capture() }, onFailure = {})
+  }
+
+  @Test
+  fun `test getJourneysOfCurrentUser success with no journeys`() {
     val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
     // Arrange
     whenever(mockUserDocumentReference.get()).thenReturn(mockUserTask)
