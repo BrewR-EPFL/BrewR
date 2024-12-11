@@ -44,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.coffee.CoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -58,6 +59,8 @@ fun CoffeeInformationScreen(
 ) {
   val coffee = coffeesViewModel.selectedCoffee.collectAsState().value ?: return
   var reviewSort by remember { mutableStateOf("Best") }
+  val favoriteCoffeesViewModel: FavoriteCoffeesViewModel =
+      viewModel(factory = FavoriteCoffeesViewModel.Factory)
 
   Scaffold(
       modifier = Modifier.testTag("coffeeInformationScreen"),
@@ -101,7 +104,7 @@ fun CoffeeInformationScreen(
                             .heightIn(min = 150.dp, max = 300.dp)
                             .testTag("coffeeImage"))
               }
-
+              FavoriteCoffeesButton(coffee, favoriteCoffeesViewModel)
               // Location
               Column(
                   verticalArrangement = Arrangement.spacedBy(4.dp),
