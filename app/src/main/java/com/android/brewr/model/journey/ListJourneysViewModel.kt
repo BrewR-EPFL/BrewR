@@ -1,5 +1,6 @@
 package com.android.brewr.model.journey
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
@@ -62,6 +63,10 @@ open class ListJourneysViewModel(private val repository: JourneysRepository) : V
    */
   fun updateJourney(journey: Journey) {
     repository.updateJourney(journey = journey, onSuccess = { getJourneys() }, onFailure = {})
+    Log.d("edit journey view model", journey.toString())
+    Log.d("edit journey view model", "new updatedJourney is ${journey.uid}")
+    Log.d("edit journey view model", "new updatedJourney is ${journey.imageUrl}")
+    Log.d("edit journey view model", "new updatedJourney ${journeys_.value}")
   }
 
   /**

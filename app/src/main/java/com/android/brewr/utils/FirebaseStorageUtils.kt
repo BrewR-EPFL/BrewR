@@ -36,6 +36,7 @@ fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
 fun updatePicture(imageUri: Uri, oldImageUrl: String, onSuccess: (String) -> Unit) {
   val storagePath = "images/${oldImageUrl.substringAfter("%2F").substringBefore("?alt")}"
   Log.d("EditJourneyScreen", "Deleting image with path $storagePath")
+  Log.d("edit journey screen", "delete image of $oldImageUrl in storage")
 
   val storageRef = FirebaseStorage.getInstance().getReference()
   val imgRefToDelete = storageRef.child(storagePath)
@@ -50,7 +51,11 @@ fun updatePicture(imageUri: Uri, oldImageUrl: String, onSuccess: (String) -> Uni
   newImageRef
       .putFile(imageUri)
       .addOnSuccessListener {
-        newImageRef.downloadUrl.addOnSuccessListener { uri -> onSuccess(uri.toString()) }
+        newImageRef.downloadUrl.addOnSuccessListener { uri ->
+          val u = uri.toString()
+          Log.d("edit journey screen", "add on image of$u in storage")
+          onSuccess(u)
+        }
       }
       .addOnFailureListener { Log.e("EditJourneyScreen", "Failed to upload image", it) }
 }

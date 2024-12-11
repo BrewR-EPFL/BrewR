@@ -1,6 +1,7 @@
 package com.android.brewr.ui.overview
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -167,6 +168,8 @@ fun EditJourneyScreen(
                             coffeeTaste = coffeeTaste,
                             coffeeRate = coffeeRate,
                             date = selectedDate)
+                    Log.d("edit journey screen", "new updatedJourney is ${updatedJourney.uid}")
+                    Log.d("edit journey screen", "new updatedJourney is ${updatedJourney.imageUrl}")
                     listJourneysViewModel.updateJourney(updatedJourney)
                     listJourneysViewModel.selectJourney(updatedJourney)
                     navigationActions.goBack()
