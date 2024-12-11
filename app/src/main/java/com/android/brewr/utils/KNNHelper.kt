@@ -5,6 +5,7 @@ import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
+import com.android.brewr.model.map.Location
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -12,6 +13,8 @@ import kotlin.math.sqrt
 class KNNHelper {
   /** Stores the predicted user ID. */
   private var predictedUid = ""
+  private var predictedJourneys: List<Location> = emptyList()
+  private var index: Int = 0
 
   /**
    * Returns the predicted user ID from the KNN algorithm.
@@ -142,4 +145,73 @@ class KNNHelper {
     predictedUid = distances[k].second // not sure if the nearest one is the best one
     return predictedUid
   }
+
+  /**
+   * Selects relevant records of coffee shop locations from a user's journeys based on a threshold
+   * distance.
+   *
+   * This function filters the user's journey data to include only locations that are not marked as
+   * "home" and have a rating of 4 stars or better. It then calculates the distance between each
+   * journey's location and the given location, and selects the locations that are within the
+   * specified threshold distance. The resulting list of selected locations is returned.
+   *
+   * @param userJourneys A list of `Journey` objects representing the user's journey data.
+   * @param givenLocation The location from which distances to the user's journey locations will be
+   *   calculated.
+   * @param thresholdDistance The maximum distance (in meters) to consider when selecting coffee
+   *   shop locations.
+   * @return A list of `Location` objects that are within the threshold distance and meet the rating
+   *   criteria.
+   */
+  fun selectRecordsOfUser(
+      userJourneys: List<Journey>,
+      givenLocation: Location,
+      thresholdDistance: Double
+  ): List<Location> {
+    val coffeeShopSet = mutableListOf<Location>()
+
+    for (journey in userJourneys) {
+      val journeyLocation = journey.location
+      val journeyRate = getRatingValue(journey.coffeeRate)
+      // make journey has a location and location is not null and rating better than 4 stars
+      if (journeyLocation.isNotAtHome() && journeyRate >= 4) {
+        // calculate the distance
+        val distance = givenLocation.distanceTo(journeyLocation)
+        if (distance < thresholdDistance) {
+          coffeeShopSet.add(journeyLocation)
+        }
+      }
+    }
+    return coffeeShopSet
+  }
+
+  /**
+   * Updates the K-Nearest Neighbors (KNN) algorithm by processing the provided journey data and
+   * predicting the user ID.
+   *
+   * This function prepares the feature vectors for the given user journeys, processes them, and
+   * then uses the KNN algorithm to predict the user ID based on the current user's journey
+   * features. The predicted user ID is stored internally for later use.
+   *
+   * @param usersJourneys A list of pairs, where each pair contains a list of `Journey` objects and
+   *   a user ID.
+   * @param userJourneys A list of doubles representing the feature vector of the current user's
+   *   journeys.
+   */
+  fun updateKNN(usersJourneys: List<Pair<List<Journey>, String>>, userJourneys: List<Double>) {
+    val data = featuresPreProcessing(usersJourneys)
+    val predictUid = predictKNN(data, userJourneys)
+  }
+
+  //    fun getNextRecommend(
+  //        predictedJourneys: List<Location>
+  //    ):Location?{
+  //        if (predictedJourneys.isNotEmpty()){
+  //
+  //        }else{
+  //
+  //        }
+  //
+  //    }
+
 }
