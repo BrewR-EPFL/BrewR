@@ -150,6 +150,12 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
+  @Test
+  fun isJourney_IsJourneyReturnCorrectly() {
+    assertTrue(isJourney(sampleCoffees[1], sampleJourneys))
+    assertFalse(isJourney(sampleCoffees[0], sampleJourneys))
+  }
+
   private fun grantLocationPermission() {
     repeat(10) { // Try up to 10 times with a delay
       val allowButton = uiDevice.findObject(UiSelector().text("While using the app"))
