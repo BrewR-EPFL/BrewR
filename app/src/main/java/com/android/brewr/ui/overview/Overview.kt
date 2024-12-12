@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.content.MediaType.Companion.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.ui.res.painterResource
+import com.android.brewr.R
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxHeight
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -113,7 +119,15 @@ fun OverviewScreen(
       topBar = {
         Column {
           TopAppBar(
-              title = { Text(text = "BrewR", modifier = Modifier.testTag("appTitle")) },
+              title = {
+                  Image(
+                      painter = painterResource(id = R.drawable.app_title),
+                      contentDescription = "App Title Logo",
+                      modifier = Modifier.testTag("appTitle")
+                          .fillMaxHeight()
+                  )
+                  //Text(text = "BrewR", modifier = Modifier.testTag("appTitle"))
+                      },
               actions = {
                 Row {
                   IconButton(
