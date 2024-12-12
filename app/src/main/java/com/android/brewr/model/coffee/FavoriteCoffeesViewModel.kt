@@ -13,7 +13,6 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
   private val favoriteCoffees_ = MutableStateFlow<List<Coffee>>(emptyList())
   val favoriteCoffees: StateFlow<List<Coffee>> = favoriteCoffees_.asStateFlow()
 
-  // Selected journey, i.e the journey for the detail view
   private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
   open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
 
@@ -46,16 +45,16 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
   /**
    * Adds a Coffee document.
    *
-   * @param coffee The Journey document to be added.
+   * @param coffee The Coffee document to be added.
    */
   fun addCoffee(coffee: Coffee) {
     repository.addCoffee(coffee = coffee, onSuccess = { getCoffees() }, onFailure = {})
   }
 
   /**
-   * Deletes a Journey document by its ID.
+   * Deletes a Coffee document by its ID.
    *
-   * @param id The ID of the Journey document to be deleted.
+   * @param id The ID of the Coffee document to be deleted.
    */
   fun deleteCoffeeById(id: String) {
     repository.deleteCoffeeById(id = id, onSuccess = { getCoffees() }, onFailure = {})
@@ -64,12 +63,22 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
   /**
    * Selects a Coffee document.
    *
-   * @param coffee The Journey document to be selected.
+   * @param coffee The Coffee document to be selected.
    */
   fun selectCoffee(coffee: Coffee) {
     selectedCoffee_.value = coffee
   }
 
+  /**
+   * Checks if a specific coffee is liked by the user.
+   *
+   * This function observes the list of favorite coffees and maps it to a `StateFlow` of `Boolean`,
+   * indicating whether the given coffee is in the list of favorites. The result is eagerly started
+   * and provides a default value of `false` until the favorite coffees list is updated.
+   *
+   * @param coffee The `Coffee` object to check.
+   * @return A `StateFlow<Boolean>` that emits `true` if the coffee is liked, or `false` otherwise.
+   */
   fun isCoffeeLiked(coffee: Coffee): StateFlow<Boolean> {
     return favoriteCoffees
         .map { coffeeList -> coffeeList.any { it.id == coffee.id } }

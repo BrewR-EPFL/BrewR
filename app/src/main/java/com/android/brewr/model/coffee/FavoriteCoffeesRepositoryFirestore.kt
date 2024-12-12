@@ -17,6 +17,18 @@ class FavoriteCoffeesRepositoryFirestore(
   private val userPath = "users"
   private var currentUserUid = ""
 
+  /**
+   * Initializes the repository by adding an authentication state listener and retrieving the
+   * current user's data.
+   *
+   * This function listens for changes in the authentication state. If a user is logged in, it
+   * retrieves the user's document from Firestore using their UID. If the document exists, it
+   * invokes the provided success callback. Any errors during the document retrieval are logged for
+   * debugging purposes.
+   *
+   * @param onSuccess A callback function to be invoked when the user's document is successfully
+   *   retrieved.
+   */
   override fun init(onSuccess: () -> Unit) {
     firebaseAuth.addAuthStateListener {
       val user = Firebase.auth.currentUser
@@ -37,6 +49,19 @@ class FavoriteCoffeesRepositoryFirestore(
     }
   }
 
+  /**
+   * Retrieves the list of coffee documents associated with the current user.
+   *
+   * This function listens for changes to the user's coffee list in Firestore and retrieves the
+   * corresponding coffee documents. It uses Firestore snapshot listeners to provide real-time
+   * updates. If there is an error during any Firestore operation, the provided failure callback is
+   * invoked with the exception.
+   *
+   * @param onSuccess A callback function invoked with the list of retrieved `Coffee` objects when
+   *   the operation is successful.
+   * @param onFailure A callback function invoked with an `Exception` if an error occurs during the
+   *   operation.
+   */
   override fun getCoffees(onSuccess: (List<Coffee>) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection(userPath).document(getCurrentUserUid()).addSnapshotListener {
         userSnapshot,
@@ -73,6 +98,19 @@ class FavoriteCoffeesRepositoryFirestore(
     }
   }
 
+  /**
+   * Adds a coffee document to Firestore and associates it with the current user.
+   *
+   * This function uses a Firestore batch operation to:
+   * 1. Add the coffee ID to the user's list of coffees in their document.
+   * 2. Save the coffee document in the main coffee collection. The operation is committed
+   *    atomically. If successful, the provided success callback is invoked. If an error occurs
+   *    during the batch operation, the failure callback is invoked with the exception.
+   *
+   * @param coffee The `Coffee` object to be added to Firestore.
+   * @param onSuccess A callback function invoked when the coffee is successfully added.
+   * @param onFailure A callback function invoked with an `Exception` if an error occurs.
+   */
   override fun addCoffee(coffee: Coffee, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     val batch = db.batch()
     batch.update(
@@ -86,6 +124,18 @@ class FavoriteCoffeesRepositoryFirestore(
         .addOnFailureListener { exception -> onFailure(exception) }
   }
 
+  /**
+   * Removes a coffee ID from the current user's list of coffees in Firestore.
+   *
+   * This function uses a Firestore batch operation to atomically remove the specified coffee ID
+   * from the "coffees" array field in the user's document. If the operation is successful, the
+   * provided success callback is invoked. If an error occurs, the failure callback is invoked with
+   * the exception.
+   *
+   * @param id The ID of the coffee to be removed from the user's list.
+   * @param onSuccess A callback function invoked when the coffee ID is successfully removed.
+   * @param onFailure A callback function invoked with an `Exception` if an error occurs.
+   */
   override fun deleteCoffeeById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     val batch = db.batch()
     val userRef = db.collection("users").document(getCurrentUserUid())
@@ -96,12 +146,31 @@ class FavoriteCoffeesRepositoryFirestore(
         .addOnFailureListener { exception -> onFailure(exception) }
   }
 
+  /**
+   * Retrieves the UID of the currently authenticated user.
+   *
+   * This function ensures that a user is logged in before attempting to fetch the UID. If no user
+   * is logged in, an `IllegalStateException` is thrown.
+   *
+   * @return The UID of the currently authenticated user.
+   * @throws IllegalStateException if no user is logged in.
+   */
   private fun getCurrentUserUid(): String {
     val user = firebaseAuth.currentUser ?: throw IllegalStateException("User not logged in")
     val uid = user.uid
     return uid
   }
 
+  /**
+   * Converts a Firestore document snapshot into a `Coffee` object.
+   *
+   * This function extracts the required fields from the document snapshot to construct a `Coffee`
+   * object. If any required fields are missing or an error occurs during extraction, the function
+   * logs the error and returns `null`.
+   *
+   * @param document The Firestore document snapshot to be converted.
+   * @return A `Coffee` object if the conversion is successful, or `null` if an error occurs.
+   */
   private fun documentToCoffee(document: DocumentSnapshot): Coffee? {
     return try {
       val id = document.id
