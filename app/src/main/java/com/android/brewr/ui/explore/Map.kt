@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.brewr.R
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -125,22 +126,22 @@ fun getMarkerIcon(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel):
         loadAndResizeIcon(R.drawable.starbucks_icon)
     coffee.coffeeShopName.contains("McDonald's", ignoreCase = true) ->
         loadAndResizeIcon(R.drawable.mcdonald_icon)
-    isJourney(coffee, listJourneysViewModel) -> loadAndResizeIcon(R.drawable.journeys_icon)
+    isJourney(coffee, listJourneysViewModel.journeys.collectAsState().value) ->
+        loadAndResizeIcon(R.drawable.journeys_icon)
     else -> loadAndResizeIcon(R.drawable.default_coffee_icon) // Default icon
   }
 }
 
 /**
- * Checks if the given coffee location is part of any journey in the listJourneysViewModel.
+ * Checks if the given coffee shop is part of any journey.
  *
- * @param coffee The coffee object containing the location to check.
- * @param listJourneysViewModel The ViewModel containing the list of journeys.
- * @return True if the coffee location is part of any journey, false otherwise.
+ * @param coffee The coffee object containing details about the coffee shop.
+ * @param journeys The list of journeys to check against.
+ * @return True if the coffee shop is part of any journey, false otherwise.
  */
-@Composable
-fun isJourney(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): Boolean {
+fun isJourney(coffee: Coffee, journeys: List<Journey>): Boolean {
   val epsilon = 0.01
-  listJourneysViewModel.journeys.collectAsState().value.forEach { journey ->
+  journeys.forEach { journey ->
     if (journey.location.name != "At Home" &&
         kotlin.math.abs(journey.location.latitude?.minus(coffee.location.latitude!!) ?: epsilon) <
             epsilon &&
