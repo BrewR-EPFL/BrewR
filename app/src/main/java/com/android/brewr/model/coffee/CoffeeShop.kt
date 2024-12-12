@@ -2,7 +2,7 @@ package com.android.brewr.model.coffee
 
 import com.android.brewr.model.location.Location
 
-data class Coffee(
+data class CoffeeShop(
     val id: String,
     val coffeeShopName: String,
     val location: Location,

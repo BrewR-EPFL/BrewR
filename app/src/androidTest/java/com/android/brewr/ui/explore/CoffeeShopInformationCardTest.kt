@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
@@ -23,15 +23,15 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
-class CoffeeInformationCardTest {
+class CoffeeShopInformationCardTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var uiDevice: UiDevice
   private lateinit var navigationActions: NavigationActions
 
   // Set up a mock Coffee object
-  private val mockCoffee =
-      Coffee(
+  private val mockCoffeeShop =
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -62,7 +62,8 @@ class CoffeeInformationCardTest {
     navigationActions = mock(NavigationActions::class.java)
     composeTestRule.setContent {
       CoffeeInformationCardScreen(
-          coffee = mockCoffee, onClick = { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
+          coffeeShop = mockCoffeeShop,
+          onClick = { navigationActions.navigateTo(Screen.EXPLORE_INFOS) })
     }
 
     // Handle location permission if prompted
@@ -72,23 +73,23 @@ class CoffeeInformationCardTest {
   @Test
   fun displayAllComponentsValidCoffee() {
     composeTestRule
-        .onNodeWithTag("coffeeShopName:${mockCoffee.id}")
+        .onNodeWithTag("coffeeShopName:${mockCoffeeShop.id}")
         .assertIsDisplayed()
-        .assertTextEquals(mockCoffee.coffeeShopName)
+        .assertTextEquals(mockCoffeeShop.coffeeShopName)
     composeTestRule
-        .onNodeWithTag("coffeeShopAddress:${mockCoffee.id}")
+        .onNodeWithTag("coffeeShopAddress:${mockCoffeeShop.id}")
         .assertIsDisplayed()
-        .assertTextEquals("Address: " + mockCoffee.location.address)
+        .assertTextEquals("Address: " + mockCoffeeShop.location.address)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours:${mockCoffee.id}")
+        .onNodeWithTag("coffeeShopHours:${mockCoffeeShop.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
-                "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
+                "${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule
-        .onNodeWithTag("coffeeShopRating:${mockCoffee.id}")
+        .onNodeWithTag("coffeeShopRating:${mockCoffeeShop.id}")
         .assertIsDisplayed()
-        .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffee.rating)))
+        .assertTextEquals(("Rating: " + String.format("%.1f/5", mockCoffeeShop.rating)))
   }
 
   private fun grantLocationPermission() {

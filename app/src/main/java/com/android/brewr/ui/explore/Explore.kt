@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.filterOpenCoffeeShops
 import com.android.brewr.ui.theme.CoffeeBrown
@@ -27,11 +27,11 @@ import kotlinx.coroutines.launch
  * A composable function that displays the Explore screen.
  *
  * @param coffeesViewModel The ViewModel that provides the list of coffees.
- * @param curatedCoffees A list of curated Coffee objects to be displayed.
+ * @param curatedCoffeeShops A list of curated Coffee objects to be displayed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffee>) {
+fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffeeShops: List<CoffeeShop>) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -57,7 +57,7 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
 
                 val listToShow =
                     when (selectedOption) {
-                      "Curated" -> curatedCoffees
+                      "Curated" -> curatedCoffeeShops
                       "Opened" -> filterOpenCoffeeShops(coffees)
                       else -> coffees
                     }
@@ -147,12 +147,12 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
 /**
  * A composable function that displays a list of coffee items.
  *
- * @param coffees A list of Coffee objects to be displayed.
+ * @param coffeeShops A list of Coffee objects to be displayed.
  * @param onCoffeeClick A lambda function to be executed when a coffee item is clicked.
  */
 @Composable
-fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
-  if (coffees.isEmpty()) {
+fun CoffeeList(coffeeShops: List<CoffeeShop>, onCoffeeClick: (CoffeeShop) -> Unit) {
+  if (coffeeShops.isEmpty()) {
     // Display a message when there are no coffee shops in the list
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
       Text(
@@ -164,8 +164,8 @@ fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
   } else {
     // Display the list of coffee shops
     LazyColumn(modifier = Modifier.fillMaxHeight(0.9f).testTag("bottomSheet")) {
-      items(coffees) { coffee ->
-        CoffeeInformationCardScreen(coffee = coffee, onClick = { onCoffeeClick(coffee) })
+      items(coffeeShops) { coffee ->
+        CoffeeInformationCardScreen(coffeeShop = coffee, onClick = { onCoffeeClick(coffee) })
       }
     }
   }

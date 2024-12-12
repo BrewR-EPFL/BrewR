@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 open class CoffeesViewModel : ViewModel() {
-  private val coffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  val coffees: StateFlow<List<Coffee>> = coffees_.asStateFlow()
+  private val coffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
+  val coffees: StateFlow<List<CoffeeShop>> = coffees_.asStateFlow()
 
   // Selected coffee, i.e the coffee for the detail view
-  private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
-  open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
+  private val selectedCoffee_Shop_ = MutableStateFlow<CoffeeShop?>(null)
+  open val selectedCoffeeShop: StateFlow<CoffeeShop?> = selectedCoffee_Shop_.asStateFlow()
 
   // create factory
   companion object {
@@ -31,12 +31,12 @@ open class CoffeesViewModel : ViewModel() {
   }
 
   // Function to update selected coffee
-  fun selectCoffee(coffee: Coffee) {
-    viewModelScope.launch { selectedCoffee_.value = coffee }
+  fun selectCoffee(coffeeShop: CoffeeShop) {
+    viewModelScope.launch { selectedCoffee_Shop_.value = coffeeShop }
   }
 
   // Function to add coffees
-  fun addCoffees(coffeesList: List<Coffee>) {
+  fun addCoffees(coffeesList: List<CoffeeShop>) {
     viewModelScope.launch { coffees_.value = coffeesList }
   }
 

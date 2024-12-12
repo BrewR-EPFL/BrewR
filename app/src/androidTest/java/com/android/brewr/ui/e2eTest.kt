@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
@@ -92,9 +92,9 @@ class E2ETest {
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
-  private val sampleCoffees =
+  private val sampleCoffeeShops =
       listOf(
-          Coffee(
+          CoffeeShop(
               "1",
               "Coffee1",
               com.android.brewr.model.location.Location(
@@ -103,7 +103,7 @@ class E2ETest {
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Lei", "good", 5.0)),
               listOf("test.jpg")),
-          Coffee(
+          CoffeeShop(
               "2",
               "Coffee2",
               com.android.brewr.model.location.Location(
@@ -122,7 +122,7 @@ class E2ETest {
     userRepositoryMock = mock(UserRepository::class.java)
     userViewModel = spy(UserViewModel(userRepositoryMock))
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    coffeesViewModel.addCoffees(sampleCoffees)
+    coffeesViewModel.addCoffees(sampleCoffeeShops)
     // Mock the behavior of `getJourneys` to simulate fetching journeys
     `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
@@ -146,7 +146,7 @@ class E2ETest {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
           composable(EXPLORE) {
-            ExploreScreen(coffeesViewModel, sampleCoffees.sortedByDescending { it.rating })
+            ExploreScreen(coffeesViewModel, sampleCoffeeShops.sortedByDescending { it.rating })
           }
         }
         navigation(

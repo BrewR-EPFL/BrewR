@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.android.brewr.BuildConfig
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
@@ -26,7 +26,7 @@ fun fetchNearbyCoffeeShops(
     context: Context,
     currentLocation: LatLng,
     radius: Double = 3000.0,
-    onSuccess: (List<Coffee>) -> Unit
+    onSuccess: (List<CoffeeShop>) -> Unit
 ) {
   // Initialize the Places API with the API key if it is not already initialized
   if (!Places.isInitialized()) {
@@ -61,12 +61,12 @@ fun fetchNearbyCoffeeShops(
       placesClient
           .searchNearby(request)
           .addOnSuccessListener { response ->
-            val coffeeShops = mutableListOf<Coffee>()
+            val coffeeShopShops = mutableListOf<CoffeeShop>()
             scope.launch {
               response.places.map { place ->
                 place.location?.let {
-                  coffeeShops.add(
-                      Coffee(
+                  coffeeShopShops.add(
+                      CoffeeShop(
                           id = place.id ?: "Undefined",
                           coffeeShopName = place.displayName ?: "Undefined",
                           location =
@@ -88,14 +88,14 @@ fun fetchNearbyCoffeeShops(
                                   "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
                   // imagesUrls = fetchAllPhotoUris(place, placesClient)))
                 }
-                if (coffeeShops.isNotEmpty()) {
+                if (coffeeShopShops.isNotEmpty()) {
                   Log.d(
                       "PlacesAPI",
-                      "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+                      "Coffee shops founded: ${coffeeShopShops.size} ${coffeeShopShops[0].coffeeShopName}")
                 } else {
                   Log.d("PlacesAPI", "No coffee shops found.")
                 }
-                onSuccess(coffeeShops)
+                onSuccess(coffeeShopShops)
               }
             }
           }

@@ -10,7 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
@@ -27,7 +27,7 @@ import org.mockito.Mockito.spy
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class CoffeeInformationScreenTest {
+class CoffeeShopInformationScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var uiDevice: UiDevice
@@ -35,8 +35,8 @@ class CoffeeInformationScreenTest {
   private lateinit var coffeesViewModel: CoffeesViewModel
 
   // Set up a mock Coffee object
-  private val mockCoffee =
-      Coffee(
+  private val mockCoffeeShop =
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -75,8 +75,8 @@ class CoffeeInformationScreenTest {
     coffeesViewModel = spy(CoffeesViewModel::class.java)
 
     composeTestRule.setContent {
-      coffeesViewModel.addCoffees(listOf((mockCoffee)))
-      coffeesViewModel.selectCoffee(mockCoffee)
+      coffeesViewModel.addCoffees(listOf((mockCoffeeShop)))
+      coffeesViewModel.selectCoffee(mockCoffeeShop)
       CoffeeInformationScreen(coffeesViewModel, onBack = { navigationActions.goBack() })
     }
 
@@ -90,17 +90,17 @@ class CoffeeInformationScreenTest {
     composeTestRule
         .onNodeWithTag("coffeeShopName")
         .assertIsDisplayed()
-        .assertTextEquals(mockCoffee.coffeeShopName)
+        .assertTextEquals(mockCoffeeShop.coffeeShopName)
     composeTestRule
         .onNodeWithTag("coffeeShopAddress")
         .assertIsDisplayed()
-        .assertTextEquals(mockCoffee.location.address)
+        .assertTextEquals(mockCoffeeShop.location.address)
     composeTestRule
         .onNodeWithTag(
             "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")
         .assertIsDisplayed()
         .assertTextEquals(
-            "${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].day}: ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffee.hours[LocalDate.now().dayOfWeek.value - 1].close}")
+            "${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].day}: ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].close}")
     composeTestRule.onNodeWithTag("buttonBest").assertExists()
     composeTestRule.onNodeWithTag("buttonWorst").assertExists()
   }
@@ -118,7 +118,7 @@ class CoffeeInformationScreenTest {
   fun reviewsButtonClicked() {
     // Perform a click on the back button
     composeTestRule.onNodeWithTag("buttonBest").assertExists().performClick()
-    mockCoffee.reviews?.forEach { review ->
+    mockCoffeeShop.reviews?.forEach { review ->
       if (composeTestRule.onNodeWithTag("button${review.authorName}").isDisplayed()) {
         composeTestRule
             .onNodeWithTag("button${review.authorName}")
@@ -132,7 +132,7 @@ class CoffeeInformationScreenTest {
       }
     }
     composeTestRule.onNodeWithTag("buttonWorst").assertExists().performClick()
-    mockCoffee.reviews?.forEach { review ->
+    mockCoffeeShop.reviews?.forEach { review ->
       if (composeTestRule.onNodeWithTag("button${review.authorName}").isDisplayed()) {
         composeTestRule
             .onNodeWithTag("button${review.authorName}")

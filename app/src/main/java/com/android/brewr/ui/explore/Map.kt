@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.brewr.R
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -26,7 +26,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun MapScreen(coffees: List<Coffee>) {
+fun MapScreen(coffeeShops: List<CoffeeShop>) {
   val context = LocalContext.current
   var userLocation by remember { mutableStateOf<LatLng?>(null) }
   val cameraPositionState = rememberCameraPositionState {
@@ -46,7 +46,7 @@ fun MapScreen(coffees: List<Coffee>) {
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
-              coffees.forEach { coffee ->
+              coffeeShops.forEach { coffee ->
                 Log.d(
                     "MapScreen",
                     "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")

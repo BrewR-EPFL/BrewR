@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
@@ -54,7 +54,7 @@ fun OverviewScreen(
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
+  var curatedCoffeeShops by rememberSaveable { mutableStateOf<List<CoffeeShop>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -100,7 +100,7 @@ fun OverviewScreen(
                     coffeesViewModel.addCoffees(coffees)
 
                     // Sort fetched coffee shops by rating
-                    curatedCoffees = sortCoffeeShopsByRating(coffees)
+                    curatedCoffeeShops = sortCoffeeShopsByRating(coffees)
                   })
             })
       }
@@ -142,7 +142,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeesViewModel, curatedCoffees)
+          ExploreScreen(coffeesViewModel, curatedCoffeeShops)
         }
       })
 }
