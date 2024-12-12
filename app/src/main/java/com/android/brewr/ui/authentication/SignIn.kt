@@ -80,7 +80,8 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
             Modifier.fillMaxSize()
                 .padding(padding)
                 .background(
-                    brush = Brush.verticalGradient(colors = listOf(Color.White, CoffeeBrown))),
+                    color = Color.White
+                ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -89,12 +90,12 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
           painter = painterResource(id = R.drawable.app_logo),
           contentDescription = "App Logo",
           modifier =
-              Modifier.size(220.dp)
-                  .clip(RoundedCornerShape(30.dp))
-                  .border(3.dp, Color.DarkGray, RoundedCornerShape(30.dp)))
+              Modifier.size(500.dp)
+      //            .clip(RoundedCornerShape(30.dp))
+      )
 
       Spacer(modifier = Modifier.height(16.dp))
-
+/**
       // Welcome Text
       Text(
           modifier = Modifier.testTag("loginTitle"),
@@ -104,7 +105,7 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
           textAlign = TextAlign.Center)
 
       Spacer(modifier = Modifier.height(48.dp))
-
+*/
       if (user == null) {
         // Sign in with Google Button
         Button(
@@ -129,14 +130,16 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Center,
-                  modifier = Modifier.fillMaxWidth()) {
+                  modifier = Modifier.fillMaxWidth()
+              //        .border(2.dp, CoffeeBrown, RoundedCornerShape(50))
+              ) {
                     Image(
                         painter = painterResource(id = R.drawable.google_logo),
                         contentDescription = "Google Logo",
                         modifier = Modifier.size(30.dp).padding(end = 8.dp))
                     Text(
                         text = "Sign in with Google",
-                        color = Color.Gray,
+                        color = CoffeeBrown,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium)
                   }
@@ -246,3 +249,5 @@ fun getAddGoogleAccountIntent(): Intent {
   intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
   return intent
 }
+
+
