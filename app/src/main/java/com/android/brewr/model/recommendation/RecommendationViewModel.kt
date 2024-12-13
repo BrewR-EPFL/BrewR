@@ -2,15 +2,15 @@ package com.android.brewr.model.recommendation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
-import com.android.brewr.model.map.Location
 import com.android.brewr.utils.KNNHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class recommendationViewModel(private val journeyRepository: JourneysRepository) {
+class RecommendationViewModel(private val journeyRepository: JourneysRepository) {
 
   private val data_ = MutableStateFlow<List<Pair<List<Journey>, String>>>(emptyList())
   val data: StateFlow<List<Pair<List<Journey>, String>>> = data_.asStateFlow()
@@ -25,8 +25,8 @@ class recommendationViewModel(private val journeyRepository: JourneysRepository)
   val predictedUserId: LiveData<String>
     get() = _predictedUserId
 
-  private val recommendedCoffees_ = MutableStateFlow<List<Location>>(emptyList())
-  val recommendedCoffees: StateFlow<List<Location>> = recommendedCoffees_.asStateFlow()
+  private val recommendedCoffees_ = MutableStateFlow<List<Coffee>>(emptyList())
+  val recommendedCoffees: StateFlow<List<Coffee>> = recommendedCoffees_.asStateFlow()
 
   private val knnHelper = KNNHelper()
 
@@ -44,7 +44,16 @@ class recommendationViewModel(private val journeyRepository: JourneysRepository)
    */
   fun predictUser(usersJourneys: List<Pair<List<Journey>, String>>, userJourneys: List<Double>) {
     val data = knnHelper.featuresPreProcessing(usersJourneys)
-    _predictedUserId.value = knnHelper.predictKNN(data, userJourneys)
+    val predictedUserId = knnHelper.predictKNN(data, userJourneys)
+    journeyRepository.getJourneysOfTheUser(
+        predictedUserId,
+        onSuccess = {
+          val journeys = it
+          // add new coffee shop into the coffee shop list
+          // recommendedCoffees_.value
+          TODO()
+        },
+        onFailure = {})
   }
 
   /**
@@ -58,24 +67,27 @@ class recommendationViewModel(private val journeyRepository: JourneysRepository)
     journeyRepository.getJourneysOfCurrentUser(onSuccess = { journeys_.value = it }, onFailure = {})
   }
 
-  /**
-   * Gets recommended coffee shop locations based on the current location and the predicted user ID.
-   *
-   * This function fetches the journey data of the predicted user and selects relevant coffee shops
-   * that are within a threshold distance from the current location. The list of recommended
-   * locations is stored in a mutable state variable.
-   *
-   * @param currentLocation The current location from which the distance to coffee shop locations
-   *   will be calculated.
-   */
-  fun getRecommendedLocation(currentLocation: Location) {
-    predictedUserId.value?.let {
-      journeyRepository.getJourneysOfTheUser(
-          it, onSuccess = { usersJourneys_.value = it }, onFailure = {})
-    }
-    recommendedCoffees_.value =
-        knnHelper.selectRecordsOfUser(usersJourneys_.value, currentLocation, 0.1)
-  }
+  //  /**
+  //   * Gets recommended coffee shop locations based on the current location and the predicted user
+  // ID.
+  //   *
+  //   * This function fetches the journey data of the predicted user and selects relevant coffee
+  // shops
+  //   * that are within a threshold distance from the current location. The list of recommended
+  //   * locations is stored in a mutable state variable.
+  //   *
+  //   * @param currentLocation The current location from which the distance to coffee shop
+  // locations
+  //   *   will be calculated.
+  //   */
+  //  fun getRecommendedLocation(currentLocation: Location) {
+  //    predictedUserId.value?.let {
+  //      journeyRepository.getJourneysOfTheUser(
+  //          it, onSuccess = { usersJourneys_.value = it }, onFailure = {})
+  //    }
+  //    recommendedCoffees_.value =
+  //        knnHelper.selectRecordsOfUser(usersJourneys_.value, currentLocation, 0.1)
+  //  }
 
   //    fun updateRecommendedJourneys(){
   //        val uid = knnHelper.getKNNResult()
