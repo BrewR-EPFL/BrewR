@@ -193,6 +193,7 @@ dependencies {
     testImplementation(libs.robolectric) // Robolectric
     androidTestImplementation(libs.mockito.android) // Mockito Android
     androidTestImplementation(libs.mockito.kotlin) // Mockito Kotlin
+    androidTestImplementation(libs.mockk.android) // Mockk Android
 
     // ------------- Compose Testing -----------------
     globalTestImplementation(platform(libs.compose.bom))
