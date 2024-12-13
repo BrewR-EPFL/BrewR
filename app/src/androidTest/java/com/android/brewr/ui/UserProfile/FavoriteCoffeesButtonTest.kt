@@ -1,6 +1,5 @@
 package com.android.brewr.ui.UserProfile
 
-import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.model.coffee.Coffee

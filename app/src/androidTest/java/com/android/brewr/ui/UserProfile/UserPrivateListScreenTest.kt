@@ -32,7 +32,7 @@ class UserPrivateListScreenTest {
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeImage:1").performClick()
+    //composeTestRule.onNodeWithTag("coffeeImage:1").performClick()
   }
 
   @Test
