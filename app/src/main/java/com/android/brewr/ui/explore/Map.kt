@@ -60,7 +60,7 @@ fun MapScreen(coffees: List<Coffee>) {
                         },
                     title = coffee.coffeeShopName,
                     icon = markerIcon,
-                    snippet = "Address: ${coffee.location.address}")
+                    snippet = "★ ${coffee.rating}")
               }
 
               userLocation?.let {

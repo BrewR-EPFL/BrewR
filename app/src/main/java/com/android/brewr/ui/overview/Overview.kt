@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.content.MediaType.Companion.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -26,9 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.brewr.R
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
@@ -43,11 +47,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import androidx.compose.ui.res.painterResource
-import com.android.brewr.R
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxHeight
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -120,14 +119,11 @@ fun OverviewScreen(
         Column {
           TopAppBar(
               title = {
-                  Image(
-                      painter = painterResource(id = R.drawable.app_title),
-                      contentDescription = "App Title Logo",
-                      modifier = Modifier.testTag("appTitle")
-                          .fillMaxHeight()
-                  )
-                  //Text(text = "BrewR", modifier = Modifier.testTag("appTitle"))
-                      },
+                Image(
+                    painter = painterResource(id = R.drawable.app_title),
+                    contentDescription = "App Title Logo",
+                    modifier = Modifier.testTag("appTitle").fillMaxHeight().testTag("appTitle"))
+              },
               actions = {
                 Row {
                   IconButton(

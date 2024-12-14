@@ -17,14 +17,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
@@ -37,7 +34,6 @@ import com.android.brewr.R
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
-import com.android.brewr.ui.theme.CoffeeBrown
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -76,12 +72,7 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
 
   Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
     Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .padding(padding)
-                .background(
-                    color = Color.White
-                ),
+        modifier = Modifier.fillMaxSize().padding(padding).background(color = Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -89,23 +80,10 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
       Image(
           painter = painterResource(id = R.drawable.app_logo),
           contentDescription = "App Logo",
-          modifier =
-              Modifier.size(500.dp)
-      //            .clip(RoundedCornerShape(30.dp))
-      )
+          modifier = Modifier.size(500.dp))
 
       Spacer(modifier = Modifier.height(16.dp))
-/**
-      // Welcome Text
-      Text(
-          modifier = Modifier.testTag("loginTitle"),
-          text = "BrewR",
-          style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
-          fontWeight = FontWeight.Bold,
-          textAlign = TextAlign.Center)
 
-      Spacer(modifier = Modifier.height(48.dp))
-*/
       if (user == null) {
         // Sign in with Google Button
         Button(
@@ -130,16 +108,17 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Center,
-                  modifier = Modifier.fillMaxWidth()
-              //        .border(2.dp, CoffeeBrown, RoundedCornerShape(50))
-              ) {
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .height(40.dp * 1.5f)
+                          .border(1.dp, Color.DarkGray, RoundedCornerShape(50))) {
                     Image(
                         painter = painterResource(id = R.drawable.google_logo),
                         contentDescription = "Google Logo",
                         modifier = Modifier.size(30.dp).padding(end = 8.dp))
                     Text(
                         text = "Sign in with Google",
-                        color = CoffeeBrown,
+                        color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium)
                   }
@@ -249,5 +228,3 @@ fun getAddGoogleAccountIntent(): Intent {
   intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
   return intent
 }
-
-
