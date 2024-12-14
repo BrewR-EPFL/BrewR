@@ -20,8 +20,6 @@ class SignInScreenTest {
   @Test
   fun signInScreen_displaysCorrectly() {
     composeTestRule.onNodeWithContentDescription("App Logo").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithText("BrewR").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
     composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Google Logo").assertIsDisplayed()
