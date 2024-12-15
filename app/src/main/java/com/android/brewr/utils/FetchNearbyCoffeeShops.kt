@@ -9,7 +9,7 @@ import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.CircularBounds

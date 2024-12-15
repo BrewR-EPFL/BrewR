@@ -14,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.brewr.R
 import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.journey.Journey
+import com.android.brewr.model.journey.ListJourneysViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -25,8 +27,14 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function to display a map screen with coffee shop markers and user location.
+ *
+ * @param coffees List of Coffee objects representing coffee shops to be displayed on the map.
+ * @param listJourneysViewModel ViewModel containing the list of journeys.
+ */
 @Composable
-fun MapScreen(coffees: List<Coffee>) {
+fun MapScreen(coffees: List<Coffee>, listJourneysViewModel: ListJourneysViewModel) {
   val context = LocalContext.current
   var userLocation by remember { mutableStateOf<LatLng?>(null) }
   val cameraPositionState = rememberCameraPositionState {
@@ -49,18 +57,18 @@ fun MapScreen(coffees: List<Coffee>) {
               coffees.forEach { coffee ->
                 Log.d(
                     "MapScreen",
-                    "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")
-                val markerIcon = getMarkerIcon(coffee.coffeeShopName)
+                    "Adding marker for ${coffee.location.name} at (${coffee.location.latitude}, ${coffee.location.longitude})")
+                val markerIcon = getMarkerIcon(coffee, listJourneysViewModel)
                 Marker(
                     state =
                         remember {
                           MarkerState(
                               position =
-                                  LatLng(coffee.location.latitude, coffee.location.longitude))
+                                  LatLng(coffee.location.latitude!!, coffee.location.longitude!!))
                         },
                     title = coffee.coffeeShopName,
                     icon = markerIcon,
-                    snippet = "Address: ${coffee.location.address}")
+                    snippet = "Address: ${coffee.location.name}")
               }
 
               userLocation?.let {
@@ -72,8 +80,15 @@ fun MapScreen(coffees: List<Coffee>) {
       })
 }
 
+/**
+ * Retrieves the current location of the user.
+ *
+ * @param context The context used to access the location services.
+ * @param onSuccess A callback function to be invoked with the user's current location as a LatLng
+ *   object.
+ */
 @SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
+suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
   try {
     val locationClient = LocationServices.getFusedLocationProviderClient(context)
     val location = locationClient.lastLocation.await()
@@ -88,8 +103,15 @@ private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> 
   }
 }
 
+/**
+ * Composable function to get the appropriate marker icon for a coffee shop.
+ *
+ * @param coffee The coffee object containing details about the coffee shop.
+ * @param listJourneysViewModel The ViewModel containing the list of journeys.
+ * @return A BitmapDescriptor representing the marker icon.
+ */
 @Composable
-private fun getMarkerIcon(shopName: String): BitmapDescriptor {
+fun getMarkerIcon(coffee: Coffee, listJourneysViewModel: ListJourneysViewModel): BitmapDescriptor {
   val context = LocalContext.current
 
   // Helper function to load and resize the icon
@@ -100,10 +122,33 @@ private fun getMarkerIcon(shopName: String): BitmapDescriptor {
   }
 
   return when {
-    shopName.contains("Starbucks", ignoreCase = true) ->
+    coffee.coffeeShopName.contains("Starbucks", ignoreCase = true) ->
         loadAndResizeIcon(R.drawable.starbucks_icon)
-    shopName.contains("McDonald's", ignoreCase = true) ->
+    coffee.coffeeShopName.contains("McDonald's", ignoreCase = true) ->
         loadAndResizeIcon(R.drawable.mcdonald_icon)
+    isJourney(coffee, listJourneysViewModel.journeys.collectAsState().value) ->
+        loadAndResizeIcon(R.drawable.journeys_icon)
     else -> loadAndResizeIcon(R.drawable.default_coffee_icon) // Default icon
   }
+}
+
+/**
+ * Checks if the given coffee shop is part of any journey.
+ *
+ * @param coffee The coffee object containing details about the coffee shop.
+ * @param journeys The list of journeys to check against.
+ * @return True if the coffee shop is part of any journey, false otherwise.
+ */
+fun isJourney(coffee: Coffee, journeys: List<Journey>): Boolean {
+  val epsilon = 0.01
+  journeys.forEach { journey ->
+    if (journey.location.name != "At Home" &&
+        kotlin.math.abs(journey.location.latitude?.minus(coffee.location.latitude!!) ?: epsilon) <
+            epsilon &&
+        kotlin.math.abs(journey.location.longitude?.minus(coffee.location.longitude!!) ?: epsilon) <
+            epsilon) {
+      return true
+    }
+  }
+  return false
 }
