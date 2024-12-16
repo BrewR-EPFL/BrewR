@@ -1,12 +1,7 @@
 package com.android.brewr.ui.authentication
 
-import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.brewr.MainActivity
 import org.junit.*
@@ -19,6 +14,7 @@ class SignInScreenTest {
 
   @Test
   fun signInScreen_displaysCorrectly() {
+    // Assert that all UI elements are displayed
     composeTestRule.onNodeWithContentDescription("App Logo").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
     composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
@@ -27,8 +23,15 @@ class SignInScreenTest {
 
   @Test
   fun testLoginButtonStartsSignInProcess() {
-    // Click the login button
-    composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("loginButton").performClick()
+    // Verify that the login button exists and can be clicked
+    val loginButton = composeTestRule.onNodeWithTag("loginButton")
+    loginButton.assertHasClickAction()
+    loginButton.performClick()
+
+    // Verify that the loading spinner appears after the button is clicked
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+
+    // Verify that the login button is no longer displayed while loading
+    loginButton.assertDoesNotExist()
   }
 }
