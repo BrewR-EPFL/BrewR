@@ -30,6 +30,30 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 
+/**
+ * A composable function that displays a Google Sign-In screen with a loading state and
+ * full-screen white background.
+ *
+ * This screen contains:
+ * - An app logo displayed at the center.
+ * - A Google Sign-In button that initiates Firebase Authentication.
+ * - A loading spinner displayed while the sign-in process is in progress.
+ *
+ * @param userViewModel The [UserViewModel] instance used to manage and update user information
+ *                      upon successful sign-in.
+ * @param navigationActions The [NavigationActions] instance used to handle navigation events,
+ *                          such as navigating to the Overview screen after a successful login.
+ *
+ * Behavior:
+ * - When the "Sign in with Google" button is clicked:
+ *   - Google Sign-In intent is launched.
+ *   - If the sign-in is successful, the user is authenticated with Firebase.
+ *   - Upon success, the user data is updated in [UserViewModel], and navigation proceeds to
+ *     the Overview screen.
+ *   - If the sign-in fails, a Toast message is displayed with the appropriate error.
+ * - While the sign-in process is ongoing, a loading spinner replaces the button to indicate
+ *   progress.
+ */
 @Composable
 fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
