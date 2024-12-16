@@ -2,6 +2,7 @@ package com.android.brewr.ui.overview
 
 import android.icu.util.GregorianCalendar
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -66,18 +67,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.android.brewr.R
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
+import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.map.LocationViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.Gold
 import com.android.brewr.ui.theme.LightBrown
+import com.android.brewr.utils.isConnectedToInternet
+import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.content.Context
+import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.ui.navigation.NavigationActions
 
 @Composable
 fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit, testTag: String) {
@@ -482,4 +490,68 @@ fun DateField(date: Timestamp, onDateChange: (Timestamp) -> Unit) {
       Text(text = selectedDate.let { dateFormat.format(it.toDate()) }, fontSize = 14.sp)
     }
   }
+}
+
+
+fun journeySaveButtonClick(context: Context, uid: String, imageUri: Uri?, description: String, selectedLocation: Location, coffeeOrigin: CoffeeOrigin, brewingMethod: BrewingMethod, coffeeTaste: CoffeeTaste, coffeeRate: CoffeeRate, selectedDate: Timestamp, listJourneysViewModel: ListJourneysViewModel, navigationActions: NavigationActions) {
+    if (imageUri != null) {
+        if (isConnectedToInternet(context)) {
+            uploadPicture(imageUri!!) { imageUrl ->
+                val newJourney =
+                    Journey(
+                        uid = uid,
+                        imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                        description = description,
+                        location = selectedLocation,
+                        coffeeOrigin = coffeeOrigin,
+                        brewingMethod = brewingMethod,
+                        coffeeTaste = coffeeTaste,
+                        coffeeRate = coffeeRate,
+                        date = selectedDate
+                    )
+                listJourneysViewModel.addJourney(newJourney)
+                navigationActions.goBack()
+                return@uploadPicture
+            }
+        } else {
+            // Use a predefined image URL when offline
+            val predefinedImageUrl =
+                "android.resource://${context.packageName}/${R.drawable.offlinemode}"
+
+            val newJourney =
+                Journey(
+                    uid = uid,
+                    imageUrl = predefinedImageUrl, // Use the predefined URL
+                    description = description,
+                    location = selectedLocation,
+                    coffeeOrigin = coffeeOrigin,
+                    brewingMethod = brewingMethod,
+                    coffeeTaste = coffeeTaste,
+                    coffeeRate = coffeeRate,
+                    date = selectedDate
+                )
+            listJourneysViewModel.addJourney(newJourney)
+            navigationActions
+                .goBack() // Update the Journey with real image when connected to the
+            // internet
+            uploadPicture(imageUri!!) { imageUrl ->
+                val journeyWithRealImage =
+                    Journey(
+                        uid = uid,
+                        imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                        description = description,
+                        location = selectedLocation,
+                        coffeeOrigin = coffeeOrigin,
+                        brewingMethod = brewingMethod,
+                        coffeeTaste = coffeeTaste,
+                        coffeeRate = coffeeRate,
+                        date = selectedDate
+                    )
+                listJourneysViewModel.updateJourney(journeyWithRealImage)
+                return@uploadPicture
+            }
+        }
+    } else {
+        Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
+    }
 }

@@ -1,7 +1,6 @@
 package com.android.brewr.ui.overview
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -33,18 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.R
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
-import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
-import com.android.brewr.utils.isConnectedToInternet
-import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,6 +153,8 @@ fun AddJourneyScreen(
               Button(
                   colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
+                      journeySaveButtonClick(context, uid, imageUri, description, selectedLocation, coffeeOrigin, brewingMethod, coffeeTaste, coffeeRate, selectedDate, listJourneysViewModel, navigationActions)
+                      /**
                     if (imageUri != null) {
                       if (isConnectedToInternet(context)) {
                         uploadPicture(imageUri!!) { imageUrl ->
@@ -215,6 +212,7 @@ fun AddJourneyScreen(
                     } else {
                       Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
                     }
+                      */
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
                     Text("Save")
