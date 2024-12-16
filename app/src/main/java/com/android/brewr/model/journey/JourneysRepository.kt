@@ -5,18 +5,12 @@ interface JourneysRepository {
 
   fun init(onSuccess: () -> Unit)
 
-  fun getJourneysOfCurrentUser(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit)
-
-  fun getJourneysOfAllOtherUsers(
+  fun retrieveJourneysOfAllOtherUsers(
       onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
       onFailure: (Exception) -> Unit
   )
 
-  fun getJourneysOfTheUser(
-      uid: String,
-      onSuccess: (List<Journey>) -> Unit,
-      onFailure: (Exception) -> Unit
-  )
+  fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit)
 
   fun addJourney(journey: Journey, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 

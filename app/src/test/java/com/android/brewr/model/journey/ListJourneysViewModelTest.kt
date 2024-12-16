@@ -48,7 +48,7 @@ class ListJourneysViewModelTest {
   @Test
   fun getJourneysCallsRepository() {
     listJourneysViewModel.getJourneys()
-    verify(journeysRepository).getJourneysOfCurrentUser(any(), any())
+    verify(journeysRepository).getJourneys(any(), any())
   }
 
   @Test

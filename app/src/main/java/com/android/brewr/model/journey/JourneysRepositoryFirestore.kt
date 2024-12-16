@@ -60,18 +60,14 @@ class JourneysRepositoryFirestore(
       }
     }
   }
-
   /**
-   * Retrieves all journeys of current user from the Firestore database.
+   * Retrieves all journeys of the current user from the Firestore database.
    *
    * @param onSuccess The callback to call with the list of journeys if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  override fun getJourneysOfCurrentUser(
-      onSuccess: (List<Journey>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    getJourneysOfTheUser(getCurrentUserUid(), onSuccess, onFailure)
+  override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
+    getJourneysOf(getCurrentUserUid(), onSuccess, onFailure)
   }
 
   /**
@@ -81,7 +77,7 @@ class JourneysRepositoryFirestore(
    *   operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  override fun getJourneysOfAllOtherUsers(
+  override fun retrieveJourneysOfAllOtherUsers(
       onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -106,7 +102,7 @@ class JourneysRepositoryFirestore(
 
           // Loop through each user UID and fetch their journeys
           allUsers.forEach { uid ->
-            getJourneysOfTheUser(
+            getJourneysOf(
                 uid,
                 onSuccess = { journeys ->
                   // Only process if no errors have occurred so far
@@ -134,53 +130,6 @@ class JourneysRepositoryFirestore(
           // Handle failure when fetching all users
           onFailure(exception)
         }
-  }
-
-  /**
-   * Retrieves all journeys of a specific user from the Firestore database.
-   *
-   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
-   * @param onFailure The callback to call if the operation fails.
-   */
-  override fun getJourneysOfTheUser(
-      uid: String,
-      onSuccess: (List<Journey>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    // Listen for changes in the user document
-    db.collection(userPath).document(uid).addSnapshotListener { documentSnapshot, userError ->
-      if (userError != null) {
-        Log.e("Firestore", "Error listening to user snapshots", userError)
-        onFailure(userError)
-        return@addSnapshotListener
-      }
-
-      // Retrieve the list of journey IDs
-      val journeyIds = documentSnapshot?.get("journeys") as? List<String> ?: emptyList()
-      if (journeyIds.isEmpty()) {
-        onSuccess(emptyList())
-        return@addSnapshotListener
-      }
-
-      // Listen for changes in all related journey documents
-      db.collection(collectionPath).whereIn("uid", journeyIds).addSnapshotListener {
-          querySnapshot,
-          journeyError ->
-        if (journeyError != null) {
-          Log.e("Firestore", "Error listening to journey snapshots", journeyError)
-          onFailure(journeyError)
-          return@addSnapshotListener
-        }
-
-        // Parse the returned documents into Journey objects
-        if (querySnapshot != null && !querySnapshot.isEmpty) {
-          val journeys = querySnapshot.documents.mapNotNull { documentTojourney(it) }
-          onSuccess(journeys)
-        } else {
-          onSuccess(emptyList()) // Return an empty list if no documents are found
-        }
-      }
-    }
   }
 
   /**
@@ -315,5 +264,49 @@ class JourneysRepositoryFirestore(
     val user = firebaseAuth.currentUser ?: throw IllegalStateException("User not logged in")
     val uid = user.uid
     return uid
+  }
+
+  /**
+   * get all journeys of the specific user
+   *
+   * @param uid The uid of the user that you want to know
+   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
+  private fun getJourneysOf(
+      uid: String,
+      onSuccess: (List<Journey>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(userPath).document(uid).addSnapshotListener { userSnapshot, userError ->
+      if (userError != null) {
+        Log.e("JourneysRepositoryFirestore", "Error listening to user snapshots", userError)
+        onFailure(userError)
+        return@addSnapshotListener
+      }
+
+      val journeyIds = userSnapshot?.get("journeys") as? List<String> ?: emptyList()
+      if (journeyIds.isEmpty()) {
+        onSuccess(emptyList())
+        return@addSnapshotListener
+      }
+
+      db.collection(collectionPath).whereIn("uid", journeyIds).addSnapshotListener {
+          journeySnapshot,
+          journeyError ->
+        if (journeyError != null) {
+          Log.e("JourneysRepositoryFirestore", "Error listening to journey snapshots", journeyError)
+          onFailure(journeyError)
+          return@addSnapshotListener
+        }
+
+        if (journeySnapshot != null && !journeySnapshot.isEmpty) {
+          val journeys = journeySnapshot.documents.mapNotNull { documentTojourney(it) }
+          onSuccess(journeys)
+        } else {
+          onSuccess(emptyList()) // Pass an empty list if there are no documents
+        }
+      }
+    }
   }
 }
