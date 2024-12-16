@@ -1,7 +1,6 @@
 package com.android.brewr.ui.overview
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -213,23 +212,26 @@ fun EditJourneyScreen(
                                   coffeeRate = coffeeRate,
                                   date = selectedDate)
                           listJourneysViewModel.updateJourney(updatedJourney)
+                          listJourneysViewModel.selectJourney(updatedJourney)
                           return@updatePicture
                         }
                       }
-                    } else {
-                      Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
                     }
-                    /**
-                     * if (imageUri != null) { updatePicture(imageUri!!, imageUrl) { updatedImageUrl
-                     * -> // Directly update the imageUrl state imageUrl = updatedImageUrl } } val
-                     * updatedJourney = Journey( uid = uid, imageUrl = imageUrl, description =
-                     * description, location = selectedLocation, coffeeOrigin = coffeeOrigin,
-                     * brewingMethod = brewingMethod, coffeeTaste = coffeeTaste, coffeeRate =
-                     * coffeeRate, date = selectedDate)
-                     * listJourneysViewModel.updateJourney(updatedJourney)
-                     * listJourneysViewModel.selectJourney(updatedJourney)
-                     * navigationActions.goBack()
-                     */
+                    // else {
+                    val updatedJourney =
+                        Journey(
+                            uid = uid,
+                            imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                            description = description,
+                            location = selectedLocation,
+                            coffeeOrigin = coffeeOrigin,
+                            brewingMethod = brewingMethod,
+                            coffeeTaste = coffeeTaste,
+                            coffeeRate = coffeeRate,
+                            date = selectedDate)
+                    listJourneysViewModel.updateJourney(updatedJourney)
+                    listJourneysViewModel.selectJourney(updatedJourney)
+                    navigationActions.goBack()
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
                     Text("Save")
