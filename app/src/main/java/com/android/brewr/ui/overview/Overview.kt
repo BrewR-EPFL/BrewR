@@ -152,7 +152,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeesViewModel, curatedCoffees)
+          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffees)
         }
       })
 }

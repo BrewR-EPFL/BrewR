@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.filterOpenCoffeeShops
+import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import kotlinx.coroutines.launch
 
@@ -32,7 +33,11 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffee>) {
+fun ExploreScreen(
+    coffeesViewModel: CoffeesViewModel,
+    listJourneysViewModel: ListJourneysViewModel,
+    curatedCoffees: List<Coffee>
+) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -45,7 +50,7 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
   var showCoffeeInfos by remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    MapScreen(coffees)
+    MapScreen(coffees, listJourneysViewModel)
 
     if (showBottomSheet) {
       ModalBottomSheet(
