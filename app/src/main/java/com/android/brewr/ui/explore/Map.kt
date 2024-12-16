@@ -68,9 +68,7 @@ fun MapScreen(coffees: List<Coffee>, listJourneysViewModel: ListJourneysViewMode
                         },
                     title = coffee.coffeeShopName,
                     icon = markerIcon,
-
                     snippet = "★ ${coffee.rating}")
-
               }
 
               userLocation?.let {
