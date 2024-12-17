@@ -3,7 +3,7 @@ package com.android.brewr.model.coffee
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.brewr.model.journey.JourneysRepositoryFirestore
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.User
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -46,7 +46,7 @@ class CoffeesRepositoryFirestoreTest {
           Location(
               latitude = 48.87847905807652,
               longitude = 2.3562626423266946,
-              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
+              name = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
           rating = 4.9,
           hours =
               listOf(

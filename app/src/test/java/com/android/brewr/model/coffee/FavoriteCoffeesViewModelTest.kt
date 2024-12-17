@@ -1,6 +1,6 @@
 package com.android.brewr.model.coffee
 
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -31,7 +31,7 @@ class FavoriteCoffeesViewModelTest {
           Location(
               latitude = 48.87847905807652,
               longitude = 2.3562626423266946,
-              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
+              name = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
           rating = 4.9,
           hours =
               listOf(

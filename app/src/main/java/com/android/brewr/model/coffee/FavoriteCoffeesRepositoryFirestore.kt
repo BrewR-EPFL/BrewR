@@ -1,7 +1,7 @@
 package com.android.brewr.model.coffee
 
 import android.util.Log
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -181,7 +181,7 @@ class FavoriteCoffeesRepositoryFirestore(
             Location(
                 latitude = it["latitude"] as? Double ?: 0.0,
                 longitude = it["longitude"] as? Double ?: 0.0,
-                address = it["address"] as? String ?: "")
+                name = it["address"] as? String ?: "")
           }
       val rating = document.getDouble("rating") ?: 0.0
       val hoursList =
