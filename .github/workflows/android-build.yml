@@ -63,7 +63,7 @@ jobs:
           RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
         run: |
           mkdir -p /home/runner/work/keystore
-          echo "$RELEASE_KEYSTORE" | base64 --decode > /home/runner/work/keystore/release.keystore
+          echo "$RELEASE_KEYSTORE" | base64 --decode > ./app/base64-keystore.txt
 
       # Step 8: Grant execute permissions to Gradle Wrapper
       - name: Grant execute permission for gradlew
