@@ -34,6 +34,7 @@ import com.android.brewr.R
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.utils.isConnectedToInternet
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -141,7 +142,14 @@ fun doGoogleSignIn(
 ) {
   val googleSignInRequest =
       GetCredentialRequest.Builder().addCredentialOption(getGoogleIdOption(context)).build()
-
+  if (!isConnectedToInternet(context)) {
+    Toast.makeText(
+            context,
+            "Log in unavailable, Please try again when the internet is back!",
+            Toast.LENGTH_LONG)
+        .show()
+    return
+  }
   coroutineScope.launch {
     try {
       val result = credentialManager.getCredential(context = context, request = googleSignInRequest)
