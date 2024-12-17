@@ -62,7 +62,8 @@ jobs:
         env:
           RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
         run: |
-          echo "$RELEASE_KEYSTORE" | base64 --decode > ~/release.keystore
+          mkdir -p /home/runner/work/keystore
+          echo "$RELEASE_KEYSTORE" | base64 --decode > /home/runner/work/keystore/release.keystore
 
       # Step 8: Grant execute permissions to Gradle Wrapper
       - name: Grant execute permission for gradlew
@@ -71,7 +72,7 @@ jobs:
       # Step 9: Build the signed release APK
       - name: Build Signed APK for Release
         env:
-          KEYSTORE_PATH: ~/release.keystore
+          KEYSTORE_PATH: /home/runner/work/keystore/release.keystore
           KS_PW: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PW: ${{ secrets.KEY_PASSWORD }}
@@ -85,7 +86,8 @@ jobs:
       # Step 10: Extract SHA-1 Fingerprint of the Keystore
       - name: Extract Keystore SHA-1 Fingerprint
         run: |
-          keytool -list -v -keystore ~/release.keystore -alias ${{ secrets.KEY_ALIAS }} -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep 'SHA1'
+          keytool -list -v -keystore /home/runner/work/keystore/release.keystore \
+          -alias ${{ secrets.KEY_ALIAS }} -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep 'SHA1'
 
       # Step 11: List Generated APKs
       - name: List Generated APK Files
