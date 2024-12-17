@@ -21,6 +21,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Fetches a list of nearby coffee shops based on the user's current location.
+ *
+ * This function uses the Google Places API to search for coffee shops within a specified radius
+ * around the user's current location. The search results include basic information such as the
+ * coffee shop's name, location, rating, hours, and a placeholder image URL.
+ *
+ * @param scope The CoroutineScope used for launching asynchronous tasks.
+ * @param context The application context required for API initialization and permission checks.
+ * @param currentLocation The user's current location represented as a `LatLng`.
+ * @param radius The search radius in meters around the user's current location. Default is 3000
+ *   meters.
+ * @param onSuccess A callback function invoked with a list of `Coffee` objects when the operation
+ *   is successful.
+ */
 fun fetchNearbyCoffeeShops(
     scope: CoroutineScope,
     context: Context,
@@ -110,6 +125,16 @@ fun fetchNearbyCoffeeShops(
   }
 }
 
+/**
+ * Fetches the photo URI for a place using its photo metadata.
+ *
+ * This function fetches the first available photo URI for the given place using the Google Places
+ * API. If no photo metadata is available or the request fails, it returns a placeholder image URL.
+ *
+ * @param place The `Place` object containing photo metadata.
+ * @param placesClient The `PlacesClient` used to fetch photo URIs.
+ * @return A list containing the fetched photo URI or a placeholder image URL if unavailable.
+ */
 private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
   val metadata = place.photoMetadatas?.get(0)
   try {
@@ -127,6 +152,15 @@ private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient):
   }
 }
 
+/**
+ * Parses a list of weekday text strings into a list of `Hours` objects.
+ *
+ * Each text string typically contains a day name and the opening/closing time range. If the input
+ * is null or invalid, it returns a list with a single "Undefined" entry.
+ *
+ * @param weekdayText A list of strings representing the opening hours for each day.
+ * @return A list of `Hours` objects representing the parsed opening hours.
+ */
 private fun getHours(weekdayText: List<String>?): List<Hours> {
   val listHour =
       weekdayText?.map { dayText ->

@@ -5,6 +5,15 @@ import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
+/**
+ * Deletes an image from Firebase Storage based on its URL.
+ *
+ * This function extracts the storage path from the image URL and deletes the corresponding file
+ * from Firebase Storage.
+ *
+ * @param imageUrl The URL of the image to delete.
+ * @param onSuccess A callback function to be invoked upon successful deletion of the image.
+ */
 fun deletePicture(imageUrl: String, onSuccess: () -> Unit) {
   val storagePath = "images/${imageUrl.substringAfter("%2F").substringBefore("?alt")}"
   val storageRef = FirebaseStorage.getInstance().getReference()
@@ -16,6 +25,15 @@ fun deletePicture(imageUrl: String, onSuccess: () -> Unit) {
       .addOnFailureListener { Log.e("FirebaseStorageUtils", "Error deleting image: $it") }
 }
 
+/**
+ * Uploads an image to Firebase Storage.
+ *
+ * This function uploads an image file to a Firebase Storage location under the "images" folder. The
+ * image is saved with a randomly generated UUID as its name.
+ *
+ * @param imageUri The URI of the image file to upload.
+ * @param onSuccess A callback function to be invoked with the download URL of the uploaded image.
+ */
 fun uploadPicture(imageUri: Uri, onSuccess: (String) -> Unit) {
   val imgPath = "images/" + UUID.randomUUID().toString()
   val imgRef = FirebaseStorage.getInstance().getReference().child(imgPath)
