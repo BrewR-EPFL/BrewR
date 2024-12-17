@@ -13,101 +13,87 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # Set up JDK 17 for the Android build
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'zulu'
+      # Step 2: Set up JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
 
-    # Cache Gradle dependencies
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          gradle-${{ runner.os }}-
+      # Step 3: Cache Gradle dependencies
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
 
-    # Set up Android SDK
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        api-level: 34
-        build-tools: "34.0.0"
-        ndk: "25.1.8937393"
+      # Step 4: Set up Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 34
+          build-tools: "34.0.0"
+          ndk: "25.1.8937393"
 
-    # Decode and create google-services.json from the secret
-    - name: Decode google-services.json
-      env:
-        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
-      run: |
-        echo $GOOGLE_SERVICES_JSON | base64 --decode > ./app/google-services.json
-        echo "$MAPS_API_KEY" | base64 --decode > ./local.properties      
+      # Step 5: Decode and place google-services.json
+      - name: Decode google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > ./app/google-services.json
 
-      # Debug: Check if google-services.json is correctly decoded
-    - name: Debug google-services.json
-      run: cat ./app/google-services.json
-      
-    # Grant execute permissions to gradlew
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
+      # Step 6: Place MAPS API Key in local.properties
+      - name: Add MAPS API Key to local.properties
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+        run: |
+          echo "MAPS_API_KEY=${MAPS_API_KEY}" > ./local.properties
 
-    # Download and cache dependencies
-    - name: Download dependencies
-      run: ./gradlew build --no-daemon --stacktrace
-    # Create a signing key for the release build
-    - name: Create Release Keystore for Signing
-      run: |
-        keytool -genkey -v -keystore ~/release.keystore -alias appkey \
-          -storepass appkey123 -keypass appkey123 -keyalg RSA -validity 4200 \
-          -dname "CN=App Release,O=Company,C=US"
+      # Step 7: Decode the persistent release keystore from secrets
+      - name: Decode Release Keystore
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+        run: |
+          echo "$RELEASE_KEYSTORE" | base64 --decode > ~/release.keystore
 
-    # Determine the absolute path of the keystore file for later use
-    - name: Locate Keystore File Path
-      id: keystore_path
-      run: |
-        KS_FILE=$(readlink -f ~/release.keystore)
-        echo "KS_FILE=$KS_FILE" >> $GITHUB_ENV
+      # Step 8: Grant execute permissions to Gradle Wrapper
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
-    # Compile the APK in release mode, ensuring it's signed with the keystore
-    - name: Build Signed APK for Release
-      env:
-        KS_PW: appkey123
-        KEY_ALIAS: appkey
-        KEY_PW: appkey123
-      run: |
-        ./gradlew assembleRelease --info
+      # Step 9: Build the signed release APK
+      - name: Build Signed APK for Release
+        env:
+          KEYSTORE_PATH: ~/release.keystore
+          KS_PW: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PW: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
+            -Pandroid.injected.signing.store.password=$KS_PW \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PW
 
-    # Extract the SHA-1 fingerprint of the keystore, which is often used for OAuth or API integrations
-    - name: Extract Keystore SHA-1 Fingerprint
-      id: sha
-      run: |
-        SHA1=$(keytool -list -v \
-            -keystore ~/release.keystore \
-            -alias appkey \
-            -storepass appkey123 | grep 'SHA1' | awk '{print $2}')
-        echo "SHA1 fingerprint: ${SHA1}"
+      # Step 10: Extract SHA-1 Fingerprint of the Keystore
+      - name: Extract Keystore SHA-1 Fingerprint
+        run: |
+          keytool -list -v -keystore ~/release.keystore -alias ${{ secrets.KEY_ALIAS }} -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep 'SHA1'
 
-    # Verify the generated APKs to ensure they were built successfully
-    - name: List Generated APK Files
-      run: |
-        find app/build/outputs/apk -type f
+      # Step 11: List Generated APKs
+      - name: List Generated APK Files
+        run: find app/build/outputs/apk -type f
 
-#    # Assemble APK (you can add `assembleRelease` for release builds)
-#    - name: Build Debug APK
-#      run: ./gradlew assembleDebug
-
-    # Upload the generated APK to GitHub Artifacts
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: BrewR-APK
-        path: app/build/outputs/apk/release/app-release.apk
+      # Step 12: Upload APK to GitHub Artifacts
+      - name: Upload Signed APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: BrewR-Signed-APK
+          path: app/build/outputs/apk/release/app-release.apk
