@@ -1,5 +1,6 @@
 package com.android.brewr.ui.explore
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.filterOpenCoffeeShops
+import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import kotlinx.coroutines.launch
 
@@ -31,7 +33,11 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffee>) {
+fun ExploreScreen(
+    coffeesViewModel: CoffeesViewModel,
+    listJourneysViewModel: ListJourneysViewModel,
+    curatedCoffees: List<Coffee>
+) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -44,7 +50,7 @@ fun ExploreScreen(coffeesViewModel: CoffeesViewModel, curatedCoffees: List<Coffe
   var showCoffeeInfos by remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    MapScreen(coffees)
+    MapScreen(coffees, listJourneysViewModel)
 
     if (showBottomSheet) {
       ModalBottomSheet(
@@ -186,12 +192,13 @@ fun ShowMenuButton(onClick: () -> Unit) {
               modifier =
                   Modifier.size(56.dp)
                       .clip(CircleShape)
-                      .border(1.dp, Color.Black, CircleShape)
+                      .border(1.dp, Color.White, CircleShape)
+                      .background(CoffeeBrown)
                       .padding(8.dp)) {
                 Icon(
                     imageVector = Icons.Rounded.Menu,
                     contentDescription = "Menu",
-                    tint = Color.Black,
+                    tint = Color.White,
                     modifier = Modifier.size(36.dp))
               }
         }

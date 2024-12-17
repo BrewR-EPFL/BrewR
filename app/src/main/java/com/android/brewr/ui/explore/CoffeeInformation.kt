@@ -110,7 +110,7 @@ fun CoffeeInformationScreen(
                   verticalArrangement = Arrangement.spacedBy(4.dp),
                   modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Address: ", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                    Text(coffee.location.address, modifier = Modifier.testTag("coffeeShopAddress"))
+                    Text(coffee.location.name, modifier = Modifier.testTag("coffeeShopAddress"))
                   }
 
               // Rating

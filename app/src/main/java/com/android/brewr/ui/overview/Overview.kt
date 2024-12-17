@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.content.MediaType.Companion.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,9 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.brewr.R
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
@@ -113,7 +118,12 @@ fun OverviewScreen(
       topBar = {
         Column {
           TopAppBar(
-              title = { Text(text = "BrewR", modifier = Modifier.testTag("appTitle")) },
+              title = {
+                Image(
+                    painter = painterResource(id = R.drawable.app_title),
+                    contentDescription = "App Title Logo",
+                    modifier = Modifier.testTag("appTitle").fillMaxHeight().testTag("appTitle"))
+              },
               actions = {
                 Row {
                   IconButton(
@@ -142,7 +152,7 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeesViewModel, curatedCoffees)
+          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffees)
         }
       })
 }
