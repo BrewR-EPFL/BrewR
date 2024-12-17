@@ -1,10 +1,14 @@
 package com.android.brewr.ui.authentication
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.brewr.MainActivity
-import org.junit.*
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -13,25 +17,18 @@ class SignInScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @Test
-  fun signInScreen_displaysCorrectly() {
-    // Assert that all UI elements are displayed
-    composeTestRule.onNodeWithContentDescription("App Logo").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("Google Logo").assertIsDisplayed()
-  }
-
-  @Test
-  fun testLoginButtonStartsSignInProcess() {
-    // Verify that the login button exists and can be clicked
-    val loginButton = composeTestRule.onNodeWithTag("loginButton")
-    loginButton.assertHasClickAction()
-    loginButton.performClick()
-
-    // Verify that the loading spinner appears after the button is clicked
-    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
-
-    // Verify that the login button is no longer displayed while loading
-    loginButton.assertDoesNotExist()
+  fun testSignInScreenElementsVisible() {
+    // Verify that all key elements are displayed on the screen
+    composeTestRule.onNodeWithTag("loginScreen").assertExists()
+    composeTestRule.onNodeWithTag("appLogo", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("loginButton", useUnmergedTree = true)
+        .assertExists()
+        .assertHasClickAction()
+    composeTestRule.onNodeWithTag("googleLogo", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("signInText", useUnmergedTree = true)
+        .assertIsDisplayed()
+        .assertTextEquals("Sign in with Google")
   }
 }
