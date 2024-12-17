@@ -90,7 +90,9 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
   // Fullscreen White Background
   Scaffold(
       modifier =
-          Modifier.fillMaxSize().background(Color.White), // Ensures the entire Scaffold is white
+          Modifier.fillMaxSize()
+              .background(Color.White)
+              .testTag("loginScreen"), // Ensures the entire Scaffold is white
       containerColor = Color.White // Sets scaffold background color
       ) { padding ->
         Column(
@@ -104,7 +106,7 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
               Image(
                   painter = painterResource(id = R.drawable.app_logo),
                   contentDescription = "App Logo",
-                  modifier = Modifier.size(500.dp))
+                  modifier = Modifier.size(500.dp).testTag("appLogo"))
 
               Spacer(modifier = Modifier.height(16.dp))
 
@@ -138,16 +140,18 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
                             Image(
                                 painter = painterResource(id = R.drawable.google_logo),
                                 contentDescription = "Google Logo",
-                                modifier = Modifier.size(30.dp).padding(end = 8.dp))
+                                modifier =
+                                    Modifier.size(30.dp).padding(end = 8.dp).testTag("googleLogo"))
                             Text(
                                 text = "Sign in with Google",
                                 color = Color.Black,
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium)
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.testTag("signInText"))
                           }
                     }
               } else {
-                CircularProgressIndicator(modifier = Modifier.testTag("loadingSpinner"))
+                CircularProgressIndicator()
               }
             }
       }
