@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.content.MediaType.Companion.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +47,16 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Displays the main overview screen with two sections: Gallery and Explore.
+ *
+ * The screen fetches nearby coffee shops based on the user's location and displays either the
+ * Gallery or Explore section depending on the selected navigation tab.
+ *
+ * @param listJourneysViewModel The ViewModel for managing journey data.
+ * @param coffeesViewModel The ViewModel for managing coffee shop data.
+ * @param navigationActions Navigation actions to navigate between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -157,6 +166,12 @@ fun OverviewScreen(
       })
 }
 
+/**
+ * Displays the sub-navigation bar for switching between Gallery and Explore sections.
+ *
+ * @param currentSection The currently selected section.
+ * @param onSectionChange Callback invoked when the user selects a new section.
+ */
 @Composable
 fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) {
   Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp)) {
@@ -174,6 +189,14 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
   }
 }
 
+/**
+ * Displays a navigation button within the sub-navigation bar.
+ *
+ * @param text The text displayed on the button.
+ * @param isSelected Whether the button is currently selected.
+ * @param onClick Callback invoked when the button is clicked.
+ * @param modifier Modifier for styling and layout configuration.
+ */
 @Composable
 fun SubNavigationButton(
     text: String,
@@ -192,6 +215,15 @@ fun SubNavigationButton(
               .testTag(text))
 }
 
+/**
+ * Retrieves the current device location.
+ *
+ * This function uses the fused location provider to obtain the user's current latitude and
+ * longitude. If no location is found, a fallback default location is used.
+ *
+ * @param context The current [Context] used for accessing location services.
+ * @param onSuccess Callback invoked with the retrieved [LatLng] location.
+ */
 @SuppressLint("MissingPermission")
 private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
   try {

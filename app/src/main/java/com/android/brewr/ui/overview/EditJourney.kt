@@ -38,6 +38,22 @@ import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.utils.updatePicture
 
+/**
+ * A composable screen that allows the user to edit an existing journey.
+ *
+ * This screen retrieves the currently selected journey from the `ListJourneysViewModel` and allows
+ * the user to update its details, including:
+ * - Journey photo (editable).
+ * - Description.
+ * - Location (coffee shop or custom location).
+ * - Coffee attributes: origin, brewing method, taste, and rating.
+ * - Date of the journey.
+ *
+ * Upon saving, the updated journey is passed back to the ViewModel and stored.
+ *
+ * @param listJourneysViewModel The ViewModel used to manage journey data.
+ * @param navigationActions Provides navigation actions for navigating back to the previous screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditJourneyScreen(
