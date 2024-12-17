@@ -38,9 +38,24 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.firestore.ktx.persistentCacheSettings
 
+/**
+ * The main activity of the BrewR application.
+ *
+ * This activity initializes Firebase, configures Firestore settings, and serves as the entry point
+ * for the application. It sets up the app's theme and renders the main navigation graph.
+ */
 class MainActivity : ComponentActivity() {
   private lateinit var auth: FirebaseAuth
 
+  /**
+   * Called when the activity is first created.
+   *
+   * Initializes Firebase services, configures Firestore settings for offline persistence, and
+   * renders the Compose-based UI.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after being shut down, this
+   *   bundle contains the data it most recently supplied.
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -67,6 +82,12 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+/**
+ * The main Composable function that sets up the navigation graph for the application.
+ *
+ * This function initializes the navigation controller and view models required for various screens
+ * and defines the navigation structure.
+ */
 @Composable
 fun BrewRApp() {
   val navController = rememberNavController()
