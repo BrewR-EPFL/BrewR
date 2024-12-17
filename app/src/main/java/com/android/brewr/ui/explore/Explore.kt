@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
@@ -138,9 +139,26 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
               modifier = Modifier.testTag("dropdownMenu")) {
                 listOf("Nearby", "Curated", "Opened").forEach { option ->
                   DropdownMenuItem(
-                      text = { Text(option) },
+                      text = {
+                        Row( // Wrap the content to include the checkmark
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                              Text(
+                                  text = option,
+                                  fontWeight =
+                                      if (selectedOption == option) FontWeight.Bold
+                                      else FontWeight.Normal, // Highlight selected
+                                  modifier = Modifier.weight(1f))
+                              if (selectedOption == option) {
+                                Text(
+                                    text = "✓", // Add checkmark
+                                    fontWeight = FontWeight.Bold,
+                                    color = CoffeeBrown)
+                              }
+                            }
+                      },
                       onClick = {
-                        onOptionSelected(option)
+                        onOptionSelected(option) // Update selected option
                         expanded = false
                       },
                       modifier = Modifier.testTag("dropdownMenuItem$option"))
