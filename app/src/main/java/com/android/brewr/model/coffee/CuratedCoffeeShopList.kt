@@ -3,7 +3,6 @@ package com.android.brewr.model.coffee
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-// Function to fetch and sort coffee shops by rating
 /**
  * Sorts a list of coffee shops by their rating in descending order.
  *

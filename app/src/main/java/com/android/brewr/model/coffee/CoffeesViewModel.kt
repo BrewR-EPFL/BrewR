@@ -8,6 +8,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel class for managing a list of coffees and the currently selected coffee.
+ *
+ * This ViewModel uses [MutableStateFlow] to hold and manage the state of coffee data. It supports
+ * operations such as adding coffees, selecting a specific coffee, and clearing the current list of
+ * coffees. The ViewModel ensures state updates occur within a coroutine scope to maintain thread
+ * safety.
+ */
 open class CoffeesViewModel : ViewModel() {
   private val coffees_ = MutableStateFlow<List<Coffee>>(emptyList())
   val coffees: StateFlow<List<Coffee>> = coffees_.asStateFlow()
@@ -16,7 +24,12 @@ open class CoffeesViewModel : ViewModel() {
   private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
   open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
 
-  // create factory
+  /**
+   * Companion object providing a factory for creating instances of [CoffeesViewModel].
+   *
+   * This factory is useful when a ViewModel needs to be created programmatically or injected into a
+   * lifecycle owner (e.g., in Android's ViewModelProvider).
+   */
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
@@ -30,12 +43,22 @@ open class CoffeesViewModel : ViewModel() {
         }
   }
 
-  // Function to update selected coffee
+  /**
+   * Updates the currently selected coffee.
+   *
+   * @param coffee The [Coffee] object to be set as the currently selected coffee. Observers of
+   *   [selectedCoffee] will receive the updated value.
+   */
   fun selectCoffee(coffee: Coffee) {
     viewModelScope.launch { selectedCoffee_.value = coffee }
   }
 
-  // Function to add coffees
+  /**
+   * Updates the list of coffees.
+   *
+   * @param coffeesList A list of [Coffee] objects to add to the state. Observers of [coffees] will
+   *   receive the updated list of coffees.
+   */
   fun addCoffees(coffeesList: List<Coffee>) {
     viewModelScope.launch { coffees_.value = coffeesList }
   }
