@@ -55,7 +55,7 @@ jobs:
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: |
-          echo "MAPS_API_KEY=${MAPS_API_KEY}" > ./local.properties
+          echo "$MAPS_API_KEY" | base64 --decode > ./local.properties 
 
       # Step 7: Decode the persistent release keystore from secrets
       - name: Decode Release Keystore
