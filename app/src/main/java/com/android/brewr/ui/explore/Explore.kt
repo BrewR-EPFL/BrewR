@@ -156,7 +156,7 @@ fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
     // Display a message when there are no coffee shops in the list
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
       Text(
-          text = "Everywhere is closed! I guess Coffee will disturb your sleep at this time",
+          text = "No coffee shops found!",
           style = MaterialTheme.typography.titleMedium,
           color = Color.Gray,
           modifier = Modifier.testTag("noOpenCoffeeShopsMessage"))
