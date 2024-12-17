@@ -158,8 +158,8 @@ fun CoffeeInformationScreen(
 /**
  * A composable function displaying a sorted list of reviews for a coffee shop.
  *
- * This function allows sorting reviews based on the selected method (e.g., Best or Worst).
- * It displays up to three reviews in a column layout.
+ * This function allows sorting reviews based on the selected method (e.g., Best or Worst). It
+ * displays up to three reviews in a column layout.
  *
  * @param reviews The list of [Review] objects to display.
  * @param reviewSort The currently selected sorting method ("Best" or "Worst").
