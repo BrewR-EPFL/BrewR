@@ -72,7 +72,6 @@ jobs:
       # Step 9: Build the signed release APK
       - name: Build Signed APK for Release
         env:
-          KEYSTORE_PATH: /home/runner/work/keystore/release.keystore
           KS_PW: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PW: ${{ secrets.KEY_PASSWORD }}
