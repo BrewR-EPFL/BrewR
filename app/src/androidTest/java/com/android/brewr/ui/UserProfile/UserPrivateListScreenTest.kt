@@ -4,14 +4,12 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.model.coffee.Coffee
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.FavoriteCoffeesRepository
 import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.location.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.userProfile.UserPrivateListScreen
-import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -26,7 +24,6 @@ class UserPrivateListScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var navigationActions: NavigationActions
   private lateinit var coffeesViewModel: CoffeesViewModel
-  private val mockRepository: FavoriteCoffeesRepository = mockk()
   private val favoriteCoffeesViewModel: FavoriteCoffeesViewModel = mock()
 
   // Create a sample Coffee object

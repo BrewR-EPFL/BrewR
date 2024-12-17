@@ -2,10 +2,9 @@ package com.android.brewr.model.coffee
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.android.brewr.model.journey.JourneysRepositoryFirestore
 import com.android.brewr.model.location.Location
 import com.android.brewr.model.user.User
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -17,24 +16,28 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockedStatic
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 class CoffeesRepositoryFirestoreTest {
 
-  private val mockDb: FirebaseFirestore = mock()
-  private val mockAuth: FirebaseAuth = mock()
-  private val mockUser: FirebaseUser = mock()
-  private val mockCollection: CollectionReference = mock()
-  private val mockUserDocument: DocumentReference = mock()
-  private val mockQuerySnapshot: QuerySnapshot = mock()
-  private val mockUserSnapshot: DocumentSnapshot = mock()
-  private val repository = FavoriteCoffeesRepositoryFirestore(mockDb, mockAuth)
+  @Mock private lateinit var mockDb: FirebaseFirestore
+  @Mock private lateinit var mockAuth: FirebaseAuth
+  @Mock private lateinit var mockUser: FirebaseUser
+  @Mock private lateinit var mockCollection: CollectionReference
+  @Mock private lateinit var mockUserDocument: DocumentReference
+  @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
+  @Mock private lateinit var mockUserSnapshot: DocumentSnapshot
+
+  private lateinit var repository: FavoriteCoffeesRepositoryFirestore
 
   private val coffee1 =
       Coffee(
@@ -79,6 +82,8 @@ class CoffeesRepositoryFirestoreTest {
     if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
+    repository = FavoriteCoffeesRepositoryFirestore(mockDb, mockAuth)
+
     // Arrange
     `when`(mockDb.collection("users")).thenReturn(mockCollection)
     `when`(mockCollection.document(anyString())).thenReturn(mockUserDocument)
@@ -221,33 +226,38 @@ class CoffeesRepositoryFirestoreTest {
 
   @Test
   fun `test init with user logged in and document exists`() {
-    // Mock FirebaseAuth
-    val authStateListenerCaptor = argumentCaptor<FirebaseAuth.AuthStateListener>()
-    doNothing().`when`(mockAuth).addAuthStateListener(authStateListenerCaptor.capture())
+    // Arrange
+    val firebaseAuthMock = mock<FirebaseAuth>()
+    val firebaseUserMock = mock<FirebaseUser>()
 
-    // Mock FirebaseAuth.currentUser
-    `when`(mockAuth.currentUser).thenReturn(mockUser)
+    // Mock Firebase Auth static methods
+    val firebaseAuthStaticMock: MockedStatic<FirebaseAuth> = mockStatic(FirebaseAuth::class.java)
 
-    // Mock Firestore document retrieval
-    val mockTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
-    val mockDocument: DocumentSnapshot = mock(DocumentSnapshot::class.java)
+    // Mock getting the auth instance and its behavior
+    whenever(FirebaseAuth.getInstance()).thenReturn(firebaseAuthMock)
+    whenever(firebaseAuthMock.currentUser).thenReturn(firebaseUserMock) // Simulate a signed-in
+    user
 
-    `when`(mockDb.collection("users").document(user.uid).get()).thenReturn(mockTask)
-    `when`(mockTask.addOnSuccessListener(any())).thenAnswer { invocation ->
-      (invocation.arguments[0] as OnSuccessListener<DocumentSnapshot>).onSuccess(mockDocument)
-      mockTask
+    whenever(firebaseUserMock.uid).thenReturn(user.uid)
+    whenever(firebaseUserMock.email).thenReturn(user.uid)
+
+    whenever(mockCollection.document(user.uid).get()).thenReturn(Tasks.forResult(mockUserSnapshot))
+    whenever(mockUserSnapshot.exists()).thenReturn(true)
+    val onSuccess: () -> Unit = mock()
+
+    // Create the repository
+    val repository = JourneysRepositoryFirestore(mockDb, firebaseAuthMock)
+
+    // Act
+    repository.init(onSuccess)
+
+    // Capture and simulate triggering the AuthStateListener
+    argumentCaptor<FirebaseAuth.AuthStateListener>().apply {
+      org.mockito.kotlin.verify(firebaseAuthMock).addAuthStateListener(capture())
+      firstValue.onAuthStateChanged(firebaseAuthMock)
     }
-    `when`(mockDocument.exists()).thenReturn(true)
-
-    // Call init
-    var successCalled = false
-    repository.init { successCalled = true }
-
-    // Simulate auth state change
-    authStateListenerCaptor.firstValue.onAuthStateChanged(mockAuth)
-
-    // Verify behavior
-    //        assertTrue(successCalled)
-    //        verify(mockDb.collection(anyString()).document(anyString())).get()
+    verify(mockDb.collection("users").document(coffee1.id)).get()
+    // Clean up static mock
+    firebaseAuthStaticMock.close()
   }
 }
