@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.*
 open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepository) :
     ViewModel() {
   private val favoriteCoffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  val favoriteCoffees: StateFlow<List<Coffee>> = favoriteCoffees_.asStateFlow()
+  open val favoriteCoffees: StateFlow<List<Coffee>> = favoriteCoffees_.asStateFlow()
 
   private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
   open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()

@@ -42,11 +42,11 @@ import com.android.brewr.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 fun UserPrivateListScreen(
     navigationActions: NavigationActions,
-    coffeesViewModel: CoffeesViewModel
+    coffeesViewModel: CoffeesViewModel,
+    favoriteCoffeesViewModel: FavoriteCoffeesViewModel =
+        viewModel(factory = FavoriteCoffeesViewModel.Factory)
 ) {
   var showPrivateCoffeeInfos by remember { mutableStateOf(false) }
-  val favoriteCoffeesViewModel: FavoriteCoffeesViewModel =
-      viewModel(factory = FavoriteCoffeesViewModel.Factory)
   val privateList = favoriteCoffeesViewModel.favoriteCoffees.collectAsState().value
 
   Scaffold(
