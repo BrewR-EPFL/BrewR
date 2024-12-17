@@ -49,6 +49,16 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.LightBrown
 
+/**
+ * A composable screen displaying detailed information about a selected coffee shop.
+ *
+ * This screen displays:
+ * - The coffee shop's name, image, address, rating, and operating hours.
+ * - A list of user reviews with sorting options (Best or Worst).
+ *
+ * @param coffeesViewModel The ViewModel providing the selected coffee data.
+ * @param onBack A callback invoked when the back button is pressed.
+ */
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,6 +155,17 @@ fun CoffeeInformationScreen(
       })
 }
 
+/**
+ * A composable function displaying a sorted list of reviews for a coffee shop.
+ *
+ * This function allows sorting reviews based on the selected method (e.g., Best or Worst).
+ * It displays up to three reviews in a column layout.
+ *
+ * @param reviews The list of [Review] objects to display.
+ * @param reviewSort The currently selected sorting method ("Best" or "Worst").
+ * @param reviewSorts A list of available sorting methods.
+ * @param onSortMethodChange A callback invoked when the sorting method is changed.
+ */
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
