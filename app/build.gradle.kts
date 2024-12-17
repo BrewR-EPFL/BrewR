@@ -23,11 +23,11 @@ android {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
     // Load the API key from local.properties
-    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: localProperties.getProperty("MAPS_API_KEY", "")
-    val keyPW = System.getenv("KEY_PW") ?: localProperties.getProperty("KEY_PW", "")
-    val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS", "")
-    val ksFile = System.getenv("KS_FILE") ?: localProperties.getProperty("KS_FILE", "") // KS = keystore
-    val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW", "")
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val keyPW = System.getenv("KEY_PW") ?: localProperties.getProperty("KEY_PW")
+    val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
+    val ksFile = System.getenv("KS_FILE") ?: localProperties.getProperty("KS_FILE") // KS = keystore
+    val ksPW = System.getenv("KS_PW") ?: localProperties.getProperty("KS_PW")
 
     defaultConfig {
         manifestPlaceholders += mapOf()
