@@ -26,8 +26,8 @@ interface JourneysRepository {
    * Retrieves the journeys of all users except the current user.
    *
    * @param onSuccess A lambda function that is invoked when the operation is successful. It takes a
-   * list of pairs, where each pair consists of a list of `Journey` objects and the user's UID.
-   *@param onFailure A callback function invoked with an [Exception] if retrieval fails.
+   *   list of pairs, where each pair consists of a list of `Journey` objects and the user's UID.
+   * @param onFailure A callback function invoked with an [Exception] if retrieval fails.
    */
   fun retrieveJourneysOfAllOtherUsers(
       onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
