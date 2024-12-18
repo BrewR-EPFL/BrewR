@@ -332,4 +332,33 @@ class JourneysRepositoryFirestoreTest {
     // Clean up static mock
     firebaseAuthStaticMock.close()
   }
+    @Test
+    fun `test retrieveJourneysOfAllOtherUsers success with multiple users`() {
+        // Arrange
+        val userIds = listOf("user1", "user2")
+        val mockDocuments = userIds.map { userId ->
+            val mockDocument: DocumentSnapshot = mock()
+            whenever(mockDocument.id).thenReturn(userId)
+            mockDocument
+        }
+
+        // Mock Firestore interactions
+        whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
+        whenever(mockFirebaseUser.uid).thenReturn("currentUserId")
+
+        val mockUserTask: Task<QuerySnapshot> = mock()
+        whenever(mockFirestore.collection("users")).thenReturn(mockUserCollectionReference)
+        whenever(mockUserCollectionReference.get()).thenReturn(mockUserTask)
+
+        // Mock QuerySnapshot behavior
+        `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+            val successListener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
+            whenever(mockJourneysQuerySnapshot.documents).thenReturn(mockDocuments)
+            successListener.onSuccess(mockJourneysQuerySnapshot)
+            mockUserTask // Chain the task
+        }
+        // Act
+        journeysRepository.retrieveJourneysOfAllOtherUsers(onSuccess = {}, onFailure = {})
+
+    }
 }
