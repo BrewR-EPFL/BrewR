@@ -29,6 +29,7 @@ import com.android.brewr.ui.overview.EditJourneyScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.theme.BrewRAppTheme
+import com.android.brewr.ui.userProfile.InformationAboutUsScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
 import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import com.google.firebase.Firebase
@@ -118,6 +119,7 @@ fun BrewRApp() {
       composable(Screen.USER_PRIVATE_LIST_INFOS) {
         CoffeeInformationScreen(privateCoffeesViewModel, onBack = { navigationActions.goBack() })
       }
+      composable(Screen.INFO_ABOUT_US) { InformationAboutUsScreen(navigationActions) }
     }
   }
 }

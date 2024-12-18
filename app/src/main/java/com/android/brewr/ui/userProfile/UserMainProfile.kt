@@ -18,9 +18,9 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,14 +47,14 @@ import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.ui.theme.LightBrown
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
-  val NOT_YET_IMPLEMENTED = "Feature not yet developed"
-
   val context = LocalContext.current
 
   // Collect username, userEmail, and user profile picture url from ViewModel
@@ -83,6 +83,7 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
+              Spacer(Modifier.height(10.dp))
               Row(
                   modifier = Modifier.fillMaxWidth(),
                   horizontalArrangement = Arrangement.SpaceBetween,
@@ -121,55 +122,17 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                           modifier = Modifier.size(60.dp).testTag("User Profile Photo"))
                     }
                   }
-              Spacer(Modifier.height(20.dp))
-
-              // Top part with horizontally aligned icon buttons
-              Row(
-                  modifier = Modifier.fillMaxWidth().testTag("horizontally aligned icon buttons"),
-                  horizontalArrangement = Arrangement.SpaceAround,
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(
-                      onClick = { navigationActions.navigateTo(Screen.USER_PRIVATE_LIST) },
-                      Modifier.testTag("Favorite button")) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite, contentDescription = "Preference")
-                      }
-                  Text("Favorite")
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(
-                      onClick = {
-                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
-                      },
-                      Modifier.testTag("Notification button")) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notification")
-                      }
-                  Text("Notification")
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  IconButton(
-                      onClick = {
-                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
-                      },
-                      Modifier.testTag("TBD button")) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "TBD")
-                      }
-                  Text("TBD")
-                }
-              }
-
-              Spacer(Modifier.height(20.dp))
+              Spacer(Modifier.height(60.dp))
+              ProfileMenuItem(
+                  icon = Icons.Default.Favorite,
+                  label = "My Favorites",
+                  onClick = { navigationActions.navigateTo(Screen.USER_PRIVATE_LIST) },
+                  testTag = "Favorite button")
               ProfileMenuItem(
                   icon = Icons.Default.MoreVert,
-                  label = "anything",
-                  onClick = {
-                    Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
-                  },
-                  testTag = "anything")
+                  label = "About us",
+                  onClick = { navigationActions.navigateTo(Screen.INFO_ABOUT_US) },
+                  testTag = "About us")
 
               ProfileMenuItem(
                   icon = Icons.Default.Clear,
@@ -184,6 +147,9 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                     text = { Text("Are you sure that you want to log out?") },
                     confirmButton = {
                       Button(
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  containerColor = CoffeeBrown, contentColor = LightBrown),
                           modifier = Modifier.testTag("button Yes"),
                           onClick = {
                             // sign out logic
@@ -199,6 +165,9 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
                     },
                     dismissButton = {
                       Button(
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  containerColor = CoffeeBrown, contentColor = LightBrown),
                           modifier = Modifier.testTag("button No"),
                           onClick = { showDialog = false }) {
                             Text("NO")
