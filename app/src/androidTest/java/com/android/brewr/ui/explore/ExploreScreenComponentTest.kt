@@ -30,7 +30,7 @@ class ExploreScreenComponentTest {
 
   @Test
   fun emptyCoffeeListDisplaysClosedMessage() {
-    composeTestRule.setContent { CoffeeList(coffees = emptyList(), onCoffeeClick = {}) }
+    composeTestRule.setContent { CoffeeList(coffeeShops = emptyList(), onCoffeeClick = {}) }
 
     // Assert the message for closed coffee shops is displayed
     composeTestRule

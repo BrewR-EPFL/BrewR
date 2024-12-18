@@ -11,6 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * ViewModel class for managing user data in the BrewR application.
+ *
+ * This ViewModel fetches and manages user-related information, including Gmail, username, and
+ * profile picture. It uses the provided [UserRepository] implementation to retrieve the data and
+ * updates the corresponding state flows for observation.
+ *
+ * @property repository An instance of [UserRepository] to fetch user data.
+ */
 open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   private val username_ = MutableStateFlow<String?>(null)
   val username: StateFlow<String?> = username_.asStateFlow()
@@ -46,6 +55,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     repository.getProfilePicture(onSuccess = { userProfilePicture_.value = it }, onFailure = {})
   }
 
+  /** Updates the user information by re-fetching Gmail, username, and profile picture. */
   fun updateUserInfo() {
     fetchUserGmail()
     fetchUsername()
@@ -54,6 +64,11 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   companion object {
+    /**
+     * Factory object for creating instances of [UserViewModel].
+     *
+     * This factory ensures the [UserRepositoryFirestore] instance is passed to the ViewModel.
+     */
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")

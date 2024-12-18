@@ -7,7 +7,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -37,7 +37,7 @@ import org.junit.Test
 
 const val LOCATION_PERMISSION_REQUEST_CODE = 1
 
-class FetchNearbyCoffeeShopsTest {
+class FetchNearbyCoffeeShopShopsTest {
 
   private lateinit var context: Context
   private lateinit var placesClient: PlacesClient
@@ -124,7 +124,7 @@ class FetchNearbyCoffeeShopsTest {
     // Create a mock LatLng for the current location
     val currentLocation = LatLng(40.7128, -74.0060)
 
-    var result = emptyList<Coffee>()
+    var result = emptyList<CoffeeShop>()
 
     // Call the function to fetch coffee shops
     fetchNearbyCoffeeShops(
@@ -148,7 +148,7 @@ class FetchNearbyCoffeeShopsTest {
     // Mock the PlacesClient to return the failed task
     every { placesClient.searchNearby(any()) } returns failedTask
 
-    var result = emptyList<Coffee>()
+    var result = emptyList<CoffeeShop>()
 
     // Execute the method
     fetchNearbyCoffeeShops(testScope, context, currentLocation, radius) { response ->
