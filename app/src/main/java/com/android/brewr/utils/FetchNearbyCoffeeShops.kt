@@ -1,6 +1,7 @@
 package com.android.brewr.utils
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
@@ -10,6 +11,7 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.map.Location
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.CircularBounds
@@ -270,4 +272,20 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
         Hours(day, openTime.trim(), closeTime.trim())
       } ?: emptyList()
   return listHour.ifEmpty { listOf(Hours("Undefined", "Undefined", "Undefined")) }
+}
+
+@SuppressLint("MissingPermission")
+suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
+  try {
+    val locationClient = LocationServices.getFusedLocationProviderClient(context)
+    val location = locationClient.lastLocation.await()
+    if (location != null) {
+      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
+    } else {
+      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
+    }
+  } catch (e: Exception) {
+    e.printStackTrace()
+    onSuccess(LatLng(46.5197, 6.6323))
+  }
 }

@@ -22,7 +22,7 @@ open class CoffeesViewModel : ViewModel() {
 
   // Selected coffee, i.e the coffee for the detail view
   private val selectedCoffee_Shop_ = MutableStateFlow<CoffeeShop?>(null)
-  open val selectedCoffee: StateFlow<CoffeeShop?> = selectedCoffee_Shop_.asStateFlow()
+  open val selectedCoffeeShop: StateFlow<CoffeeShop?> = selectedCoffee_Shop_.asStateFlow()
 
   /**
    * Companion object providing a factory for creating instances of [CoffeesViewModel].
@@ -46,8 +46,8 @@ open class CoffeesViewModel : ViewModel() {
   /**
    * Updates the currently selected coffee.
    *
-   * @param coffeeShop The [CoffeeShop] object to be set as the currently selected coffee. Observers of
-   *   [selectedCoffee] will receive the updated value.
+   * @param coffeeShop The [CoffeeShop] object to be set as the currently selected coffee. Observers
+   *   of [selectedCoffee] will receive the updated value.
    */
   fun selectCoffee(coffeeShop: CoffeeShop) {
     viewModelScope.launch { selectedCoffee_Shop_.value = coffeeShop }
@@ -56,8 +56,8 @@ open class CoffeesViewModel : ViewModel() {
   /**
    * Updates the list of coffees.
    *
-   * @param coffeesList A list of [CoffeeShop] objects to add to the state. Observers of [coffees] will
-   *   receive the updated list of coffees.
+   * @param coffeesList A list of [CoffeeShop] objects to add to the state. Observers of [coffees]
+   *   will receive the updated list of coffees.
    */
   fun addCoffees(coffeesList: List<CoffeeShop>) {
     viewModelScope.launch { coffees_.value = coffeesList }
