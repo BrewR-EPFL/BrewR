@@ -29,7 +29,11 @@ class JourneysRepositoryFirestore(
     return db.collection(collectionPath).document().id
   }
 
-  // Clearly ask TODO it
+  /**
+   * Initializes the repository and creates a user document if it doesn't already exist.
+   *
+   * @param onSuccess The callback to call when initialization is successful.
+   */
   override fun init(onSuccess: () -> Unit) {
     firebaseAuth.addAuthStateListener {
       val user = Firebase.auth.currentUser
@@ -259,7 +263,12 @@ class JourneysRepositoryFirestore(
       null
     }
   }
-
+  /**
+   * Retrieves the current logged-in user's UID.
+   *
+   * @return The UID of the logged-in user.
+   * @throws IllegalStateException If the user is not logged in.
+   */
   private fun getCurrentUserUid(): String {
     val user = firebaseAuth.currentUser ?: throw IllegalStateException("User not logged in")
     val uid = user.uid
