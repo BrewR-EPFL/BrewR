@@ -1,5 +1,6 @@
 package com.android.brewr.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ fun GalleryScreen(
         modifier = Modifier.fillMaxSize().padding(padding),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           items(journeys) { journey ->
+            Log.e("GalleryScreen", "journey: $journey")
             JourneyItem(journey = journey) {
               listJourneysViewModel.selectJourney(journey)
               navigationActions.navigateTo(Screen.JOURNEY_RECORD)

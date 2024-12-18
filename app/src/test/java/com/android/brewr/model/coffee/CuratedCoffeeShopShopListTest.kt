@@ -16,7 +16,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CuratedCoffeeShopListTest {
+class CuratedCoffeeShopShopListTest {
   private lateinit var context: Context
   private val testDispatcher = StandardTestDispatcher()
 
@@ -59,10 +59,10 @@ class CuratedCoffeeShopListTest {
   @Test
   fun `sortCoffeeShopsByRating handles empty list`() {
     // Create an empty list
-    val emptyCoffeeShops = emptyList<Coffee>()
+    val emptyCoffeeShopShops = emptyList<CoffeeShop>()
 
     // Sort the empty list
-    val result = sortCoffeeShopsByRating(emptyCoffeeShops)
+    val result = sortCoffeeShopsByRating(emptyCoffeeShopShops)
 
     // Verify the result is also an empty list
     assertEquals(0, result.size)
@@ -120,8 +120,8 @@ class CuratedCoffeeShopListTest {
     assertEquals("Coffee Shop 3", result[0].coffeeShopName)
   }
 
-  private fun createCoffeeShop(id: String, name: String, rating: Double): Coffee {
-    return Coffee(
+  private fun createCoffeeShop(id: String, name: String, rating: Double): CoffeeShop {
+    return CoffeeShop(
         id = id,
         coffeeShopName = name,
         location = Location(0.0, 0.0, "Test Address"),
@@ -131,8 +131,8 @@ class CuratedCoffeeShopListTest {
         imagesUrls = emptyList())
   }
 
-  private fun createCoffeeShopWithHours(id: String, name: String, hours: List<Hours>): Coffee {
-    return Coffee(
+  private fun createCoffeeShopWithHours(id: String, name: String, hours: List<Hours>): CoffeeShop {
+    return CoffeeShop(
         id = id,
         coffeeShopName = name,
         location = Location(0.0, 0.0, "Test Address"),

@@ -66,7 +66,7 @@ fun CoffeeInformationScreen(
     coffeesViewModel: CoffeesViewModel = viewModel(factory = ListJourneysViewModel.Factory),
     onBack: () -> Unit
 ) {
-  val coffee = coffeesViewModel.selectedCoffee.collectAsState().value ?: return
+  val coffee = coffeesViewModel.selectedCoffeeShop.collectAsState().value ?: return
   var reviewSort by remember { mutableStateOf("Best") }
 
   Scaffold(

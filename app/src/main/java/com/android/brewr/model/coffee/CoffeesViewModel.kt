@@ -17,12 +17,12 @@ import kotlinx.coroutines.launch
  * safety.
  */
 open class CoffeesViewModel : ViewModel() {
-  private val coffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  val coffees: StateFlow<List<Coffee>> = coffees_.asStateFlow()
+  private val coffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
+  val coffees: StateFlow<List<CoffeeShop>> = coffees_.asStateFlow()
 
   // Selected coffee, i.e the coffee for the detail view
-  private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
-  open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
+  private val selectedCoffee_Shop_ = MutableStateFlow<CoffeeShop?>(null)
+  open val selectedCoffeeShop: StateFlow<CoffeeShop?> = selectedCoffee_Shop_.asStateFlow()
 
   /**
    * Companion object providing a factory for creating instances of [CoffeesViewModel].
@@ -46,20 +46,20 @@ open class CoffeesViewModel : ViewModel() {
   /**
    * Updates the currently selected coffee.
    *
-   * @param coffee The [Coffee] object to be set as the currently selected coffee. Observers of
-   *   [selectedCoffee] will receive the updated value.
+   * @param coffeeShop The [CoffeeShop] object to be set as the currently selected coffee. Observers
+   *   of [selectedCoffee] will receive the updated value.
    */
-  fun selectCoffee(coffee: Coffee) {
-    viewModelScope.launch { selectedCoffee_.value = coffee }
+  fun selectCoffee(coffeeShop: CoffeeShop) {
+    viewModelScope.launch { selectedCoffee_Shop_.value = coffeeShop }
   }
 
   /**
    * Updates the list of coffees.
    *
-   * @param coffeesList A list of [Coffee] objects to add to the state. Observers of [coffees] will
-   *   receive the updated list of coffees.
+   * @param coffeesList A list of [CoffeeShop] objects to add to the state. Observers of [coffees]
+   *   will receive the updated list of coffees.
    */
-  fun addCoffees(coffeesList: List<Coffee>) {
+  fun addCoffees(coffeesList: List<CoffeeShop>) {
     viewModelScope.launch { coffees_.value = coffeesList }
   }
 
