@@ -32,6 +32,16 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 
+/**
+ * Displays a gallery of journey items in a staggered grid layout.
+ *
+ * This composable fetches a list of journeys from the [ListJourneysViewModel] and displays them in
+ * a grid. If no journeys are available, a placeholder text is shown.
+ *
+ * @param listJourneysViewModel The ViewModel containing journey data.
+ * @param padding Padding values for the screen layout.
+ * @param navigationActions Navigation actions for screen transitions.
+ */
 @Composable
 fun GalleryScreen(
     listJourneysViewModel: ListJourneysViewModel =
@@ -62,6 +72,15 @@ fun GalleryScreen(
   }
 }
 
+/**
+ * Represents a journey item in the gallery.
+ *
+ * This composable displays a card with an image representing the journey. Clicking on the card
+ * triggers the [onClick] callback.
+ *
+ * @param journey The [Journey] object containing journey details.
+ * @param onClick The callback function to execute when the card is clicked.
+ */
 @Composable
 fun JourneyItem(journey: Journey, onClick: () -> Unit) {
   Card(

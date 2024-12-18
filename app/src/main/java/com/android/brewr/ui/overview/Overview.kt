@@ -44,6 +44,16 @@ import com.android.brewr.utils.fetchNearbyCoffeeShops
 import com.android.brewr.utils.getCurrentLocation
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the main overview screen with two sections: Gallery and Explore.
+ *
+ * The screen fetches nearby coffee shops based on the user's location and displays either the
+ * Gallery or Explore section depending on the selected navigation tab.
+ *
+ * @param listJourneysViewModel The ViewModel for managing journey data.
+ * @param coffeesViewModel The ViewModel for managing coffee shop data.
+ * @param navigationActions Navigation actions to navigate between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -170,6 +180,14 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
   }
 }
 
+/**
+ * Displays a navigation button within the sub-navigation bar.
+ *
+ * @param text The text displayed on the button.
+ * @param isSelected Whether the button is currently selected.
+ * @param onClick Callback invoked when the button is clicked.
+ * @param modifier Modifier for styling and layout configuration.
+ */
 @Composable
 fun SubNavigationButton(
     text: String,

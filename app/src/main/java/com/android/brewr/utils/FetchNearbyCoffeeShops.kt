@@ -1,7 +1,6 @@
 package com.android.brewr.utils
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
@@ -11,7 +10,6 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.map.Location
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.CircularBounds
@@ -116,6 +114,21 @@ fun fetchCoffeeShopsByLocationQuery(
   }
 }
 
+/**
+ * Fetches a list of nearby coffee shops based on the user's current location.
+ *
+ * This function uses the Google Places API to search for coffee shops within a specified radius
+ * around the user's current location. The search results include basic information such as the
+ * coffee shop's name, location, rating, hours, and a placeholder image URL.
+ *
+ * @param scope The CoroutineScope used for launching asynchronous tasks.
+ * @param context The application context required for API initialization and permission checks.
+ * @param currentLocation The user's current location represented as a `LatLng`.
+ * @param radius The search radius in meters around the user's current location. Default is 3000
+ *   meters.
+ * @param onSuccess A callback function invoked with a list of `Coffee` objects when the operation
+ *   is successful.
+ */
 fun fetchNearbyCoffeeShops(
     scope: CoroutineScope,
     context: Context,
@@ -156,11 +169,11 @@ fun fetchNearbyCoffeeShops(
       placesClient
           .searchNearby(request)
           .addOnSuccessListener { response ->
-            val coffeeShopShops = mutableListOf<CoffeeShop>()
+            val coffeeShops = mutableListOf<CoffeeShop>()
             scope.launch {
               response.places.map { place ->
                 place.location?.let {
-                  coffeeShopShops.add(
+                  coffeeShops.add(
                       CoffeeShop(
                           id = place.id ?: "Undefined",
                           coffeeShopName = place.displayName ?: "Undefined",
@@ -183,14 +196,14 @@ fun fetchNearbyCoffeeShops(
                                   "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
                   // imagesUrls = fetchAllPhotoUris(place, placesClient)))
                 }
-                if (coffeeShopShops.isNotEmpty()) {
+                if (coffeeShops.isNotEmpty()) {
                   Log.d(
                       "PlacesAPI",
-                      "Coffee shops founded: ${coffeeShopShops.size} ${coffeeShopShops[0].coffeeShopName}")
+                      "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
                 } else {
                   Log.d("PlacesAPI", "No coffee shops found.")
                 }
-                onSuccess(coffeeShopShops)
+                onSuccess(coffeeShops)
               }
             }
           }
@@ -205,6 +218,16 @@ fun fetchNearbyCoffeeShops(
   }
 }
 
+/**
+ * Fetches the photo URI for a place using its photo metadata.
+ *
+ * This function fetches the first available photo URI for the given place using the Google Places
+ * API. If no photo metadata is available or the request fails, it returns a placeholder image URL.
+ *
+ * @param place The `Place` object containing photo metadata.
+ * @param placesClient The `PlacesClient` used to fetch photo URIs.
+ * @return A list containing the fetched photo URI or a placeholder image URL if unavailable.
+ */
 private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient): List<String> {
   val metadata = place.photoMetadatas?.get(0)
   try {
@@ -222,6 +245,15 @@ private suspend fun fetchAllPhotoUris(place: Place, placesClient: PlacesClient):
   }
 }
 
+/**
+ * Parses a list of weekday text strings into a list of `Hours` objects.
+ *
+ * Each text string typically contains a day name and the opening/closing time range. If the input
+ * is null or invalid, it returns a list with a single "Undefined" entry.
+ *
+ * @param weekdayText A list of strings representing the opening hours for each day.
+ * @return A list of `Hours` objects representing the parsed opening hours.
+ */
 private fun getHours(weekdayText: List<String>?): List<Hours> {
   val listHour =
       weekdayText?.map { dayText ->
@@ -238,20 +270,4 @@ private fun getHours(weekdayText: List<String>?): List<Hours> {
         Hours(day, openTime.trim(), closeTime.trim())
       } ?: emptyList()
   return listHour.ifEmpty { listOf(Hours("Undefined", "Undefined", "Undefined")) }
-}
-
-@SuppressLint("MissingPermission")
-suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
-  try {
-    val locationClient = LocationServices.getFusedLocationProviderClient(context)
-    val location = locationClient.lastLocation.await()
-    if (location != null) {
-      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
-    } else {
-      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
-    }
-  } catch (e: Exception) {
-    e.printStackTrace()
-    onSuccess(LatLng(46.5197, 6.6323))
-  }
 }

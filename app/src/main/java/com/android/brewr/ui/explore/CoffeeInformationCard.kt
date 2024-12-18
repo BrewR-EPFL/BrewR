@@ -26,6 +26,21 @@ import coil.request.ImageRequest
 import com.android.brewr.model.coffee.CoffeeShop
 import java.time.LocalDate
 
+/**
+ * A composable function that displays a detailed card for a coffee shop.
+ *
+ * This card includes:
+ * - An image of the coffee shop.
+ * - The coffee shop's name.
+ * - Its address.
+ * - The operating hours for the current day.
+ * - The shop's rating.
+ *
+ * The card is clickable and triggers a callback when clicked.
+ *
+ * @param coffee The [Coffee] object containing the data for the coffee shop.
+ * @param onClick The callback to invoke when the card is clicked.
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {

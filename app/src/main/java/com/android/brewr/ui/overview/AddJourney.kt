@@ -48,6 +48,22 @@ import com.android.brewr.utils.isConnectedToInternet
 import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
+/**
+ * A composable screen that allows the user to add a new journey to the app.
+ *
+ * This screen collects various journey details, including:
+ * - Image upload.
+ * - Description.
+ * - Location selection (e.g., coffee shop).
+ * - Coffee attributes (origin, brewing method, taste, and rating).
+ * - Date selection.
+ *
+ * The journey data is saved locally or uploaded to Firebase Firestore, with image handling managed
+ * through Firebase Storage.
+ *
+ * @param listJourneysViewModel The ViewModel used for managing journey-related data.
+ * @param navigationActions Navigation actions to handle screen transitions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddJourneyScreen(
