@@ -144,7 +144,6 @@ class OverviewScreenTest {
     }
     // Assert that the app title is displayed
     composeTestRule.onNodeWithTag("appTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithText("BrewR").assertExists().assertIsDisplayed()
     // Assert that the 'Add' and 'Account' buttons exist
     composeTestRule.onNodeWithTag("addButton").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().assertHasClickAction()

@@ -151,7 +151,10 @@ class E2ETest {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
           composable(EXPLORE) {
-            ExploreScreen(coffeesViewModel, sampleCoffeeShops.sortedByDescending { it.rating })
+            ExploreScreen(
+                coffeesViewModel,
+                listJourneysViewModel,
+                sampleCoffeeShops.sortedByDescending { it.rating })
           }
         }
         navigation(
