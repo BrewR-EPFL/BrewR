@@ -332,7 +332,7 @@ class JourneysRepositoryFirestore(
         }
 
         if (journeySnapshot != null && !journeySnapshot.isEmpty) {
-          val journeys = journeySnapshot.documents.mapNotNull { documentTojourney(it) }
+          val journeys = journeySnapshot.documents.mapNotNull { documentToJourney(it) }
           onSuccess(journeys)
         } else {
           onSuccess(emptyList()) // Pass an empty list if there are no documents
