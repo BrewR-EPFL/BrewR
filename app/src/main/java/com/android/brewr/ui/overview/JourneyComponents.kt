@@ -79,6 +79,14 @@ import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Displays an image box for selecting and previewing images.
+ *
+ * @param imageUri The URI of the selected image (if any).
+ * @param imageUrl The URL of the selected image (used for previews).
+ * @param onImageClick Callback when the image box is clicked.
+ * @param testTag A test tag for UI testing purposes.
+ */
 @Composable
 fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit, testTag: String) {
   Box(
@@ -98,6 +106,12 @@ fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit,
       }
 }
 
+/**
+ * Displays a text field for entering a journey description.
+ *
+ * @param description The current description text.
+ * @param onDescriptionChange Callback when the description is updated.
+ */
 @Composable
 fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -> Unit) {
   OutlinedTextField(
@@ -108,6 +122,14 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
       modifier = Modifier.fillMaxWidth().height(150.dp).testTag("inputJourneyDescription"))
 }
 
+/**
+ * Displays a row for coffee shop check options and location selection.
+ *
+ * @param isYesSelected Whether the coffee shop option is selected.
+ * @param onCheckChange Callback when the checkbox state changes.
+ * @param coffeeshopExpanded Whether the dropdown menu is expanded.
+ * @param onSelectedLocationChange Callback when the location is updated.
+ */
 @Composable
 fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
@@ -130,6 +152,12 @@ fun CoffeeShopCheckRow(
   }
 }
 
+/**
+ * Displays a row with a checkbox for selecting "At home" or "At a coffee shop".
+ *
+ * @param isYesSelected Whether the coffee shop option is selected.
+ * @param onCheckChange Callback when the checkbox state changes.
+ */
 @Composable
 fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
   Row(
@@ -148,6 +176,17 @@ fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
       }
 }
 
+/**
+ * Displays a dropdown menu for selecting a coffee shop location.
+ *
+ * Users can search for a coffee shop by typing a query. Matching location suggestions are displayed
+ * in a dropdown list. Selecting an option updates the selected location.
+ *
+ * @param locationSuggestions A list of [Location] suggestions based on the current query.
+ * @param locationQuery The current query text entered by the user.
+ * @param onSelectedLocationChange Callback to update the selected [Location].
+ * @param locationViewModel The [LocationViewModel] responsible for managing location suggestions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDropdown(
@@ -224,6 +263,12 @@ fun LocationDropdown(
       }
 }
 
+/**
+ * Displays a dropdown menu for selecting a coffee origin.
+ *
+ * @param coffeeOrigin The currently selected coffee origin.
+ * @param onCoffeeOriginChange Callback when the coffee origin is updated.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeOriginDropdownMenu(
@@ -283,6 +328,15 @@ fun CoffeeOriginDropdownMenu(
       }
 }
 
+/**
+ * Displays a selection field for choosing a brewing method.
+ *
+ * This function provides users with options to choose a brewing method using buttons. Selected
+ * options are displayed as filled buttons, while unselected options appear as outlined buttons.
+ *
+ * @param brewingMethod The currently selected brewing method as a [BrewingMethod] enum value.
+ * @param onBrewingMethodChange Callback to update the selected brewing method.
+ */
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 fun BrewingMethodField(
@@ -334,6 +388,15 @@ fun BrewingMethodField(
       }
 }
 
+/**
+ * Displays a selection field for choosing a coffee taste.
+ *
+ * This function allows users to choose a coffee taste using buttons. The selected option is
+ * highlighted for clarity, while unselected options are displayed as outlined buttons.
+ *
+ * @param coffeeTaste The currently selected coffee taste as a [CoffeeTaste] enum value.
+ * @param onCoffeeTasteChange Callback to update the selected coffee taste.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste) -> Unit) {
@@ -384,6 +447,12 @@ fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste
       }
 }
 
+/**
+ * Displays a rating field for selecting a coffee rating using stars.
+ *
+ * @param coffeeRate The currently selected coffee rate.
+ * @param onCoffeeRateChange Callback when the coffee rate is updated.
+ */
 @Composable
 fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> Unit) {
   Column(
@@ -431,6 +500,12 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
       }
 }
 
+/**
+ * Displays a date picker for selecting a date.
+ *
+ * @param date The currently selected date as a [Timestamp].
+ * @param onDateChange Callback when the date is updated.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(date: Timestamp, onDateChange: (Timestamp) -> Unit) {
