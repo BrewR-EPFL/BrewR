@@ -49,6 +49,7 @@ fun InformationAboutUsScreen(navigationActions: NavigationActions) {
               Text(
                   text =
                       "With BrewR, you can:\n" +
+                          "Sign in with google and have your own account with coffee records and coffee shops\n" +
                           "Discover Nearby Coffee Shops: Find the best spots around you using GPS and Google Maps API.\n" +
                           "Get Personalized Recommendations: Enjoy tailored suggestions based on community ratings and your preferences.\n" +
                           "Keep a Tasting Journal: Record your coffee experiences, rate your favorites, and share your journey.\n" +
