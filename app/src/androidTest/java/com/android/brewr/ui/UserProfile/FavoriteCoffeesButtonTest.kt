@@ -2,9 +2,9 @@ package com.android.brewr.ui.UserProfile
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.android.brewr.model.coffee.Coffee
-import com.android.brewr.model.coffee.FavoriteCoffeesRepository
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsRepository
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import com.android.brewr.model.map.Location
 import com.android.brewr.ui.explore.FavoriteCoffeesButton
 import org.junit.Before
@@ -17,11 +17,11 @@ class FavoriteCoffeesButtonTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockViewModel: FavoriteCoffeesViewModel
-  private lateinit var mockRepository: FavoriteCoffeesRepository
+  private lateinit var mockViewModel: FavoriteCoffeeShopsViewModel
+  private lateinit var mockRepository: FavoriteCoffeeShopsRepository
   // Create a sample Coffee object
   val coffee =
-      Coffee(
+      CoffeeShop(
           id = "1",
           coffeeShopName = "Sample Coffee Shop",
           location = Location(40.7128, 74.0060, "123 Main St"),
@@ -32,10 +32,10 @@ class FavoriteCoffeesButtonTest {
 
   @Before
   fun setUp() {
-    mockRepository = mock(FavoriteCoffeesRepository::class.java)
-    mockViewModel = FavoriteCoffeesViewModel(mockRepository)
+    mockRepository = mock(FavoriteCoffeeShopsRepository::class.java)
+    mockViewModel = FavoriteCoffeeShopsViewModel(mockRepository)
     composeTestRule.setContent {
-      FavoriteCoffeesButton(coffee = coffee, favoriteCoffeesViewModel = mockViewModel)
+      FavoriteCoffeesButton(coffee = coffee, favoriteCoffeeShopsViewModel = mockViewModel)
     }
   }
 

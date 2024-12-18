@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.coffee.CoffeeShop
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import java.time.LocalDate
 
 /**
@@ -46,8 +46,8 @@ import java.time.LocalDate
 @SuppressLint("DefaultLocale")
 @Composable
 fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
-  val favoriteCoffeesViewModel: FavoriteCoffeesViewModel =
-      viewModel(factory = FavoriteCoffeesViewModel.Factory)
+  val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel =
+      viewModel(factory = FavoriteCoffeeShopsViewModel.Factory)
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Image(
@@ -119,7 +119,7 @@ fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
                     fontSize = 16.sp,
                     modifier = Modifier.testTag("coffeeShopRating:${coffeeShop.id}"))
               }
-          FavoriteCoffeesButton(coffeeShop, favoriteCoffeesViewModel)
+          FavoriteCoffeesButton(coffeeShop, favoriteCoffeeShopsViewModel)
         }
   }
 }

@@ -8,16 +8,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.*
 
-open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepository) :
+open class FavoriteCoffeeShopsViewModel(private val repository: FavoriteCoffeeShopsRepository) :
     ViewModel() {
-  private val favoriteCoffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  open val favoriteCoffees: StateFlow<List<Coffee>> = favoriteCoffees_.asStateFlow()
+  private val favoriteCoffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
+  open val favoriteCoffees: StateFlow<List<CoffeeShop>> = favoriteCoffees_.asStateFlow()
 
-  private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
-  open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
+  private val selectedCoffee_ = MutableStateFlow<CoffeeShop?>(null)
+  open val selectedCoffee: StateFlow<CoffeeShop?> = selectedCoffee_.asStateFlow()
 
   init {
-    repository.init { getCoffees() }
+    repository.init { getCoffeeShops() }
   }
 
   // create factory
@@ -26,9 +26,9 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(FavoriteCoffeesViewModel::class.java)) {
-              return FavoriteCoffeesViewModel(
-                  FavoriteCoffeesRepositoryFirestore(
+            if (modelClass.isAssignableFrom(FavoriteCoffeeShopsViewModel::class.java)) {
+              return FavoriteCoffeeShopsViewModel(
+                  FavoriteCoffeeShopsRepositoryFirestore(
                       Firebase.firestore, FirebaseAuth.getInstance()))
                   as T
             }
@@ -38,8 +38,8 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
   }
 
   /** Gets all Coffee documents. */
-  fun getCoffees() {
-    repository.getCoffees(onSuccess = { favoriteCoffees_.value = it }, onFailure = {})
+  fun getCoffeeShops() {
+    repository.getCoffeeShops(onSuccess = { favoriteCoffees_.value = it }, onFailure = {})
   }
 
   /**
@@ -47,8 +47,8 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
    *
    * @param coffee The Coffee document to be added.
    */
-  fun addCoffee(coffee: Coffee) {
-    repository.addCoffee(coffee = coffee, onSuccess = { getCoffees() }, onFailure = {})
+  fun addCoffeeShop(coffee: CoffeeShop) {
+    repository.addCoffeeShop(coffee = coffee, onSuccess = { getCoffeeShops() }, onFailure = {})
   }
 
   /**
@@ -56,8 +56,8 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
    *
    * @param id The ID of the Coffee document to be deleted.
    */
-  fun deleteCoffeeById(id: String) {
-    repository.deleteCoffeeById(id = id, onSuccess = { getCoffees() }, onFailure = {})
+  fun deleteCoffeeShopById(id: String) {
+    repository.deleteCoffeeShopById(id = id, onSuccess = { getCoffeeShops() }, onFailure = {})
   }
 
   /**
@@ -65,7 +65,7 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
    *
    * @param coffee The Coffee document to be selected.
    */
-  fun selectCoffee(coffee: Coffee) {
+  fun selectCoffeeShop(coffee: CoffeeShop) {
     selectedCoffee_.value = coffee
   }
 
@@ -79,7 +79,7 @@ open class FavoriteCoffeesViewModel(private val repository: FavoriteCoffeesRepos
    * @param coffee The `Coffee` object to check.
    * @return A `StateFlow<Boolean>` that emits `true` if the coffee is liked, or `false` otherwise.
    */
-  fun isCoffeeLiked(coffee: Coffee): StateFlow<Boolean> {
+  fun isCoffeeShopLiked(coffee: CoffeeShop): StateFlow<Boolean> {
     return favoriteCoffees
         .map { coffeeList -> coffeeList.any { it.id == coffee.id } }
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = false)

@@ -2,9 +2,9 @@ package com.android.brewr.ui.UserProfile
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.map.Location
@@ -24,11 +24,11 @@ class UserPrivateListScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var navigationActions: NavigationActions
   private lateinit var coffeesViewModel: CoffeesViewModel
-  private val favoriteCoffeesViewModel: FavoriteCoffeesViewModel = mock()
+  private val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel = mock()
 
   // Create a sample Coffee object
   private val mockCoffee =
-      Coffee(
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -64,13 +64,13 @@ class UserPrivateListScreenTest {
     // Mock NavController
     navigationActions = mock(NavigationActions::class.java)
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    whenever(favoriteCoffeesViewModel.favoriteCoffees).thenReturn(favoriteCoffeesFlow)
+    whenever(favoriteCoffeeShopsViewModel.favoriteCoffees).thenReturn(favoriteCoffeesFlow)
   }
 
   @Test
   fun userPrivateListScreen_displaysComponents() {
     composeTestRule.setContent {
-      UserPrivateListScreen(navigationActions, coffeesViewModel, favoriteCoffeesViewModel)
+      UserPrivateListScreen(navigationActions, coffeesViewModel, favoriteCoffeeShopsViewModel)
     }
     composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()

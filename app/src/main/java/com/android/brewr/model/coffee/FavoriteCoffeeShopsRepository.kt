@@ -7,7 +7,7 @@ package com.android.brewr.model.coffee
  * such as initialization, fetching, adding, and deleting coffee entries. It abstracts the data
  * source and provides a contract for implementations to interact with favorite coffee storage.
  */
-interface FavoriteCoffeesRepository {
+interface FavoriteCoffeeShopsRepository {
 
   /**
    * Initializes the repository.
@@ -31,7 +31,7 @@ interface FavoriteCoffeesRepository {
    *   successful.
    * @param onFailure Callback invoked with an exception if the operation fails.
    */
-  fun getCoffees(onSuccess: (List<Coffee>) -> Unit, onFailure: (Exception) -> Unit)
+  fun getCoffeeShops(onSuccess: (List<CoffeeShop>) -> Unit, onFailure: (Exception) -> Unit)
 
   /**
    * Adds a coffee to the list of favorites.
@@ -44,7 +44,7 @@ interface FavoriteCoffeesRepository {
    * @param onSuccess Callback invoked when the operation is successful.
    * @param onFailure Callback invoked with an exception if the operation fails.
    */
-  fun addCoffee(coffee: Coffee, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun addCoffeeShop(coffee: CoffeeShop, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   /**
    * Deletes a coffee from the list of favorites by its ID.
@@ -57,5 +57,5 @@ interface FavoriteCoffeesRepository {
    * @param onSuccess Callback invoked when the operation is successful.
    * @param onFailure Callback invoked with an exception if the operation fails.
    */
-  fun deleteCoffeeById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun deleteCoffeeShopById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }

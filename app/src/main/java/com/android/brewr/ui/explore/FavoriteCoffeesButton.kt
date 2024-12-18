@@ -11,8 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import com.android.brewr.model.coffee.Coffee
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 
 /**
  * A composable button to like or unlike a coffee shop.
@@ -24,22 +24,25 @@ import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
  * the current state of the coffee.
  *
  * @param coffee The `Coffee` object representing the coffee shop to be liked or unliked.
- * @param favoriteCoffeesViewModel The `FavoriteCoffeesViewModel` used to manage the favorite coffee
- *   shops.
+ * @param favoriteCoffeeShopsViewModel The `FavoriteCoffeesViewModel` used to manage the favorite
+ *   coffee shops.
  */
 @Composable
-fun FavoriteCoffeesButton(coffee: Coffee, favoriteCoffeesViewModel: FavoriteCoffeesViewModel) {
+fun FavoriteCoffeesButton(
+    coffee: CoffeeShop,
+    favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel
+) {
 
   // Observe the isInList result dynamically
-  val isLiked by favoriteCoffeesViewModel.isCoffeeLiked(coffee).collectAsState()
+  val isLiked by favoriteCoffeeShopsViewModel.isCoffeeShopLiked(coffee).collectAsState()
 
   IconButton(
       modifier = Modifier.testTag("likedButton"),
       onClick = {
         if (isLiked) {
-          favoriteCoffeesViewModel.deleteCoffeeById(coffee.id)
+          favoriteCoffeeShopsViewModel.deleteCoffeeShopById(coffee.id)
         } else {
-          favoriteCoffeesViewModel.addCoffee(coffee)
+          favoriteCoffeeShopsViewModel.addCoffeeShop(coffee)
         }
       }) {
         Icon(

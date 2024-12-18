@@ -37,10 +37,10 @@ class CoffeesRepositoryFirestoreTest {
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
   @Mock private lateinit var mockUserSnapshot: DocumentSnapshot
 
-  private lateinit var repository: FavoriteCoffeesRepositoryFirestore
+  private lateinit var repository: FavoriteCoffeeShopsRepositoryFirestore
 
   private val coffee1 =
-      Coffee(
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -82,7 +82,7 @@ class CoffeesRepositoryFirestoreTest {
     if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
-    repository = FavoriteCoffeesRepositoryFirestore(mockDb, mockAuth)
+    repository = FavoriteCoffeeShopsRepositoryFirestore(mockDb, mockAuth)
 
     // Arrange
     `when`(mockDb.collection("users")).thenReturn(mockCollection)
@@ -106,8 +106,8 @@ class CoffeesRepositoryFirestoreTest {
 
     `when`(mockUserSnapshot.get("coffees")).thenReturn(emptyList<String>())
 
-    var result: List<Coffee>? = null
-    repository.getCoffees(onSuccess = { result = it }, onFailure = { throw it })
+    var result: List<CoffeeShop>? = null
+    repository.getCoffeeShops(onSuccess = { result = it }, onFailure = { throw it })
 
     // Act
     userListenerCaptor.firstValue.onEvent(mockUserSnapshot, null)
@@ -163,8 +163,8 @@ class CoffeesRepositoryFirestoreTest {
             listOf(mapOf("authorName" to "John", "review" to "Great coffee!", "rating" to 5.0)))
     `when`(mockCoffeeDocument1.get("imagesUrls")).thenReturn(emptyList<String>())
 
-    var result: List<Coffee>? = null
-    repository.getCoffees(onSuccess = { result = it }, onFailure = { throw it })
+    var result: List<CoffeeShop>? = null
+    repository.getCoffeeShops(onSuccess = { result = it }, onFailure = { throw it })
 
     // Act
     userListenerCaptor.firstValue.onEvent(mockUserSnapshot, null)
@@ -187,7 +187,7 @@ class CoffeesRepositoryFirestoreTest {
     `when`(mockBatch.set(mockCollection.document(eq(coffee1.id)), coffee1)).thenReturn(mockBatch)
     `when`(mockBatch.commit()).thenReturn(Tasks.forResult(null)) // Simulate success
 
-    repository.addCoffee(
+    repository.addCoffeeShop(
         coffee1, onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
 
     // Verify batch operations were called
@@ -212,7 +212,7 @@ class CoffeesRepositoryFirestoreTest {
     `when`(mockBatch.commit()).thenReturn(Tasks.forResult(null))
 
     // Call deleteJourneyById
-    repository.deleteCoffeeById(
+    repository.deleteCoffeeShopById(
         coffee1.id, onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
 
     shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete

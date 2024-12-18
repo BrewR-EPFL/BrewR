@@ -18,14 +18,14 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class FavoriteCoffeesViewModelTest {
-  private lateinit var favoriteCoffeesViewModel: FavoriteCoffeesViewModel
-  private lateinit var mockRepository: FavoriteCoffeesRepository
+class FavoriteCoffeeShopsViewModelTest {
+  private lateinit var favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel
+  private lateinit var mockRepository: FavoriteCoffeeShopsRepository
   private val testDispatcher = StandardTestDispatcher()
 
   // Create a sample Coffee object
-  private val coffee =
-      Coffee(
+  private val coffeeShop =
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -57,8 +57,8 @@ class FavoriteCoffeesViewModelTest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
-    mockRepository = mock(FavoriteCoffeesRepository::class.java)
-    favoriteCoffeesViewModel = FavoriteCoffeesViewModel(mockRepository)
+    mockRepository = mock(FavoriteCoffeeShopsRepository::class.java)
+    favoriteCoffeeShopsViewModel = FavoriteCoffeeShopsViewModel(mockRepository)
     Dispatchers.setMain(testDispatcher)
   }
 
@@ -69,34 +69,34 @@ class FavoriteCoffeesViewModelTest {
   }
 
   @Test
-  fun getCoffeesTest() {
-    favoriteCoffeesViewModel.getCoffees()
-    verify(mockRepository).getCoffees(any(), any())
+  fun getCoffeeShopsTest() {
+    favoriteCoffeeShopsViewModel.getCoffeeShops()
+    verify(mockRepository).getCoffeeShops(any(), any())
   }
 
   @Test
-  fun addCoffeeTest() {
-    favoriteCoffeesViewModel.addCoffee(coffee)
-    verify(mockRepository).addCoffee(any(), any(), any())
+  fun addCoffeeShopTest() {
+    favoriteCoffeeShopsViewModel.addCoffeeShop(coffeeShop)
+    verify(mockRepository).addCoffeeShop(any(), any(), any())
   }
 
   @Test
-  fun deleteCoffeeByIdTest() {
-    favoriteCoffeesViewModel.deleteCoffeeById(coffee.id)
-    verify(mockRepository).deleteCoffeeById(eq(coffee.id), any(), any())
+  fun deleteCoffeeShopByIdTest() {
+    favoriteCoffeeShopsViewModel.deleteCoffeeShopById(coffeeShop.id)
+    verify(mockRepository).deleteCoffeeShopById(eq(coffeeShop.id), any(), any())
   }
 
   @Test
-  fun selectCoffeeTest() {
-    favoriteCoffeesViewModel.selectCoffee(coffee)
-    val selected = favoriteCoffeesViewModel.selectedCoffee.value
-    assertEquals(coffee, selected)
+  fun selectCoffeeShopTest() {
+    favoriteCoffeeShopsViewModel.selectCoffeeShop(coffeeShop)
+    val selected = favoriteCoffeeShopsViewModel.selectedCoffee.value
+    assertEquals(coffeeShop, selected)
   }
 
   @Test
   fun isLikedButtonTest() = runBlocking {
     val coffee2 =
-        Coffee(
+        CoffeeShop(
             id = "2",
             coffeeShopName = "Sample Coffee Shop",
             location = Location(40.7128, 74.0060, "123 Main St"),
@@ -104,14 +104,14 @@ class FavoriteCoffeesViewModelTest {
             hours = emptyList(),
             reviews = null,
             imagesUrls = emptyList())
-    whenever(mockRepository.getCoffees(any(), any())).thenAnswer {
-      (it.arguments[0] as (List<Coffee>) -> Unit).invoke(listOf(coffee))
+    whenever(mockRepository.getCoffeeShops(any(), any())).thenAnswer {
+      (it.arguments[0] as (List<CoffeeShop>) -> Unit).invoke(listOf(coffeeShop))
     }
 
-    favoriteCoffeesViewModel.getCoffees() // This updates the favoriteCoffees list
+    favoriteCoffeeShopsViewModel.getCoffeeShops() // This updates the favoriteCoffees list
 
     // Act
-    val result = favoriteCoffeesViewModel.isCoffeeLiked(coffee2).first()
+    val result = favoriteCoffeeShopsViewModel.isCoffeeShopLiked(coffee2).first()
 
     // Assert
     assert(!result)

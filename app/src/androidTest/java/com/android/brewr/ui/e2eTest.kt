@@ -25,7 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.BrewingMethod
@@ -72,7 +72,7 @@ class E2ETest {
   @get:Rule
   val coarseLocationPermissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
-  private val favoriteCoffeesViewModel: FavoriteCoffeesViewModel = mock()
+  private val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel = mock()
 
   private lateinit var journeyRepositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
@@ -151,7 +151,7 @@ class E2ETest {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
         }
-    whenever(favoriteCoffeesViewModel.favoriteCoffees).thenReturn(favoriteCoffeesFlow)
+    whenever(favoriteCoffeeShopsViewModel.favoriteCoffees).thenReturn(favoriteCoffeesFlow)
     composeTestRule.setContent {
       navController = rememberNavController()
       navigationActions = NavigationActions(navController)
@@ -192,7 +192,7 @@ class E2ETest {
         ) {
           composable(Screen.USER_PRIVATE_LIST) {
             UserPrivateListScreen(
-                navigationActions, privateCoffeesViewModel, favoriteCoffeesViewModel)
+                navigationActions, privateCoffeesViewModel, favoriteCoffeeShopsViewModel)
           }
           composable(Screen.USER_PRIVATE_LIST_INFOS) {
             CoffeeInformationScreen(

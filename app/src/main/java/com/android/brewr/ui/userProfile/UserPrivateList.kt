@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.model.coffee.CoffeesViewModel
-import com.android.brewr.model.coffee.FavoriteCoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import com.android.brewr.ui.explore.CoffeeList
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
@@ -43,11 +43,11 @@ import com.android.brewr.ui.navigation.Screen
 fun UserPrivateListScreen(
     navigationActions: NavigationActions,
     coffeesViewModel: CoffeesViewModel,
-    favoriteCoffeesViewModel: FavoriteCoffeesViewModel =
-        viewModel(factory = FavoriteCoffeesViewModel.Factory)
+    favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel =
+        viewModel(factory = FavoriteCoffeeShopsViewModel.Factory)
 ) {
   var showPrivateCoffeeInfos by remember { mutableStateOf(false) }
-  val privateList = favoriteCoffeesViewModel.favoriteCoffees.collectAsState().value
+  val privateList = favoriteCoffeeShopsViewModel.favoriteCoffees.collectAsState().value
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("UserPrivateListScreen"),

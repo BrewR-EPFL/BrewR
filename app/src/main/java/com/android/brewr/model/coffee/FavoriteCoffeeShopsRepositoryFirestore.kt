@@ -9,10 +9,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-class FavoriteCoffeesRepositoryFirestore(
+class FavoriteCoffeeShopsRepositoryFirestore(
     private val db: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth
-) : FavoriteCoffeesRepository {
+) : FavoriteCoffeeShopsRepository {
   private val collectionPath = "coffees"
   private val userPath = "users"
   private var currentUserUid = ""
@@ -62,7 +62,10 @@ class FavoriteCoffeesRepositoryFirestore(
    * @param onFailure A callback function invoked with an `Exception` if an error occurs during the
    *   operation.
    */
-  override fun getCoffees(onSuccess: (List<Coffee>) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getCoffeeShops(
+      onSuccess: (List<CoffeeShop>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     db.collection(userPath).document(getCurrentUserUid()).addSnapshotListener {
         userSnapshot,
         userError ->
@@ -111,7 +114,11 @@ class FavoriteCoffeesRepositoryFirestore(
    * @param onSuccess A callback function invoked when the coffee is successfully added.
    * @param onFailure A callback function invoked with an `Exception` if an error occurs.
    */
-  override fun addCoffee(coffee: Coffee, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  override fun addCoffeeShop(
+      coffee: CoffeeShop,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     val batch = db.batch()
     batch.update(
         db.collection(userPath).document(getCurrentUserUid()),
@@ -136,7 +143,11 @@ class FavoriteCoffeesRepositoryFirestore(
    * @param onSuccess A callback function invoked when the coffee ID is successfully removed.
    * @param onFailure A callback function invoked with an `Exception` if an error occurs.
    */
-  override fun deleteCoffeeById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  override fun deleteCoffeeShopById(
+      id: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     val batch = db.batch()
     val userRef = db.collection("users").document(getCurrentUserUid())
     batch.update(userRef, "coffees", FieldValue.arrayRemove(id))
@@ -171,7 +182,7 @@ class FavoriteCoffeesRepositoryFirestore(
    * @param document The Firestore document snapshot to be converted.
    * @return A `Coffee` object if the conversion is successful, or `null` if an error occurs.
    */
-  private fun documentToCoffee(document: DocumentSnapshot): Coffee? {
+  private fun documentToCoffee(document: DocumentSnapshot): CoffeeShop? {
     return try {
       val id = document.id
       val coffeeShopName = document.getString("coffeeShopName") ?: return null
@@ -208,7 +219,7 @@ class FavoriteCoffeesRepositoryFirestore(
           }
       val imagesUrls = document.get("imagesUrls") as? List<String> ?: emptyList()
 
-      Coffee(id, coffeeShopName, location, rating, hoursList, reviewsList, imagesUrls)
+      CoffeeShop(id, coffeeShopName, location, rating, hoursList, reviewsList, imagesUrls)
     } catch (e: Exception) {
       Log.e("CoffeesRepositoryFirestore", "Error converting document to Coffee", e)
       null
