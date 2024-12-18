@@ -82,11 +82,18 @@ class E2ETest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "2",
+                  "Coffee page",
+                  Location(
+                      46.5183076,
+                      6.6338096,
+                      "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                  listOf(Review("Lei", "good", 5.0)),
+                  listOf("test.jpg")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -97,8 +104,7 @@ class E2ETest {
           CoffeeShop(
               "1",
               "Coffee1",
-              com.android.brewr.model.location.Location(
-                  latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+              Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
               4.5,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Lei", "good", 5.0)),
@@ -106,8 +112,7 @@ class E2ETest {
           CoffeeShop(
               "2",
               "Coffee2",
-              com.android.brewr.model.location.Location(
-                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
+              Location(latitude = 47.5228, longitude = 6.8385, name = "Lausanne 2"),
               5.0,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Jaeyi", "perfect", 5.0)),

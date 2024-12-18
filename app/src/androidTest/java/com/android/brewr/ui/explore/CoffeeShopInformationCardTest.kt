@@ -11,7 +11,7 @@ import androidx.test.uiautomator.UiSelector
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import java.time.LocalDate
@@ -37,7 +37,7 @@ class CoffeeShopInformationCardTest {
           Location(
               latitude = 48.87847905807652,
               longitude = 2.3562626423266946,
-              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
+              name = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
           rating = 4.9,
           hours =
               listOf(
@@ -79,7 +79,7 @@ class CoffeeShopInformationCardTest {
     composeTestRule
         .onNodeWithTag("coffeeShopAddress:${mockCoffeeShop.id}")
         .assertIsDisplayed()
-        .assertTextEquals("Address: " + mockCoffeeShop.location.address)
+        .assertTextEquals("Address: " + mockCoffeeShop.location.name)
     composeTestRule
         .onNodeWithTag("coffeeShopHours:${mockCoffeeShop.id}")
         .assertIsDisplayed()

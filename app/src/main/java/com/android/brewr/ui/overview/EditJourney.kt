@@ -26,9 +26,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,7 +55,9 @@ fun EditJourneyScreen(
   val imageUrl by remember { mutableStateOf(task.imageUrl) }
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf(task.description) }
-  var selectedLocation by remember { mutableStateOf(task.location) }
+  var selectedCoffeeShop by remember { mutableStateOf(task.coffeeShop) }
+  val scope = rememberCoroutineScope()
+  val context = LocalContext.current
   var coffeeOrigin by remember { mutableStateOf(task.coffeeOrigin) }
   var brewingMethod by remember { mutableStateOf(task.brewingMethod) }
   var coffeeTaste by remember { mutableStateOf(task.coffeeTaste) }
@@ -61,7 +65,7 @@ fun EditJourneyScreen(
   val date by remember { mutableStateOf(task.date) }
 
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(selectedLocation.name != "At home") }
+  var isYesSelected by remember { mutableStateOf(selectedCoffeeShop != null) }
   val getImageLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
@@ -123,8 +127,10 @@ fun EditJourneyScreen(
                     isYesSelected = !isYesSelected
                     expanded = isYesSelected
                   },
-                  coffeeshopExpanded = expanded,
-                  onSelectedLocationChange = { selectedLocation = it })
+                  coffeeShopExpanded = expanded,
+                  onSelectedCoffeeShopChange = { selectedCoffeeShop = it },
+                  scope = scope,
+                  context = context)
 
               // Coffee Origin Dropdown Menu
               CoffeeOriginDropdownMenu(
@@ -161,7 +167,7 @@ fun EditJourneyScreen(
                             uid = uid,
                             imageUrl = finalImageUrl,
                             description = description,
-                            location = selectedLocation,
+                            coffeeShop = selectedCoffeeShop,
                             coffeeOrigin = coffeeOrigin,
                             brewingMethod = brewingMethod,
                             coffeeTaste = coffeeTaste,

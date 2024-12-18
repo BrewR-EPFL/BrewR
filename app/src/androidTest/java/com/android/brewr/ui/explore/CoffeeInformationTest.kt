@@ -14,7 +14,7 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
@@ -42,7 +42,7 @@ class CoffeeShopInformationScreenTest {
           Location(
               latitude = 48.87847905807652,
               longitude = 2.3562626423266946,
-              address = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
+              name = "147 Rue du Faubourg Saint-Denis, 75010 Paris, France"),
           rating = 4.9,
           hours =
               listOf(
@@ -94,7 +94,7 @@ class CoffeeShopInformationScreenTest {
     composeTestRule
         .onNodeWithTag("coffeeShopAddress")
         .assertIsDisplayed()
-        .assertTextEquals(mockCoffeeShop.location.address)
+        .assertTextEquals(mockCoffeeShop.location.name)
     composeTestRule
         .onNodeWithTag(
             "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")

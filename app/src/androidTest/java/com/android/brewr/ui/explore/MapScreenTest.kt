@@ -10,7 +10,7 @@ import androidx.test.uiautomator.UiSelector
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -35,7 +35,7 @@ class MapScreenTest {
             CoffeeShop(
                 "1",
                 "Starbucks",
-                Location(latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+                Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
                 4.5,
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
@@ -43,7 +43,7 @@ class MapScreenTest {
             CoffeeShop(
                 "2",
                 "McDonald's",
-                Location(latitude = 46.5228, longitude = 6.7285, address = "Lausanne 1"),
+                Location(latitude = 46.5228, longitude = 6.7285, name = "Lausanne 1"),
                 4.5,
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
@@ -51,7 +51,7 @@ class MapScreenTest {
             CoffeeShop(
                 "3",
                 "default",
-                Location(latitude = 46.5228, longitude = 6.7285, address = "Lausanne 1"),
+                Location(latitude = 46.5228, longitude = 6.7285, name = "Lausanne 1"),
                 4.5,
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),

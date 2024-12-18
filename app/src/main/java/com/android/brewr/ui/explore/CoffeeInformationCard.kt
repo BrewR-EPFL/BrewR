@@ -61,7 +61,7 @@ fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
                   buildAnnotatedString1 {
                     append("Address: ")
                     addStyle(SpanStyle(fontWeight = FontWeight.Bold), 0, "Address: ".length)
-                    append(coffeeShop.location.address)
+                    append(coffeeShop.location.name)
                   },
               fontSize = 16.sp,
               modifier = Modifier.testTag("coffeeShopAddress:${coffeeShop.id}"))

@@ -1,13 +1,13 @@
 package com.android.brewr.model.journey
 
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.coffee.CoffeeShop
 import com.google.firebase.Timestamp
 
 data class Journey(
     val uid: String,
     val imageUrl: String,
     val description: String,
-    val location: Location,
+    val coffeeShop: CoffeeShop?,
     val coffeeOrigin: CoffeeOrigin,
     val brewingMethod: BrewingMethod,
     val coffeeTaste: CoffeeTaste,

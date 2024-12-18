@@ -1,6 +1,6 @@
 package com.android.brewr.model.coffee
 
-import com.android.brewr.model.location.Location
+import com.android.brewr.model.map.Location
 
 data class CoffeeShop(
     val id: String,

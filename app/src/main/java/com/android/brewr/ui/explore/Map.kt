@@ -49,18 +49,18 @@ fun MapScreen(coffeeShops: List<CoffeeShop>) {
               coffeeShops.forEach { coffee ->
                 Log.d(
                     "MapScreen",
-                    "Adding marker for ${coffee.location.address} at (${coffee.location.latitude}, ${coffee.location.longitude})")
+                    "Adding marker for ${coffee.location.name} at (${coffee.location.latitude}, ${coffee.location.longitude})")
                 val markerIcon = getMarkerIcon(coffee.coffeeShopName)
                 Marker(
                     state =
                         remember {
                           MarkerState(
                               position =
-                                  LatLng(coffee.location.latitude, coffee.location.longitude))
+                                  LatLng(coffee.location.latitude!!, coffee.location.longitude!!))
                         },
                     title = coffee.coffeeShopName,
                     icon = markerIcon,
-                    snippet = "Address: ${coffee.location.address}")
+                    snippet = "Address: ${coffee.location.name}")
               }
 
               userLocation?.let {
