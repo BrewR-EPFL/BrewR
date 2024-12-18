@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
@@ -47,8 +47,8 @@ fun UserPrivateListScreen(
 ) {
   var showPrivateCoffeeInfos by remember { mutableStateOf(false) }
 
-  val mockCoffee =
-      Coffee(
+  val mockCoffeeShop =
+      CoffeeShop(
           "1",
           coffeeShopName = "Café tranquille",
           Location(
@@ -77,7 +77,7 @@ fun UserPrivateListScreen(
               listOf(
                   "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F2023-09-29.jpg?alt=media&token=eaaa9dbf-f402-4d12-b5ac-7c5589231a35"))
   // To be changed later with a get user private list function
-  val privateList = listOf(mockCoffee)
+  val privateList = listOf(mockCoffeeShop)
 
   coffeesViewModel.addCoffees(privateList)
   Scaffold(
@@ -102,7 +102,7 @@ fun UserPrivateListScreen(
                 Modifier.fillMaxSize().testTag("privateList").padding(16.dp).padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               if (!showPrivateCoffeeInfos) {
-                CoffeeList(listOf(mockCoffee)) {
+                CoffeeList(listOf(mockCoffeeShop)) {
                   coffeesViewModel.selectCoffee(it)
                   showPrivateCoffeeInfos = true
                 }

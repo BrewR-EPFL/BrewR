@@ -14,7 +14,7 @@ import com.android.brewr.model.map.Location
  * @property reviews An optional list of [Review] objects containing user reviews.
  * @property imagesUrls A list of image URLs showcasing the coffee shop.
  */
-data class Coffee(
+data class CoffeeShop(
     val id: String,
     val coffeeShopName: String,
     val location: Location,

@@ -2,7 +2,6 @@ package com.android.brewr.ui.overview
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.R
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
@@ -42,10 +41,8 @@ import com.android.brewr.ui.navigation.Screen
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
+import com.android.brewr.utils.getCurrentLocation
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 /**
  * Displays the main overview screen with two sections: Gallery and Explore.
@@ -68,7 +65,7 @@ fun OverviewScreen(
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
+  var curatedCoffeeShops by rememberSaveable { mutableStateOf<List<CoffeeShop>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -114,7 +111,7 @@ fun OverviewScreen(
                     coffeesViewModel.addCoffees(coffees)
 
                     // Sort fetched coffee shops by rating
-                    curatedCoffees = sortCoffeeShopsByRating(coffees)
+                    curatedCoffeeShops = sortCoffeeShopsByRating(coffees)
                   })
             })
       }
@@ -161,17 +158,11 @@ fun OverviewScreen(
         if (currentSection == "Gallery") {
           GalleryScreen(listJourneysViewModel, pd, navigationActions)
         } else {
-          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffees)
+          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
         }
       })
 }
 
-/**
- * Displays the sub-navigation bar for switching between Gallery and Explore sections.
- *
- * @param currentSection The currently selected section.
- * @param onSectionChange Callback invoked when the user selects a new section.
- */
 @Composable
 fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) {
   Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp)) {
@@ -213,29 +204,4 @@ fun SubNavigationButton(
               .background(if (isSelected) CoffeeBrown else LightBrown, RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
-}
-
-/**
- * Retrieves the current device location.
- *
- * This function uses the fused location provider to obtain the user's current latitude and
- * longitude. If no location is found, a fallback default location is used.
- *
- * @param context The current [Context] used for accessing location services.
- * @param onSuccess Callback invoked with the retrieved [LatLng] location.
- */
-@SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
-  try {
-    val locationClient = LocationServices.getFusedLocationProviderClient(context)
-    val location = locationClient.lastLocation.await()
-    if (location != null) {
-      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
-    } else {
-      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
-    }
-  } catch (e: Exception) {
-    e.printStackTrace()
-    onSuccess(LatLng(46.5197, 6.6323))
-  }
 }

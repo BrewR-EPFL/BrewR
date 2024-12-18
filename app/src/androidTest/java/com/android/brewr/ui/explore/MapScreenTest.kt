@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.BrewingMethod
@@ -34,27 +34,36 @@ class MapScreenTest {
 
   private lateinit var uiDevice: UiDevice
   private lateinit var listJourneysViewModel: ListJourneysViewModel
-  private lateinit var sampleCoffees: List<Coffee>
+  private lateinit var sampleCoffeeShops: List<CoffeeShop>
   private lateinit var sampleJourneys: List<Journey>
 
   @Before
   fun setUp() {
     // Initialize UiDevice instance
     uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-    listJourneysViewModel = ListJourneysViewModel(mock(JourneysRepository::class.java))
 
-    // Sample journeys and coffees for testing
+    val mockJourneysRepository = mock(JourneysRepository::class.java)
+
+    listJourneysViewModel = ListJourneysViewModel(mockJourneysRepository)
+
     sampleJourneys =
         listOf(
             Journey(
                 "1",
                 "",
                 "Display as a saved on the map",
-                Location(
-                    latitude = 37.4305087,
-                    longitude = -122.0854755,
-                    name =
-                        "Shoreline Golf Links, 2940, North Shoreline Boulevard, Mountain View, Santa Clara County, California, 94043, United States"),
+                CoffeeShop(
+                    "1",
+                    "Starbucks",
+                    Location(
+                        latitude = 37.4305087,
+                        longitude = -122.0854755,
+                        name =
+                            "Shoreline Golf Links, 2940, North Shoreline Boulevard, Mountain View, Santa Clara County, California, 94043, United States"),
+                    4.5,
+                    listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                    listOf(Review("Lei", "good", 5.0)),
+                    listOf("test.jpg")),
                 CoffeeOrigin.DEFAULT,
                 BrewingMethod.DEFAULT,
                 CoffeeTaste.DEFAULT,
@@ -64,7 +73,7 @@ class MapScreenTest {
                 "2",
                 "",
                 "Home Journey",
-                Location(),
+                null,
                 CoffeeOrigin.DEFAULT,
                 BrewingMethod.DEFAULT,
                 CoffeeTaste.DEFAULT,
@@ -72,9 +81,9 @@ class MapScreenTest {
                 Timestamp.now()))
     sampleJourneys.forEach { listJourneysViewModel.addJourney(it) }
 
-    sampleCoffees =
+    sampleCoffeeShops =
         listOf(
-            Coffee(
+            CoffeeShop(
                 "1",
                 "Starbucks",
                 Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
@@ -82,7 +91,7 @@ class MapScreenTest {
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
                 listOf("test.jpg")),
-            Coffee(
+            CoffeeShop(
                 "2",
                 "Shoreline Golf Links",
                 Location(
@@ -91,7 +100,7 @@ class MapScreenTest {
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Pablo", "Awesome", 5.0)),
                 listOf("test.jpg")),
-            Coffee(
+            CoffeeShop(
                 "3",
                 "McDonald's",
                 Location(latitude = 46.5228, longitude = 6.7285, name = "Lausanne 1"),
@@ -99,7 +108,7 @@ class MapScreenTest {
                 listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
                 listOf(Review("Lei", "good", 5.0)),
                 listOf("test.jpg")),
-            Coffee(
+            CoffeeShop(
                 "4",
                 "default",
                 Location(latitude = 46.5228, longitude = 6.7285, name = "Lausanne 1"),
@@ -114,20 +123,20 @@ class MapScreenTest {
   @Test
   fun mapScreen_IsDisplayedProperly() {
     sampleJourneys.forEach { listJourneysViewModel.addJourney(it) }
-    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    composeTestRule.setContent { MapScreen(sampleCoffeeShops, listJourneysViewModel) }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
   @Test
   fun userLocationMarker_IsDisplayedWhenAvailable() {
-    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    composeTestRule.setContent { MapScreen(sampleCoffeeShops, listJourneysViewModel) }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
   @Test
   fun customIcons_AreAssignedToMarkers() {
     composeTestRule.setContent {
-      sampleCoffees.forEach { coffee ->
+      sampleCoffeeShops.forEach { coffee ->
         val icon = getMarkerIcon(coffee, listJourneysViewModel)
         assertNotNull(icon)
       }
@@ -142,7 +151,7 @@ class MapScreenTest {
 
   @Test
   fun locationPermission_IsHandledCorrectly() {
-    composeTestRule.setContent { MapScreen(sampleCoffees, listJourneysViewModel) }
+    composeTestRule.setContent { MapScreen(sampleCoffeeShops, listJourneysViewModel) }
     val allowButton = uiDevice.findObject(UiSelector().text("While using the app"))
     if (allowButton.exists()) {
       allowButton.click()
@@ -152,17 +161,19 @@ class MapScreenTest {
 
   @Test
   fun isJourney_IsJourneyReturnCorrectly() {
-    assertTrue(isJourney(sampleCoffees[1], sampleJourneys))
-    assertFalse(isJourney(sampleCoffees[0], sampleJourneys))
+    assertTrue(isJourney(sampleCoffeeShops[1], sampleJourneys))
+    assertFalse(isJourney(sampleCoffeeShops[0], sampleJourneys))
   }
 
   private fun grantLocationPermission() {
+    // Grant location permission automatically for the test
     repeat(10) { // Try up to 10 times with a delay
       val allowButton = uiDevice.findObject(UiSelector().text("While using the app"))
       if (allowButton.exists()) {
         allowButton.click()
         return
       }
+      // Short delay between checks
       Thread.sleep(500)
     }
   }

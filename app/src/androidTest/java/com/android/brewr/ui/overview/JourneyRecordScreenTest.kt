@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.*
 import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
@@ -39,11 +40,19 @@ class JourneyRecordScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2F448195f9-c8bc-4bdc-a8da-c7691c053b16?alt=media&token=bcc21fec-04d4-4dda-8972-be949c29bd23",
           description = "Great coffee",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "2",
+                  "Coffee page",
+                  Location(
+                      latitude = 46.5183076,
+                      longitude = 6.6338096,
+                      name =
+                          "Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(),
+                  listOf(),
+                  listOf("")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
           coffeeTaste = CoffeeTaste.SWEET,
@@ -150,11 +159,7 @@ class JourneyRecordScreenTest {
             uid = "",
             imageUrl = "",
             description = "",
-            location =
-                Location(
-                    46.5183076,
-                    6.6338096,
-                    "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+            coffeeShop = null,
             coffeeOrigin = CoffeeOrigin.BRAZIL,
             brewingMethod = BrewingMethod.ESPRESSO_MACHINE,
             coffeeTaste = CoffeeTaste.SWEET,

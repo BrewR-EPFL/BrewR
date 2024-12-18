@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,12 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.R
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
-import com.android.brewr.utils.isConnectedToInternet
 import com.android.brewr.utils.updatePicture
 
 /**
@@ -69,10 +68,12 @@ fun EditJourneyScreen(
           ?: return Text(text = "No Journey selected. Should not happen", color = Color.Red)
 
   val uid = task.uid
-  var imageUrl by remember { mutableStateOf(task.imageUrl) }
+  val imageUrl by remember { mutableStateOf(task.imageUrl) }
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf(task.description) }
-  var selectedLocation by remember { mutableStateOf(task.location) }
+  var selectedCoffeeShop by remember { mutableStateOf(task.coffeeShop) }
+  val scope = rememberCoroutineScope()
+  val context = LocalContext.current
   var coffeeOrigin by remember { mutableStateOf(task.coffeeOrigin) }
   var brewingMethod by remember { mutableStateOf(task.brewingMethod) }
   var coffeeTaste by remember { mutableStateOf(task.coffeeTaste) }
@@ -80,11 +81,10 @@ fun EditJourneyScreen(
   val date by remember { mutableStateOf(task.date) }
 
   var expanded by remember { mutableStateOf(false) } // State for the dropdown menu
-  var isYesSelected by remember { mutableStateOf(selectedLocation.name != "At home") }
+  var isYesSelected by remember { mutableStateOf(selectedCoffeeShop != null) }
   val getImageLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.GetContent(), onResult = { uri -> imageUri = uri })
-  val context = LocalContext.current
 
   Scaffold(
       modifier = Modifier.testTag("editJourneyScreen"),
@@ -143,8 +143,10 @@ fun EditJourneyScreen(
                     isYesSelected = !isYesSelected
                     expanded = isYesSelected
                   },
-                  coffeeshopExpanded = expanded,
-                  onSelectedLocationChange = { selectedLocation = it })
+                  coffeeShopExpanded = expanded,
+                  onSelectedCoffeeShopChange = { selectedCoffeeShop = it },
+                  scope = scope,
+                  context = context)
 
               // Coffee Origin Dropdown Menu
               CoffeeOriginDropdownMenu(
@@ -168,78 +170,20 @@ fun EditJourneyScreen(
               var selectedDate by remember { mutableStateOf(date) }
               DateField(date) { selectedDate = it }
 
-              //  var finalImageUrl by remember { mutableStateOf(imageUrl) }
+              var finalImageUrl by remember { mutableStateOf(imageUrl) }
               // Save button
               Button(
                   colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
-                      if (isConnectedToInternet(context)) {
-                        updatePicture(imageUri!!, imageUrl) { updatedImageUrl ->
-                          val updatedJourney =
-                              Journey(
-                                  uid = uid,
-                                  imageUrl =
-                                      updatedImageUrl, // Use the downloaded URL from Firebase
-                                  description = description,
-                                  location = selectedLocation,
-                                  coffeeOrigin = coffeeOrigin,
-                                  brewingMethod = brewingMethod,
-                                  coffeeTaste = coffeeTaste,
-                                  coffeeRate = coffeeRate,
-                                  date = selectedDate)
-                          listJourneysViewModel.updateJourney(updatedJourney)
-                          listJourneysViewModel.selectJourney(updatedJourney)
-                          navigationActions.goBack()
-                          return@updatePicture
-                        }
-                      } else {
-                        // Use a predefined image URL when offline
-                        val predefinedImageUrl =
-                            "android.resource://${context.packageName}/${R.drawable.offlinemode}"
-
-                        val updatedJourney_tmp =
-                            Journey(
-                                uid = uid,
-                                imageUrl = predefinedImageUrl, // Use the predefined URL
-                                description = description,
-                                location = selectedLocation,
-                                coffeeOrigin = coffeeOrigin,
-                                brewingMethod = brewingMethod,
-                                coffeeTaste = coffeeTaste,
-                                coffeeRate = coffeeRate,
-                                date = selectedDate)
-                        listJourneysViewModel.updateJourney(updatedJourney_tmp)
-                        listJourneysViewModel.selectJourney(updatedJourney_tmp)
-                        navigationActions
-                            .goBack() // Update the Journey with real image when connected to the
-                        // internet
-                        updatePicture(imageUri!!, imageUrl) { updatedImageUrl ->
-                          val updatedJourney =
-                              Journey(
-                                  uid = uid,
-                                  imageUrl =
-                                      updatedImageUrl, // Use the downloaded URL from Firebase
-                                  description = description,
-                                  location = selectedLocation,
-                                  coffeeOrigin = coffeeOrigin,
-                                  brewingMethod = brewingMethod,
-                                  coffeeTaste = coffeeTaste,
-                                  coffeeRate = coffeeRate,
-                                  date = selectedDate)
-                          listJourneysViewModel.updateJourney(updatedJourney)
-                          listJourneysViewModel.selectJourney(updatedJourney)
-                          return@updatePicture
-                        }
-                      }
+                      updatePicture(imageUri!!, imageUrl) { finalImageUrl = it }
                     }
-                    // else {
                     val updatedJourney =
                         Journey(
                             uid = uid,
-                            imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                            imageUrl = finalImageUrl,
                             description = description,
-                            location = selectedLocation,
+                            coffeeShop = selectedCoffeeShop,
                             coffeeOrigin = coffeeOrigin,
                             brewingMethod = brewingMethod,
                             coffeeTaste = coffeeTaste,

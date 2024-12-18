@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,13 +35,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.brewr.R
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
-import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.utils.isConnectedToInternet
@@ -73,12 +74,13 @@ fun AddJourneyScreen(
   val uid = listJourneysViewModel.getNewUid()
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf("") }
-  var selectedLocation by remember { mutableStateOf(Location()) }
+  var selectedCoffeeShop by remember { mutableStateOf<CoffeeShop?>(null) }
   var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
   var brewingMethod by remember { mutableStateOf(BrewingMethod.DEFAULT) }
   var coffeeTaste by remember { mutableStateOf(CoffeeTaste.DEFAULT) }
   var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
   val date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
+  val scope = rememberCoroutineScope()
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(true) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(true) }
@@ -138,15 +140,17 @@ fun AddJourneyScreen(
                         description = description, onDescriptionChange = { description = it })
                   }
               // CoffeeShop Dropdown Menu below the row
-              selectedLocation.let {
+              selectedCoffeeShop.let {
                 CoffeeShopCheckRow(
                     isYesSelected = isYesSelected,
                     onCheckChange = {
                       isYesSelected = !isYesSelected
                       expanded = isYesSelected
                     },
-                    coffeeshopExpanded = expanded,
-                    onSelectedLocationChange = { selectedLocation = it })
+                    coffeeShopExpanded = expanded,
+                    onSelectedCoffeeShopChange = { selectedCoffeeShop = it },
+                    scope = scope,
+                    context = context)
               }
 
               // Coffee Origin Dropdown Menu
@@ -182,7 +186,7 @@ fun AddJourneyScreen(
                                   uid = uid,
                                   imageUrl = imageUrl, // Use the downloaded URL from Firebase
                                   description = description,
-                                  location = selectedLocation,
+                                  coffeeShop = selectedCoffeeShop,
                                   coffeeOrigin = coffeeOrigin,
                                   brewingMethod = brewingMethod,
                                   coffeeTaste = coffeeTaste,
@@ -202,7 +206,7 @@ fun AddJourneyScreen(
                                 uid = uid,
                                 imageUrl = predefinedImageUrl, // Use the predefined URL
                                 description = description,
-                                location = selectedLocation,
+                                coffeeShop = selectedCoffeeShop,
                                 coffeeOrigin = coffeeOrigin,
                                 brewingMethod = brewingMethod,
                                 coffeeTaste = coffeeTaste,
@@ -218,7 +222,7 @@ fun AddJourneyScreen(
                                   uid = uid,
                                   imageUrl = imageUrl, // Use the downloaded URL from Firebase
                                   description = description,
-                                  location = selectedLocation,
+                                  coffeeShop = selectedCoffeeShop,
                                   coffeeOrigin = coffeeOrigin,
                                   brewingMethod = brewingMethod,
                                   coffeeTaste = coffeeTaste,

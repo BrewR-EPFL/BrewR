@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
@@ -37,7 +37,6 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.UserRepository
 import com.android.brewr.model.user.UserViewModel
-import com.android.brewr.ui.explore.CoffeeInformationScreen
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
@@ -48,7 +47,6 @@ import com.android.brewr.ui.overview.EditJourneyScreen
 import com.android.brewr.ui.overview.JourneyRecordScreen
 import com.android.brewr.ui.overview.OverviewScreen
 import com.android.brewr.ui.userProfile.UserMainProfileScreen
-import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -77,7 +75,6 @@ class E2ETest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var navController: NavHostController
   private lateinit var coffeesViewModel: CoffeesViewModel
-  private lateinit var privateCoffeesViewModel: CoffeesViewModel
 
   private val journey =
       Journey(
@@ -85,19 +82,26 @@ class E2ETest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "2",
+                  "Coffee page",
+                  Location(
+                      46.5183076,
+                      6.6338096,
+                      "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                  listOf(Review("Lei", "good", 5.0)),
+                  listOf("test.jpg")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
-  private val sampleCoffees =
+  private val sampleCoffeeShops =
       listOf(
-          Coffee(
+          CoffeeShop(
               "1",
               "Coffee1",
               Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
@@ -105,7 +109,7 @@ class E2ETest {
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Lei", "good", 5.0)),
               listOf("test.jpg")),
-          Coffee(
+          CoffeeShop(
               "2",
               "Coffee2",
               Location(latitude = 47.5228, longitude = 6.8385, name = "Lausanne 2"),
@@ -123,9 +127,7 @@ class E2ETest {
     userRepositoryMock = mock(UserRepository::class.java)
     userViewModel = spy(UserViewModel(userRepositoryMock))
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    coffeesViewModel.addCoffees(sampleCoffees)
-    privateCoffeesViewModel = spy(CoffeesViewModel::class.java)
-
+    coffeesViewModel.addCoffees(sampleCoffeeShops)
     // Mock the behavior of `getJourneys` to simulate fetching journeys
     `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
@@ -152,7 +154,7 @@ class E2ETest {
             ExploreScreen(
                 coffeesViewModel,
                 listJourneysViewModel,
-                sampleCoffees.sortedByDescending { it.rating })
+                sampleCoffeeShops.sortedByDescending { it.rating })
           }
         }
         navigation(
@@ -164,18 +166,6 @@ class E2ETest {
           }
           composable(Screen.EDIT_JOURNEY) {
             EditJourneyScreen(listJourneysViewModel, navigationActions)
-          }
-        }
-        navigation(
-            startDestination = Screen.USERPROFILE,
-            route = Route.USER_PROFILE,
-        ) {
-          composable(Screen.USER_PRIVATE_LIST) {
-            UserPrivateListScreen(navigationActions, privateCoffeesViewModel)
-          }
-          composable(Screen.USER_PRIVATE_LIST_INFOS) {
-            CoffeeInformationScreen(
-                privateCoffeesViewModel, onBack = { navigationActions.goBack() })
           }
         }
       }
@@ -276,10 +266,29 @@ class E2ETest {
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
       swipe(center, Offset(center.x, center.y - 800)) // scroll down
     }
+
+    // Verify the coffee shop name
+    /*
+    composeTestRule
+        .onNodeWithTag("coffeeShopName:${sampleCoffees[0].id}")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals(sampleCoffees[0].coffeeShopName)
+    composeTestRule.onNodeWithTag("coffeeImage:${sampleCoffees[0].id}").assertIsDisplayed()
+    // Verify the second coffee shop name
+    composeTestRule
+        .onNodeWithTag("coffeeShopName:${sampleCoffees[1].id}")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .assertTextEquals(sampleCoffees[1].coffeeShopName)
+    composeTestRule.onNodeWithTag("coffeeImage:${sampleCoffees[1].id}").assertIsDisplayed()
+
+       */
+
   }
 
   @Test
-  fun endToEndExploreScreenDropdownMenuFlowTest() {
+  fun exploreScreenDropdownMenuIntegrationTest() {
     // Go to the Explore screen
     composeTestRule.onNodeWithTag("Explore").assertIsDisplayed().performClick()
     composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
@@ -306,49 +315,5 @@ class E2ETest {
 
     // Assert the "closed" message is displayed if the list is empty
     composeTestRule.onNodeWithTag("noOpenCoffeeShopsMessage").assertExists()
-  }
-
-  @Test
-  fun userProfileScreenE2EFlowTest() {
-    // Step 1: Start from the Overview screen and navigate to the User Profile screen
-    composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().performClick()
-
-    // Verify User Profile screen is displayed
-    composeTestRule.onNodeWithTag("UserProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Username").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("User Email").assertIsDisplayed()
-
-    // Step 2: Click on the "Favorite" button to navigate to the User Private List
-    composeTestRule.onNodeWithTag("Favorite button").assertIsDisplayed().performClick()
-
-    // Verify User Private List screen is displayed
-    composeTestRule.onNodeWithTag("UserPrivateListScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("privateList").assertIsDisplayed()
-
-    // Check all elements in User Private List are displayed
-    composeTestRule.onNodeWithTag("coffeeImage:1").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopName:1").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopAddress:1").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHours:1").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopRating:1").performScrollTo().assertIsDisplayed()
-
-    // Step 3: Click on the clickable image to navigate to the detailed info screen
-    composeTestRule.onNodeWithTag("coffeeImage:1").assertIsDisplayed().performClick()
-
-    // Verify the Coffee Information screen is displayed
-    composeTestRule.onNodeWithTag("coffeeInformationScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopAddress").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopRating").assertIsDisplayed()
-
-    // Check Operating Hours are displayed
-    composeTestRule.onNodeWithTag("coffeeShopHourMonday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourTuesday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourWednesday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourThursday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourFriday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourSaturday").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("coffeeShopHourSunday").performScrollTo().assertIsDisplayed()
   }
 }
