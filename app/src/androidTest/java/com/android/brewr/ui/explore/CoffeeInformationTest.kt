@@ -14,7 +14,7 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
