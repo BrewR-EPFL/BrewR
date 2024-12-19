@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -82,8 +81,7 @@ class CoffeeShopInformationCardTest {
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffeeShop.location.name)
     composeTestRule
-        .onNodeWithTag(
-            "coffeeShopHour${mockCoffeeShop.id}")
+        .onNodeWithTag("coffeeShopHour${mockCoffeeShop.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
