@@ -1,6 +1,6 @@
 package com.android.brewr.model.coffee
 
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

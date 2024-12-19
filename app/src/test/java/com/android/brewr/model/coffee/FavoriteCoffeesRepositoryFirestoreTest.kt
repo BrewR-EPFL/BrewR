@@ -3,7 +3,7 @@ package com.android.brewr.model.coffee
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.brewr.model.journey.JourneysRepositoryFirestore
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.model.user.User
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
