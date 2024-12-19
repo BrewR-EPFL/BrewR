@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -11,7 +12,7 @@ import androidx.test.uiautomator.UiSelector
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import java.time.LocalDate
@@ -81,7 +82,8 @@ class CoffeeShopInformationCardTest {
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffeeShop.location.name)
     composeTestRule
-        .onNodeWithTag("coffeeShopHours:${mockCoffeeShop.id}")
+        .onNodeWithTag(
+            "coffeeShopHour${mockCoffeeShop.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +

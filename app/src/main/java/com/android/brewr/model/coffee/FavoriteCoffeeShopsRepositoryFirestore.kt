@@ -1,7 +1,7 @@
 package com.android.brewr.model.coffee
 
 import android.util.Log
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth

@@ -10,7 +10,7 @@ import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places

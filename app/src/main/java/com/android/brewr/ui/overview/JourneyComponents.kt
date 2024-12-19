@@ -67,7 +67,7 @@ import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.Gold
 import com.android.brewr.ui.theme.LightBrown
@@ -124,12 +124,14 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
 }
 
 /**
- * Displays a row for coffee shop check options and location selection.
+ * Displays a row with a checkbox for selecting "At home" or "At a coffee shop".
  *
  * @param isYesSelected Whether the coffee shop option is selected.
  * @param onCheckChange Callback when the checkbox state changes.
- * @param coffeeshopExpanded Whether the dropdown menu is expanded.
- * @param onSelectedLocationChange Callback when the location is updated.
+ * @param coffeeShopExpanded Whether the coffee shop dropdown is expanded.
+ * @param onSelectedCoffeeShopChange Callback to update the selected [CoffeeShop].
+ * @param scope The coroutine scope for launching asynchronous tasks.
+ * @param context The context for accessing resources and services.
  */
 @Composable
 fun CoffeeShopCheckRow(
@@ -187,10 +189,9 @@ fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
  * Users can search for a coffee shop by typing a query. Matching location suggestions are displayed
  * in a dropdown list. Selecting an option updates the selected location.
  *
- * @param locationSuggestions A list of [Location] suggestions based on the current query.
- * @param locationQuery The current query text entered by the user.
- * @param onSelectedLocationChange Callback to update the selected [Location].
- * @param locationViewModel The [LocationViewModel] responsible for managing location suggestions.
+ * @param onSelectedLocationChange Callback to update the selected [CoffeeShop].
+ * @param coroutineScope The coroutine scope for launching asynchronous tasks.
+ * @param context The context for accessing resources and services.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
