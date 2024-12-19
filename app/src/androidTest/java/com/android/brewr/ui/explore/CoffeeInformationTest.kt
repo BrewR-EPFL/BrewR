@@ -98,7 +98,8 @@ class CoffeeShopInformationScreenTest {
         .assertTextEquals(mockCoffeeShop.location.name)
     composeTestRule
         .onNodeWithTag(
-            "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}").performScrollTo()
+            "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")
+        .performScrollTo()
         .assertIsDisplayed()
         .assertTextEquals(
             "${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].day}: ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].close}")
