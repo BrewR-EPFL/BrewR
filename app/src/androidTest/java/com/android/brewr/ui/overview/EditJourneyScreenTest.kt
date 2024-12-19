@@ -17,6 +17,9 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.Hours
+import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -55,11 +58,19 @@ class EditJourneyScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "1",
+                  "Coffee page",
+                  Location(
+                      latitude = 46.5183076,
+                      longitude = 6.6338096,
+                      name =
+                          "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                  listOf(Review("Lei", "good", 5.0)),
+                  listOf("test.jpg")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -71,7 +82,7 @@ class EditJourneyScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location = Location(),
+          coffeeShop = null,
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,

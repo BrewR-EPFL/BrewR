@@ -23,8 +23,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.journey.BrewingMethod
@@ -51,6 +52,7 @@ import com.android.brewr.ui.userProfile.UserMainProfileScreen
 import com.android.brewr.ui.userProfile.UserPrivateListScreen
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -59,6 +61,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class E2ETest {
@@ -69,6 +72,7 @@ class E2ETest {
   @get:Rule
   val coarseLocationPermissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
+  private val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel = mock()
 
   private lateinit var journeyRepositoryMock: JourneysRepository
   private lateinit var listJourneysViewModel: ListJourneysViewModel
@@ -85,27 +89,41 @@ class E2ETest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "2",
+                  "Coffee page",
+                  Location(
+                      46.5183076,
+                      6.6338096,
+                      "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                  listOf(Review("Lei", "good", 5.0)),
+                  listOf("test.jpg")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
-  private val sampleCoffees =
+  private val sampleCoffeeShops =
       listOf(
-          Coffee(
+          CoffeeShop(
               "1",
               "Coffee1",
               Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
               4.5,
-              listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+              listOf(
+                  Hours("Monday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Tuesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Wednesday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Thursday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Friday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Saturday", open = "8:00 AM", close = "5:00 PM"),
+                  Hours("Sunday", open = "8:00 AM", close = "5:00 PM")),
               listOf(Review("Lei", "good", 5.0)),
               listOf("test.jpg")),
-          Coffee(
+          CoffeeShop(
               "2",
               "Coffee2",
               Location(latitude = 47.5228, longitude = 6.8385, name = "Lausanne 2"),
@@ -114,6 +132,7 @@ class E2ETest {
               listOf(Review("Jaeyi", "perfect", 5.0)),
               listOf(
                   "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+  private val favoriteCoffeesFlow = MutableStateFlow(sampleCoffeeShops)
 
   @Before
   fun setUp() {
@@ -123,7 +142,7 @@ class E2ETest {
     userRepositoryMock = mock(UserRepository::class.java)
     userViewModel = spy(UserViewModel(userRepositoryMock))
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    coffeesViewModel.addCoffees(sampleCoffees)
+    coffeesViewModel.addCoffees(sampleCoffeeShops)
     privateCoffeesViewModel = spy(CoffeesViewModel::class.java)
 
     // Mock the behavior of `getJourneys` to simulate fetching journeys
@@ -132,6 +151,7 @@ class E2ETest {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
         }
+    whenever(favoriteCoffeeShopsViewModel.favoriteCoffees).thenReturn(favoriteCoffeesFlow)
     composeTestRule.setContent {
       navController = rememberNavController()
       navigationActions = NavigationActions(navController)
@@ -152,7 +172,7 @@ class E2ETest {
             ExploreScreen(
                 coffeesViewModel,
                 listJourneysViewModel,
-                sampleCoffees.sortedByDescending { it.rating })
+                sampleCoffeeShops.sortedByDescending { it.rating })
           }
         }
         navigation(
@@ -171,7 +191,8 @@ class E2ETest {
             route = Route.USER_PROFILE,
         ) {
           composable(Screen.USER_PRIVATE_LIST) {
-            UserPrivateListScreen(navigationActions, privateCoffeesViewModel)
+            UserPrivateListScreen(
+                navigationActions, privateCoffeesViewModel, favoriteCoffeeShopsViewModel)
           }
           composable(Screen.USER_PRIVATE_LIST_INFOS) {
             CoffeeInformationScreen(

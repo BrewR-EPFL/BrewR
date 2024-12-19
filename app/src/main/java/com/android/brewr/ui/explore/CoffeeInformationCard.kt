@@ -21,20 +21,40 @@ import androidx.compose.ui.text.buildAnnotatedString as buildAnnotatedString1
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import java.time.LocalDate
 
+/**
+ * A composable function that displays a detailed card for a coffee shop.
+ *
+ * This card includes:
+ * - An image of the coffee shop.
+ * - The coffee shop's name.
+ * - Its address.
+ * - The operating hours for the current day.
+ * - The shop's rating.
+ *
+ * The card is clickable and triggers a callback when clicked.
+ *
+ * @param coffee The [Coffee] object containing the data for the coffee shop.
+ * @param onClick The callback to invoke when the card is clicked.
+ */
 @SuppressLint("DefaultLocale")
 @Composable
-fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
+fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
+  val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel =
+      viewModel(factory = FavoriteCoffeeShopsViewModel.Factory)
+
   Column(modifier = Modifier.fillMaxWidth()) {
     Image(
         painter =
             rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
-                    .data(coffee.imagesUrls[0])
+                    .data(coffeeShop.imagesUrls[0])
                     .apply(
                         block =
                             fun ImageRequest.Builder.() {
@@ -44,15 +64,15 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
         contentDescription = "Selected Image",
         contentScale = ContentScale.Crop,
         modifier =
-            Modifier.testTag("coffeeImage:${coffee.id}")
+            Modifier.testTag("coffeeImage:${coffeeShop.id}")
                 .fillMaxWidth()
                 .heightIn(min = 180.dp, max = 300.dp)
                 .clickable(onClick = onClick))
     Text(
-        text = coffee.coffeeShopName,
+        text = coffeeShop.coffeeShopName,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.testTag("coffeeShopName:${coffee.id}"))
+        modifier = Modifier.testTag("coffeeShopName:${coffeeShop.id}"))
     Column(
         modifier = Modifier.fillMaxWidth().padding(start = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -61,10 +81,10 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                   buildAnnotatedString1 {
                     append("Address: ")
                     addStyle(SpanStyle(fontWeight = FontWeight.Bold), 0, "Address: ".length)
-                    append(coffee.location.name)
+                    append(coffeeShop.location.name)
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopAddress:${coffee.id}"))
+              modifier = Modifier.testTag("coffeeShopAddress:${coffeeShop.id}"))
 
           Text(
               text =
@@ -76,15 +96,15 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                         end = "Opening Hours: ".length)
                     val todayIndex = LocalDate.now().dayOfWeek.value - 1
 
-                    if (todayIndex in coffee.hours.indices) {
-                      val todayHours = coffee.hours[todayIndex]
+                    if (todayIndex in coffeeShop.hours.indices) {
+                      val todayHours = coffeeShop.hours[todayIndex]
                       append("${todayHours.open} - ${todayHours.close}")
                     } else {
                       append("Hours not available")
                     }
                   },
               fontSize = 16.sp,
-              modifier = Modifier.testTag("coffeeShopHours:${coffee.id}"))
+              modifier = Modifier.testTag("coffeeShopHours:${coffeeShop.id}"))
 
           Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -94,11 +114,12 @@ fun CoffeeInformationCardScreen(coffee: Coffee, onClick: () -> Unit) {
                         buildAnnotatedString1 {
                           append("Rating: ")
                           addStyle(SpanStyle(fontWeight = FontWeight.Bold), 0, "Rating: ".length)
-                          append(String.format("%.1f/5", coffee.rating))
+                          append(String.format("%.1f/5", coffeeShop.rating))
                         },
                     fontSize = 16.sp,
-                    modifier = Modifier.testTag("coffeeShopRating:${coffee.id}"))
+                    modifier = Modifier.testTag("coffeeShopRating:${coffeeShop.id}"))
               }
+          FavoriteCoffeesButton(coffeeShop, favoriteCoffeeShopsViewModel)
         }
   }
 }

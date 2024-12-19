@@ -1,13 +1,21 @@
 package com.android.brewr.model.journey
 
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.coffee.CoffeeShop
 import com.google.firebase.Timestamp
 
+/**
+ * Represents a review for a coffee shop, including the author's name, the review text, and the
+ * rating given by the reviewer.
+ *
+ * @property authorName The name of the person who wrote the review.
+ * @property review A textual description or comment provided by the reviewer.
+ * @property rating The numerical rating given by the reviewer, typically on a scale of 1.0 to 5.0.
+ */
 data class Journey(
     val uid: String,
     val imageUrl: String,
     val description: String,
-    val location: Location,
+    val coffeeShop: CoffeeShop?,
     val coffeeOrigin: CoffeeOrigin,
     val brewingMethod: BrewingMethod,
     val coffeeTaste: CoffeeTaste,

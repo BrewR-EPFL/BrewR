@@ -1,6 +1,5 @@
 package com.android.brewr.ui.explore
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,8 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.filterOpenCoffeeShops
 import com.android.brewr.model.journey.ListJourneysViewModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 fun ExploreScreen(
     coffeesViewModel: CoffeesViewModel,
     listJourneysViewModel: ListJourneysViewModel,
-    curatedCoffees: List<Coffee>
+    curatedCoffees: List<CoffeeShop>
 ) {
   val sheetState = rememberModalBottomSheetState()
   val coroutineScope = rememberCoroutineScope()
@@ -138,9 +138,26 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
               modifier = Modifier.testTag("dropdownMenu")) {
                 listOf("Nearby", "Curated", "Opened").forEach { option ->
                   DropdownMenuItem(
-                      text = { Text(option) },
+                      text = {
+                        Row( // Wrap the content to include the checkmark
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                              Text(
+                                  text = option,
+                                  fontWeight =
+                                      if (selectedOption == option) FontWeight.Bold
+                                      else FontWeight.Normal, // Highlight selected
+                                  modifier = Modifier.weight(1f))
+                              if (selectedOption == option) {
+                                Text(
+                                    text = "✓", // Add checkmark
+                                    fontWeight = FontWeight.Bold,
+                                    color = CoffeeBrown)
+                              }
+                            }
+                      },
                       onClick = {
-                        onOptionSelected(option)
+                        onOptionSelected(option) // Update selected option
                         expanded = false
                       },
                       modifier = Modifier.testTag("dropdownMenuItem$option"))
@@ -157,12 +174,12 @@ fun ListToggleRow(selectedOption: String, onOptionSelected: (String) -> Unit) {
  * @param onCoffeeClick A lambda function to be executed when a coffee item is clicked.
  */
 @Composable
-fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
-  if (coffees.isEmpty()) {
+fun CoffeeList(coffeeShops: List<CoffeeShop>, onCoffeeClick: (CoffeeShop) -> Unit) {
+  if (coffeeShops.isEmpty()) {
     // Display a message when there are no coffee shops in the list
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
       Text(
-          text = "Everywhere is closed! I guess Coffee will disturb your sleep at this time",
+          text = "No coffee shops found!",
           style = MaterialTheme.typography.titleMedium,
           color = Color.Gray,
           modifier = Modifier.testTag("noOpenCoffeeShopsMessage"))
@@ -170,8 +187,8 @@ fun CoffeeList(coffees: List<Coffee>, onCoffeeClick: (Coffee) -> Unit) {
   } else {
     // Display the list of coffee shops
     LazyColumn(modifier = Modifier.fillMaxHeight(0.9f).testTag("bottomSheet")) {
-      items(coffees) { coffee ->
-        CoffeeInformationCardScreen(coffee = coffee, onClick = { onCoffeeClick(coffee) })
+      items(coffeeShops) { coffee ->
+        CoffeeInformationCardScreen(coffeeShop = coffee, onClick = { onCoffeeClick(coffee) })
       }
     }
   }
@@ -192,13 +209,12 @@ fun ShowMenuButton(onClick: () -> Unit) {
               modifier =
                   Modifier.size(56.dp)
                       .clip(CircleShape)
-                      .border(1.dp, Color.White, CircleShape)
-                      .background(CoffeeBrown)
+                      .border(1.dp, Color.Black, CircleShape)
                       .padding(8.dp)) {
                 Icon(
                     imageVector = Icons.Rounded.Menu,
                     contentDescription = "Menu",
-                    tint = Color.White,
+                    tint = Color.Black,
                     modifier = Modifier.size(36.dp))
               }
         }

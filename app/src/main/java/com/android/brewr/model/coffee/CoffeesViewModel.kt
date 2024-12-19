@@ -8,15 +8,28 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel class for managing a list of coffees and the currently selected coffee.
+ *
+ * This ViewModel uses [MutableStateFlow] to hold and manage the state of coffee data. It supports
+ * operations such as adding coffees, selecting a specific coffee, and clearing the current list of
+ * coffees. The ViewModel ensures state updates occur within a coroutine scope to maintain thread
+ * safety.
+ */
 open class CoffeesViewModel : ViewModel() {
-  private val coffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  val coffees: StateFlow<List<Coffee>> = coffees_.asStateFlow()
+  private val coffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
+  val coffees: StateFlow<List<CoffeeShop>> = coffees_.asStateFlow()
 
   // Selected coffee, i.e the coffee for the detail view
-  private val selectedCoffee_ = MutableStateFlow<Coffee?>(null)
-  open val selectedCoffee: StateFlow<Coffee?> = selectedCoffee_.asStateFlow()
+  private val selectedCoffee_Shop_ = MutableStateFlow<CoffeeShop?>(null)
+  open val selectedCoffeeShop: StateFlow<CoffeeShop?> = selectedCoffee_Shop_.asStateFlow()
 
-  // create factory
+  /**
+   * Companion object providing a factory for creating instances of [CoffeesViewModel].
+   *
+   * This factory is useful when a ViewModel needs to be created programmatically or injected into a
+   * lifecycle owner (e.g., in Android's ViewModelProvider).
+   */
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
@@ -30,13 +43,23 @@ open class CoffeesViewModel : ViewModel() {
         }
   }
 
-  // Function to update selected coffee
-  fun selectCoffee(coffee: Coffee) {
-    viewModelScope.launch { selectedCoffee_.value = coffee }
+  /**
+   * Updates the currently selected coffee.
+   *
+   * @param coffeeShop The [CoffeeShop] object to be set as the currently selected coffee. Observers
+   *   of [selectedCoffee] will receive the updated value.
+   */
+  fun selectCoffee(coffeeShop: CoffeeShop) {
+    viewModelScope.launch { selectedCoffee_Shop_.value = coffeeShop }
   }
 
-  // Function to add coffees
-  fun addCoffees(coffeesList: List<Coffee>) {
+  /**
+   * Updates the list of coffees.
+   *
+   * @param coffeesList A list of [CoffeeShop] objects to add to the state. Observers of [coffees]
+   *   will receive the updated list of coffees.
+   */
+  fun addCoffees(coffeesList: List<CoffeeShop>) {
     viewModelScope.launch { coffees_.value = coffeesList }
   }
 
