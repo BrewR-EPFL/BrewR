@@ -111,54 +111,6 @@ class JourneysRepositoryFirestoreTest {
   }
 
   @Test
-  fun `test getJourneys success`() {
-    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
-    val mockJourneysTask: Task<QuerySnapshot> = mock(Task::class.java) as Task<QuerySnapshot>
-    // Arrange
-
-    `when`(mockUserDocumentReference.get()).thenReturn(mockUserTask)
-    `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
-      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
-      `when`(mockUserDocumentSnapshot.get("journeys")).thenReturn(listOf("id1", "id2"))
-      listener.onSuccess(mockUserDocumentSnapshot)
-      mockUserTask // Chain the task
-    }
-    `when`(mockJourneyCollectionReference.whereIn(anyString(), anyList()))
-        .thenReturn(mockJourneyCollectionReference)
-    `when`(mockJourneyCollectionReference.get()).thenReturn(mockJourneysTask)
-    `when`(mockJourneysTask.addOnSuccessListener(any())).thenAnswer { invocation ->
-      val listener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
-      `when`(mockJourneysQuerySnapshot.documents)
-          .thenReturn(
-              listOf(mock(DocumentSnapshot::class.java), mock(DocumentSnapshot::class.java)))
-      listener.onSuccess(mockJourneysQuerySnapshot)
-      mockJourneysTask // Chain the task
-    }
-
-    val successCaptor = argumentCaptor<List<Journey>>()
-
-    // Act
-    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
-  }
-
-  @Test
-  fun `test getJourneys success with no journeys`() {
-    val mockUserTask: Task<DocumentSnapshot> = mock(Task::class.java) as Task<DocumentSnapshot>
-    // Arrange
-    whenever(mockUserDocumentReference.get()).thenReturn(mockUserTask)
-
-    whenever(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
-      val listener = invocation.getArgument<OnSuccessListener<DocumentSnapshot>>(0)
-      whenever(mockUserDocumentSnapshot.get("journeys")).thenReturn(null) // No journeys field
-      listener.onSuccess(mockUserDocumentSnapshot)
-      mockUserTask
-    }
-    val successCaptor = argumentCaptor<List<Journey>>()
-    // Act
-    journeysRepository.getJourneys(onSuccess = { successCaptor.capture() }, onFailure = {})
-  }
-
-  @Test
   fun addJourney_shouldCommitBatchSuccessfully() {
     // Mock Firestore batch
     val mockBatch = mock(WriteBatch::class.java)
@@ -354,5 +306,147 @@ class JourneysRepositoryFirestoreTest {
     }
     // Clean up static mock
     firebaseAuthStaticMock.close()
+  }
+
+  @Test
+  fun `test retrieveJourneysOfAllOtherUsers success with multiple users`() {
+    // Arrange
+    val userIds = listOf("user1", "user2")
+    val mockDocuments =
+        userIds.map { userId ->
+          val mockDocument: DocumentSnapshot = mock()
+          whenever(mockDocument.id).thenReturn(userId)
+          mockDocument
+        }
+
+    // Mock Firestore interactions
+    whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
+    whenever(mockFirebaseUser.uid).thenReturn("currentUserId")
+
+    val mockUserTask: Task<QuerySnapshot> = mock()
+    whenever(mockFirestore.collection("users")).thenReturn(mockUserCollectionReference)
+    whenever(mockUserCollectionReference.get()).thenReturn(mockUserTask)
+
+    // Mock QuerySnapshot behavior
+    `when`(mockUserTask.addOnSuccessListener(any())).thenAnswer { invocation ->
+      val successListener = invocation.getArgument<OnSuccessListener<QuerySnapshot>>(0)
+      whenever(mockJourneysQuerySnapshot.documents).thenReturn(mockDocuments)
+      successListener.onSuccess(mockJourneysQuerySnapshot)
+      mockUserTask // Chain the task
+    }
+    // Act
+    journeysRepository.retrieveJourneysOfAllOtherUsers(onSuccess = {}, onFailure = {})
+  }
+
+  @Test
+  fun `new test getJourneys success`() {
+    // Arrange
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+    val mockJourneyDocumentSnapshot: DocumentSnapshot = mock()
+    val mockListenerRegistration: ListenerRegistration = mock()
+    val journeyIds = listOf("journey1", "journey2")
+
+    // Mock user snapshot to return journey IDs
+    whenever(mockDocumentSnapshot.get("journeys")).thenReturn(journeyIds)
+    whenever(mockFirestore.collection("users").document("testUid").addSnapshotListener(any()))
+        .thenAnswer { invocation ->
+          val listener = invocation.getArgument<EventListener<DocumentSnapshot>>(0)
+          listener.onEvent(mockDocumentSnapshot, null) // Simulate success
+          mockListenerRegistration
+        }
+    val mockQuery: Query = mock()
+    whenever(mockFirestore.collection("journeys").whereIn("uid", journeyIds)).thenReturn(mockQuery)
+    // Mock journeys snapshot
+    val mockJourneySnapshots = listOf(mockJourneyDocumentSnapshot, mockJourneyDocumentSnapshot)
+    whenever(
+            mockFirestore
+                .collection("journeys")
+                .whereIn("uid", journeyIds)
+                .addSnapshotListener(any()))
+        .thenAnswer { invocation ->
+          val listener = invocation.getArgument<EventListener<QuerySnapshot>>(0)
+          val mockQuerySnapshot: QuerySnapshot = mock()
+          whenever(mockQuerySnapshot.documents).thenReturn(mockJourneySnapshots)
+          listener.onEvent(mockQuerySnapshot, null) // Simulate success
+          mockListenerRegistration
+        }
+
+    // Callback mocks
+    val onSuccess: (List<Journey>) -> Unit = mock()
+    val onFailure: (Exception) -> Unit = mock()
+
+    // Act
+    journeysRepository.getJourneys(onSuccess, onFailure)
+
+    // Assert
+    verify(onSuccess).invoke(anyList())
+  }
+
+  @Test
+  fun `new test getJourneys failure`() {
+    // Arrange
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+    val mockListenerRegistration: ListenerRegistration = mock()
+    val journeyIds = listOf("journey1", "journey2")
+    val firestoreException = mock<FirebaseFirestoreException>()
+
+    // Mock user snapshot to return journey IDs
+    whenever(mockDocumentSnapshot.get("journeys")).thenReturn(journeyIds)
+    whenever(mockFirestore.collection("users").document("testUid").addSnapshotListener(any()))
+        .thenAnswer { invocation ->
+          val listener = invocation.getArgument<EventListener<DocumentSnapshot>>(0)
+          listener.onEvent(mockDocumentSnapshot, null) // Simulate success
+          mockListenerRegistration
+        }
+    val mockQuery: Query = mock()
+    whenever(mockFirestore.collection("journeys").whereIn("uid", journeyIds)).thenReturn(mockQuery)
+    whenever(
+            mockFirestore
+                .collection("journeys")
+                .whereIn("uid", journeyIds)
+                .addSnapshotListener(any()))
+        .thenAnswer { invocation ->
+          val listener = invocation.getArgument<EventListener<QuerySnapshot>>(0)
+          listener.onEvent(null, firestoreException) // Simulate failure
+          mockListenerRegistration
+        }
+
+    // Callback mocks
+    val onSuccess: (List<Journey>) -> Unit = mock()
+    val onFailure: (Exception) -> Unit = mock()
+
+    // Act
+    journeysRepository.getJourneys(onSuccess, onFailure)
+
+    // Assert
+    verify(onFailure).invoke(firestoreException)
+  }
+
+  @Test
+  fun `new test getJourneys user failure`() {
+    // Arrange
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+    val mockListenerRegistration: ListenerRegistration = mock()
+    val journeyIds = listOf("journey1", "journey2")
+    val firestoreException = mock<FirebaseFirestoreException>()
+
+    // Mock user snapshot to return journey IDs
+    whenever(mockDocumentSnapshot.get("journeys")).thenReturn(journeyIds)
+    whenever(mockFirestore.collection("users").document("testUid").addSnapshotListener(any()))
+        .thenAnswer { invocation ->
+          val listener = invocation.getArgument<EventListener<DocumentSnapshot>>(0)
+          listener.onEvent(null, firestoreException) // Simulate success
+          mockListenerRegistration
+        }
+
+    // Callback mocks
+    val onSuccess: (List<Journey>) -> Unit = mock()
+    val onFailure: (Exception) -> Unit = mock()
+
+    // Act
+    journeysRepository.getJourneys(onSuccess, onFailure)
+
+    // Assert
+    verify(onFailure).invoke(firestoreException)
   }
 }
