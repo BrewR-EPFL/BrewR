@@ -21,9 +21,11 @@ import androidx.compose.ui.text.buildAnnotatedString as buildAnnotatedString1
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
 import java.time.LocalDate
 
 /**
@@ -44,6 +46,9 @@ import java.time.LocalDate
 @SuppressLint("DefaultLocale")
 @Composable
 fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
+  val favoriteCoffeeShopsViewModel: FavoriteCoffeeShopsViewModel =
+      viewModel(factory = FavoriteCoffeeShopsViewModel.Factory)
+
   Column(modifier = Modifier.fillMaxWidth()) {
     Image(
         painter =
@@ -114,6 +119,7 @@ fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
                     fontSize = 16.sp,
                     modifier = Modifier.testTag("coffeeShopRating:${coffeeShop.id}"))
               }
+          FavoriteCoffeesButton(coffeeShop, favoriteCoffeeShopsViewModel)
         }
   }
 }
