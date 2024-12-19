@@ -38,6 +38,7 @@ import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.recommendation.RecommendScreen
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
@@ -155,10 +156,10 @@ fun OverviewScreen(
         }
       },
       content = { pd ->
-        if (currentSection == "Gallery") {
-          GalleryScreen(listJourneysViewModel, pd, navigationActions)
-        } else {
-          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
+        when (currentSection) {
+          "Gallery" -> GalleryScreen(listJourneysViewModel, pd, navigationActions)
+          "Explore" -> ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
+          "Recommend" -> RecommendScreen(navigationActions)
         }
       })
 }
@@ -177,6 +178,12 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
         isSelected = currentSection == "Explore",
         onClick = { onSectionChange("Explore") },
         modifier = Modifier.testTag("Explore"))
+    Spacer(modifier = Modifier.width(6.dp))
+    SubNavigationButton(
+        text = "Recommend",
+        isSelected = currentSection == "Recommend",
+        onClick = { onSectionChange("Recommend") },
+        modifier = Modifier.testTag("Recommend"))
   }
 }
 

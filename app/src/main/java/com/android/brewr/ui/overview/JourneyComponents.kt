@@ -128,8 +128,8 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
  *
  * @param isYesSelected Whether the coffee shop option is selected.
  * @param onCheckChange Callback when the checkbox state changes.
- * @param coffeeshopExpanded Whether the dropdown menu is expanded.
- * @param onSelectedLocationChange Callback when the location is updated.
+ * @param coffeeShopExpanded Whether the dropdown menu is expanded.
+ * @param onSelectedCoffeeShopChange Callback when the location is updated.
  */
 @Composable
 fun CoffeeShopCheckRow(

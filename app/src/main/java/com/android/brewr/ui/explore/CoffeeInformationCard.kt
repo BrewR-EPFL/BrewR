@@ -40,7 +40,7 @@ import java.time.LocalDate
  *
  * The card is clickable and triggers a callback when clicked.
  *
- * @param coffee The [Coffee] object containing the data for the coffee shop.
+ * @param coffeeShop The [CoffeeShop] object containing the data for the coffee shop.
  * @param onClick The callback to invoke when the card is clicked.
  */
 @SuppressLint("DefaultLocale")

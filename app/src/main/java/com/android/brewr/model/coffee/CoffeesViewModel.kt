@@ -47,7 +47,7 @@ open class CoffeesViewModel : ViewModel() {
    * Updates the currently selected coffee.
    *
    * @param coffeeShop The [CoffeeShop] object to be set as the currently selected coffee. Observers
-   *   of [selectedCoffee] will receive the updated value.
+   *   of [selectedCoffeeShop] will receive the updated value.
    */
   fun selectCoffee(coffeeShop: CoffeeShop) {
     viewModelScope.launch { selectedCoffee_Shop_.value = coffeeShop }

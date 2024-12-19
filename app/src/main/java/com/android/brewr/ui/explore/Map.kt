@@ -30,7 +30,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * Composable function to display a map screen with coffee shop markers and user location.
  *
- * @param coffees List of Coffee objects representing coffee shops to be displayed on the map.
+ * @param coffeeShops List of Coffee objects representing coffee shops to be displayed on the map.
  * @param listJourneysViewModel ViewModel containing the list of journeys.
  */
 @Composable
