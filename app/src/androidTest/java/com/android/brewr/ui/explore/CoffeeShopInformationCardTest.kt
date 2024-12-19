@@ -83,8 +83,7 @@ class CoffeeShopInformationCardTest {
         .assertTextEquals("Address: " + mockCoffeeShop.location.name)
     composeTestRule
         .onNodeWithTag(
-            "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")
-        .performScrollTo()
+            "coffeeShopHour${mockCoffeeShop.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
