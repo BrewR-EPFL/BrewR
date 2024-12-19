@@ -1,6 +1,6 @@
 package com.android.brewr.model.coffee
 
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 
 /**
  * Represents a coffee shop with detailed information including its name, location, ratings,

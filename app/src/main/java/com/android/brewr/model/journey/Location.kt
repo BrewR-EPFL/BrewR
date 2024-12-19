@@ -1,4 +1,4 @@
-package com.android.brewr.model.map
+package com.android.brewr.model.journey
 
 /**
  * Represents a geographic location with latitude, longitude, and an optional name.

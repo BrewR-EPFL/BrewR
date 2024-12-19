@@ -1,7 +1,7 @@
 package com.android.brewr.model.coffee
 
 import android.content.Context
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.utils.fetchNearbyCoffeeShops
 import io.mockk.*
 import java.time.LocalTime

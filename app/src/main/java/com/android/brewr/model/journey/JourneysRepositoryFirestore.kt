@@ -4,7 +4,6 @@ import android.util.Log
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -70,8 +69,9 @@ class JourneysRepositoryFirestore(
   /**
    * Retrieves all journeys of the current user from the Firestore database.
    *
-   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
-   * @param onFailure The callback to call if the operation fails.
+   * @param [onSuccess] The callback to call with the list of journeys if the operation is
+   *   successful.
+   * @param [onFailure] The callback to call if the operation fails.
    */
   override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
     getJourneysOf(getCurrentUserUid(), onSuccess, onFailure)
