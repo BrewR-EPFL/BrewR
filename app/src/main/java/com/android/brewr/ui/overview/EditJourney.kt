@@ -1,7 +1,6 @@
 package com.android.brewr.ui.overview
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -237,7 +236,20 @@ fun EditJourneyScreen(
                         }
                       }
                     } else {
-                      Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
+                      val updatedJourney =
+                          Journey(
+                              uid = uid,
+                              imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                              description = description,
+                              coffeeShop = selectedCoffeeShop,
+                              coffeeOrigin = coffeeOrigin,
+                              brewingMethod = brewingMethod,
+                              coffeeTaste = coffeeTaste,
+                              coffeeRate = coffeeRate,
+                              date = selectedDate)
+                      listJourneysViewModel.updateJourney(updatedJourney)
+                      listJourneysViewModel.selectJourney(updatedJourney)
+                      navigationActions.goBack()
                     }
                   },
                   modifier = Modifier.fillMaxWidth().testTag("journeySave")) {
