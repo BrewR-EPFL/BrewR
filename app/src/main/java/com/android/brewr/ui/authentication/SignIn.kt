@@ -23,6 +23,7 @@ import com.android.brewr.R
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.utils.isConnectedToInternet
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.GoogleAuthProvider
@@ -64,6 +65,15 @@ fun SignInScreen(userViewModel: UserViewModel, navigationActions: NavigationActi
   val launcher =
       rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
         ->
+        if (!isConnectedToInternet(context)) {
+          Toast.makeText(
+                  context,
+                  "\"Log in unavailable, Please try again when the internet is back!",
+                  Toast.LENGTH_LONG)
+              .show()
+          isLoading.value = false
+          return@rememberLauncherForActivityResult
+        }
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
           val account = task.getResult(Exception::class.java)
