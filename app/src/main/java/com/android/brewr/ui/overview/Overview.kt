@@ -2,13 +2,14 @@ package com.android.brewr.ui.overview
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,10 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.R
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
@@ -39,11 +42,19 @@ import com.android.brewr.ui.recommendation.RecommendScreen
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
+import com.android.brewr.utils.getCurrentLocation
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
+/**
+ * Displays the main overview screen with two sections: Gallery and Explore.
+ *
+ * The screen fetches nearby coffee shops based on the user's location and displays either the
+ * Gallery or Explore section depending on the selected navigation tab.
+ *
+ * @param listJourneysViewModel The ViewModel for managing journey data.
+ * @param coffeesViewModel The ViewModel for managing coffee shop data.
+ * @param navigationActions Navigation actions to navigate between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -55,7 +66,7 @@ fun OverviewScreen(
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
   var currentSection by remember { mutableStateOf("Gallery") }
-  var curatedCoffees by rememberSaveable { mutableStateOf<List<Coffee>>(emptyList()) }
+  var curatedCoffeeShops by rememberSaveable { mutableStateOf<List<CoffeeShop>>(emptyList()) }
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -101,7 +112,7 @@ fun OverviewScreen(
                     coffeesViewModel.addCoffees(coffees)
 
                     // Sort fetched coffee shops by rating
-                    curatedCoffees = sortCoffeeShopsByRating(coffees)
+                    curatedCoffeeShops = sortCoffeeShopsByRating(coffees)
                   })
             })
       }
@@ -114,7 +125,12 @@ fun OverviewScreen(
       topBar = {
         Column {
           TopAppBar(
-              title = { Text(text = "BrewR", modifier = Modifier.testTag("appTitle")) },
+              title = {
+                Image(
+                    painter = painterResource(id = R.drawable.app_title),
+                    contentDescription = "App Title Logo",
+                    modifier = Modifier.testTag("appTitle").fillMaxHeight().testTag("appTitle"))
+              },
               actions = {
                 Row {
                   IconButton(
@@ -142,7 +158,7 @@ fun OverviewScreen(
       content = { pd ->
         when (currentSection) {
           "Gallery" -> GalleryScreen(listJourneysViewModel, pd, navigationActions)
-          "Explore" -> ExploreScreen(coffeesViewModel, curatedCoffees)
+          "Explore" -> ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
           "Recommend" -> RecommendScreen(navigationActions)
         }
       })
@@ -171,6 +187,14 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
   }
 }
 
+/**
+ * Displays a navigation button within the sub-navigation bar.
+ *
+ * @param text The text displayed on the button.
+ * @param isSelected Whether the button is currently selected.
+ * @param onClick Callback invoked when the button is clicked.
+ * @param modifier Modifier for styling and layout configuration.
+ */
 @Composable
 fun SubNavigationButton(
     text: String,
@@ -182,26 +206,9 @@ fun SubNavigationButton(
       text = text,
       color = if (isSelected) Color.White else CoffeeBrown,
       modifier =
-          modifier
-              .padding(vertical = 4.dp, horizontal = 8.dp)
+          Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
               .clickable { onClick() }
               .background(if (isSelected) CoffeeBrown else LightBrown, RoundedCornerShape(8.dp))
               .padding(8.dp)
               .testTag(text))
-}
-
-@SuppressLint("MissingPermission")
-private suspend fun getCurrentLocation(context: Context, onSuccess: (LatLng) -> Unit) {
-  try {
-    val locationClient = LocationServices.getFusedLocationProviderClient(context)
-    val location = locationClient.lastLocation.await()
-    if (location != null) {
-      onSuccess(LatLng(location.latitude, location.longitude)) // Success case
-    } else {
-      onSuccess(LatLng(46.5197, 6.6323)) // Fallback case
-    }
-  } catch (e: Exception) {
-    e.printStackTrace()
-    onSuccess(LatLng(46.5197, 6.6323))
-  }
 }

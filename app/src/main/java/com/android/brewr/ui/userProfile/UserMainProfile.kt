@@ -46,9 +46,21 @@ import coil.request.ImageRequest
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Route
+import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+/**
+ * Displays the main user profile screen.
+ *
+ * The screen shows the user's profile picture, username, and email, along with various menu options
+ * such as favorites, notifications, and a sign-out option. A confirmation dialog is presented
+ * before logging the user out.
+ *
+ * @param userViewModel ViewModel that provides user-related information, including username, email,
+ *   and profile picture.
+ * @param navigationActions Actions used for navigating between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: NavigationActions) {
@@ -130,14 +142,12 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
               ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
-                      onClick = {
-                        Toast.makeText(context, NOT_YET_IMPLEMENTED, Toast.LENGTH_SHORT).show()
-                      },
-                      Modifier.testTag("Preference button")) {
+                      onClick = { navigationActions.navigateTo(Screen.USER_PRIVATE_LIST) },
+                      Modifier.testTag("Favorite button")) {
                         Icon(
                             imageVector = Icons.Default.Favorite, contentDescription = "Preference")
                       }
-                  Text("Preference")
+                  Text("Favorite")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                   IconButton(
@@ -210,6 +220,14 @@ fun UserMainProfileScreen(userViewModel: UserViewModel, navigationActions: Navig
       })
 }
 
+/**
+ * Displays a clickable menu item in the user profile.
+ *
+ * @param icon The icon to display alongside the label.
+ * @param label The label describing the menu item.
+ * @param onClick The callback invoked when the menu item is clicked.
+ * @param testTag The test tag for UI testing purposes.
+ */
 @Composable
 fun ProfileMenuItem(icon: ImageVector, label: String, onClick: () -> Unit, testTag: String) {
   Row(

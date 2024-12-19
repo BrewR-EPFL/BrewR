@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
@@ -82,32 +82,37 @@ class E2ETest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "2",
+                  "Coffee page",
+                  Location(
+                      46.5183076,
+                      6.6338096,
+                      "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
+                  listOf(Review("Lei", "good", 5.0)),
+                  listOf("test.jpg")),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
           coffeeRate = CoffeeRate.ONE,
           date = Timestamp.now())
-  private val sampleCoffees =
+  private val sampleCoffeeShops =
       listOf(
-          Coffee(
+          CoffeeShop(
               "1",
               "Coffee1",
-              com.android.brewr.model.location.Location(
-                  latitude = 46.5228, longitude = 6.6285, address = "Lausanne 1"),
+              Location(latitude = 46.5228, longitude = 6.6285, name = "Lausanne 1"),
               4.5,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Lei", "good", 5.0)),
               listOf("test.jpg")),
-          Coffee(
+          CoffeeShop(
               "2",
               "Coffee2",
-              com.android.brewr.model.location.Location(
-                  latitude = 47.5228, longitude = 6.8385, address = "Lausanne 2"),
+              Location(latitude = 47.5228, longitude = 6.8385, name = "Lausanne 2"),
               5.0,
               listOf(Hours("Monday", "10", "20"), Hours("Tuesday", "10", "20")),
               listOf(Review("Jaeyi", "perfect", 5.0)),
@@ -122,11 +127,9 @@ class E2ETest {
     userRepositoryMock = mock(UserRepository::class.java)
     userViewModel = spy(UserViewModel(userRepositoryMock))
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    coffeesViewModel.addCoffees(sampleCoffees)
+    coffeesViewModel.addCoffees(sampleCoffeeShops)
     // Mock the behavior of `getJourneys` to simulate fetching journeys
-    `when`(
-            journeyRepositoryMock.getJourneysOfCurrentUser(
-                org.mockito.kotlin.any(), org.mockito.kotlin.any()))
+    `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
         .thenAnswer {
           val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
           onSuccess(listOf(journey)) // Simulate return list of journeys
@@ -148,7 +151,10 @@ class E2ETest {
             JourneyRecordScreen(listJourneysViewModel, navigationActions)
           }
           composable(EXPLORE) {
-            ExploreScreen(coffeesViewModel, sampleCoffees.sortedByDescending { it.rating })
+            ExploreScreen(
+                coffeesViewModel,
+                listJourneysViewModel,
+                sampleCoffeeShops.sortedByDescending { it.rating })
           }
         }
         navigation(
@@ -252,11 +258,9 @@ class E2ETest {
         .assertIsDisplayed()
         .assertTextEquals("Nearby Coffee Shops")
 
-    // Verify the toggle button and switch to the curated list
-    composeTestRule.onNodeWithTag("toggleListButton").assertIsDisplayed().performClick()
-
-    // Verify the curated list title is displayed
-    composeTestRule.onNodeWithTag("listTitle").assertIsDisplayed().assertTextEquals("Curated List")
+    // Verify the dropdown menu functionality
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
 
     // check the bottomSheet and coffee shop information existence
     composeTestRule.onNodeWithTag("bottomSheet").assertIsDisplayed().performTouchInput {
@@ -280,5 +284,36 @@ class E2ETest {
     composeTestRule.onNodeWithTag("coffeeImage:${sampleCoffees[1].id}").assertIsDisplayed()
 
        */
+
+  }
+
+  @Test
+  fun exploreScreenDropdownMenuIntegrationTest() {
+    // Go to the Explore screen
+    composeTestRule.onNodeWithTag("Explore").assertIsDisplayed().performClick()
+    composeTestRule.runOnIdle { navigationActions.navigateTo(EXPLORE) }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // Clear the coffee list to simulate an empty state
+    composeTestRule.runOnIdle { coffeesViewModel.clearCoffees() }
+    // Open the bottom sheet
+    composeTestRule.onNodeWithTag("menuButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("exploreBottomSheet").assertIsDisplayed()
+
+    // Verify the dropdown menu opens
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu").assertIsDisplayed()
+
+    // Select "Curated" from the dropdown menu
+    composeTestRule.onNodeWithText("Curated").assertExists().performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Curated Coffee Shops")
+
+    // Select "Opened" from the dropdown menu
+    composeTestRule.onNodeWithTag("toggleDropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Opened").assertExists().performClick()
+    composeTestRule.onNodeWithTag("listTitle").assertTextEquals("Opened Coffee Shops")
+
+    // Assert the "closed" message is displayed if the list is empty
+    composeTestRule.onNodeWithTag("noOpenCoffeeShopsMessage").assertExists()
   }
 }

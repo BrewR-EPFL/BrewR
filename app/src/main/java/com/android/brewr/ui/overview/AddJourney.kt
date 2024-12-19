@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,18 +34,36 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.brewr.R
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.ListJourneysViewModel
-import com.android.brewr.model.map.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.theme.CoffeeBrown
+import com.android.brewr.utils.isConnectedToInternet
 import com.android.brewr.utils.uploadPicture
 import com.google.firebase.Timestamp
 
+/**
+ * A composable screen that allows the user to add a new journey to the app.
+ *
+ * This screen collects various journey details, including:
+ * - Image upload.
+ * - Description.
+ * - Location selection (e.g., coffee shop).
+ * - Coffee attributes (origin, brewing method, taste, and rating).
+ * - Date selection.
+ *
+ * The journey data is saved locally or uploaded to Firebase Firestore, with image handling managed
+ * through Firebase Storage.
+ *
+ * @param listJourneysViewModel The ViewModel used for managing journey-related data.
+ * @param navigationActions Navigation actions to handle screen transitions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddJourneyScreen(
@@ -55,12 +74,13 @@ fun AddJourneyScreen(
   val uid = listJourneysViewModel.getNewUid()
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var description by remember { mutableStateOf("") }
-  var selectedLocation by remember { mutableStateOf(Location()) }
+  var selectedCoffeeShop by remember { mutableStateOf<CoffeeShop?>(null) }
   var coffeeOrigin by remember { mutableStateOf(CoffeeOrigin.DEFAULT) }
   var brewingMethod by remember { mutableStateOf(BrewingMethod.DEFAULT) }
   var coffeeTaste by remember { mutableStateOf(CoffeeTaste.DEFAULT) }
   var coffeeRate by remember { mutableStateOf(CoffeeRate.DEFAULT) }
   val date by remember { mutableStateOf(Timestamp.now()) } // Using Firebase Timestamp for now
+  val scope = rememberCoroutineScope()
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(true) } // State for the dropdown menu
   var isYesSelected by remember { mutableStateOf(true) }
@@ -120,15 +140,17 @@ fun AddJourneyScreen(
                         description = description, onDescriptionChange = { description = it })
                   }
               // CoffeeShop Dropdown Menu below the row
-              selectedLocation.let {
+              selectedCoffeeShop.let {
                 CoffeeShopCheckRow(
                     isYesSelected = isYesSelected,
                     onCheckChange = {
                       isYesSelected = !isYesSelected
                       expanded = isYesSelected
                     },
-                    coffeeshopExpanded = expanded,
-                    onSelectedLocationChange = { selectedLocation = it })
+                    coffeeShopExpanded = expanded,
+                    onSelectedCoffeeShopChange = { selectedCoffeeShop = it },
+                    scope = scope,
+                    context = context)
               }
 
               // Coffee Origin Dropdown Menu
@@ -157,21 +179,58 @@ fun AddJourneyScreen(
                   colors = ButtonColors(CoffeeBrown, Color.White, CoffeeBrown, Color.White),
                   onClick = {
                     if (imageUri != null) {
-                      uploadPicture(imageUri!!) { imageUrl ->
+                      if (isConnectedToInternet(context)) {
+                        uploadPicture(imageUri!!) { imageUrl ->
+                          val newJourney =
+                              Journey(
+                                  uid = uid,
+                                  imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                  description = description,
+                                  coffeeShop = selectedCoffeeShop,
+                                  coffeeOrigin = coffeeOrigin,
+                                  brewingMethod = brewingMethod,
+                                  coffeeTaste = coffeeTaste,
+                                  coffeeRate = coffeeRate,
+                                  date = selectedDate)
+                          listJourneysViewModel.addJourney(newJourney)
+                          navigationActions.goBack()
+                          return@uploadPicture
+                        }
+                      } else {
+                        // Use a predefined image URL when offline
+                        val predefinedImageUrl =
+                            "android.resource://${context.packageName}/${R.drawable.offlinemode}"
+
                         val newJourney =
                             Journey(
                                 uid = uid,
-                                imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                imageUrl = predefinedImageUrl, // Use the predefined URL
                                 description = description,
-                                location = selectedLocation,
+                                coffeeShop = selectedCoffeeShop,
                                 coffeeOrigin = coffeeOrigin,
                                 brewingMethod = brewingMethod,
                                 coffeeTaste = coffeeTaste,
                                 coffeeRate = coffeeRate,
                                 date = selectedDate)
                         listJourneysViewModel.addJourney(newJourney)
-                        navigationActions.goBack()
-                        return@uploadPicture
+                        navigationActions
+                            .goBack() // Update the Journey with real image when connected to the
+                        // internet
+                        uploadPicture(imageUri!!) { imageUrl ->
+                          val journeyWithRealImage =
+                              Journey(
+                                  uid = uid,
+                                  imageUrl = imageUrl, // Use the downloaded URL from Firebase
+                                  description = description,
+                                  coffeeShop = selectedCoffeeShop,
+                                  coffeeOrigin = coffeeOrigin,
+                                  brewingMethod = brewingMethod,
+                                  coffeeTaste = coffeeTaste,
+                                  coffeeRate = coffeeRate,
+                                  date = selectedDate)
+                          listJourneysViewModel.updateJourney(journeyWithRealImage)
+                          return@uploadPicture
+                        }
                       }
                     } else {
                       Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()

@@ -1,5 +1,6 @@
 package com.android.brewr.utils
 
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
@@ -13,7 +14,7 @@ import kotlin.math.sqrt
 class KNNHelper {
   /** Stores the predicted user ID. */
   private var predictedUid = ""
-  private var predictedJourneys: List<Location> = emptyList()
+  private var predictedJourneys: List<CoffeeShop> = emptyList()
   private var index: Int = 0
 
   /**
@@ -167,19 +168,17 @@ class KNNHelper {
       userJourneys: List<Journey>,
       givenLocation: Location,
       thresholdDistance: Double
-  ): List<Location> {
-    val coffeeShopSet = mutableListOf<Location>()
+  ): Set<CoffeeShop> {
+    val coffeeShopSet = mutableSetOf<CoffeeShop>()
 
     for (journey in userJourneys) {
-      val journeyLocation = journey.location
+      val journeyCoffeeShop = journey.coffeeShop
       val journeyRate = getRatingValue(journey.coffeeRate)
       // make journey has a location and location is not null and rating better than 4 stars
-      if (journeyLocation.isNotAtHome() && journeyRate >= 4) {
+      if (journeyCoffeeShop != null && journeyRate >= 4) {
         // calculate the distance
-        val distance = givenLocation.distanceTo(journeyLocation)
-        if (distance < thresholdDistance) {
-          coffeeShopSet.add(journeyLocation)
-        }
+
+        coffeeShopSet.add(journeyCoffeeShop)
       }
     }
     return coffeeShopSet

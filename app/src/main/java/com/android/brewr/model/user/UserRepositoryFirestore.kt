@@ -6,6 +6,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * Implementation of [UserRepository] using Firestore and Firebase Authentication.
+ *
+ * This class provides methods to retrieve user data, such as Gmail, username, and profile picture,
+ * from Firebase services.
+ *
+ * @property db An instance of [FirebaseFirestore] to interact with Firestore.
+ * @property firebaseAuth An instance of [FirebaseAuth] to retrieve authenticated user information.
+ */
 class UserRepositoryFirestore(
     private val db: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth

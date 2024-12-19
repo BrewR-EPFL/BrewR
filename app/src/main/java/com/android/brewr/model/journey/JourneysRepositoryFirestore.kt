@@ -1,6 +1,9 @@
 package com.android.brewr.model.journey
 
 import android.util.Log
+import com.android.brewr.model.coffee.CoffeeShop
+import com.android.brewr.model.coffee.Hours
+import com.android.brewr.model.coffee.Review
 import com.android.brewr.model.map.Location
 import com.android.brewr.model.user.User
 import com.google.android.gms.tasks.Task
@@ -29,7 +32,11 @@ class JourneysRepositoryFirestore(
     return db.collection(collectionPath).document().id
   }
 
-  // Clearly ask TODO it
+  /**
+   * Initializes the repository and creates a user document if it doesn't already exist.
+   *
+   * @param onSuccess The callback to call when initialization is successful.
+   */
   override fun init(onSuccess: () -> Unit) {
     firebaseAuth.addAuthStateListener {
       val user = Firebase.auth.currentUser
@@ -60,18 +67,14 @@ class JourneysRepositoryFirestore(
       }
     }
   }
-
   /**
-   * Retrieves all journeys of current user from the Firestore database.
+   * Retrieves all journeys of the current user from the Firestore database.
    *
    * @param onSuccess The callback to call with the list of journeys if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  override fun getJourneysOfCurrentUser(
-      onSuccess: (List<Journey>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    getJourneysOfTheUser(getCurrentUserUid(), onSuccess, onFailure)
+  override fun getJourneys(onSuccess: (List<Journey>) -> Unit, onFailure: (Exception) -> Unit) {
+    getJourneysOf(getCurrentUserUid(), onSuccess, onFailure)
   }
 
   /**
@@ -81,7 +84,7 @@ class JourneysRepositoryFirestore(
    *   operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
-  override fun getJourneysOfAllOtherUsers(
+  override fun retrieveJourneysOfAllOtherUsers(
       onSuccess: (List<Pair<List<Journey>, String>>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -106,7 +109,7 @@ class JourneysRepositoryFirestore(
 
           // Loop through each user UID and fetch their journeys
           allUsers.forEach { uid ->
-            getJourneysOfTheUser(
+            getJourneysOf(
                 uid,
                 onSuccess = { journeys ->
                   // Only process if no errors have occurred so far
@@ -134,38 +137,6 @@ class JourneysRepositoryFirestore(
           // Handle failure when fetching all users
           onFailure(exception)
         }
-  }
-
-  /**
-   * Retrieves all journeys of a specific user from the Firestore database.
-   *
-   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
-   * @param onFailure The callback to call if the operation fails.
-   */
-  override fun getJourneysOfTheUser(
-      uid: String,
-      onSuccess: (List<Journey>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(userPath)
-        .document(uid)
-        .get()
-        .addOnSuccessListener { document ->
-          val journeyIds = document.get("journeys") as? List<String> ?: emptyList()
-          if (journeyIds.isEmpty()) {
-            onSuccess(emptyList())
-            return@addOnSuccessListener
-          }
-          db.collection(collectionPath)
-              .whereIn("uid", journeyIds)
-              .get()
-              .addOnSuccessListener { querySnapshot ->
-                val journeys = querySnapshot.documents.mapNotNull { documentTojourney(it) }
-                onSuccess(journeys)
-              }
-              .addOnFailureListener { onFailure(it) }
-        }
-        .addOnFailureListener { onFailure(it) }
   }
 
   /**
@@ -203,6 +174,7 @@ class JourneysRepositoryFirestore(
   ) {
     performFirestoreOperation(
         db.collection(collectionPath).document(journey.uid).set(journey), onSuccess, onFailure)
+    Log.v("update journey", journey.toString())
   }
 
   /**
@@ -257,33 +229,52 @@ class JourneysRepositoryFirestore(
    * @param document The Firestore document to convert.
    * @return The Journey object.
    */
-  private fun documentTojourney(document: DocumentSnapshot): Journey? {
+  private fun documentToJourney(document: DocumentSnapshot): Journey? {
     return try {
       val uid = document.id
       val imageUrl = document.getString("imageUrl") ?: return null
       val description = document.getString("description") ?: return null
-      val locationData = document["location"] as? Map<*, *> ?: return null
+
+      val coffeeShopData = document.get("coffeeShop") as? Map<*, *> ?: return null
+      val locationData = coffeeShopData["location"] as? Map<*, *> ?: return null
+
       val location =
-          locationData.let {
-            Location(
-                latitude = it["latitude"] as? Double ?: 0.0,
-                longitude = it["longitude"] as? Double ?: 0.0,
-                name = it["name"] as? String ?: "home")
+          Location(
+              latitude = locationData["latitude"] as? Double ?: 0.0,
+              longitude = locationData["longitude"] as? Double ?: 0.0,
+              name = locationData["name"] as? String ?: "")
+      val hoursData = coffeeShopData["hours"] as? Map<String, Map<String, String>> ?: emptyMap()
+      val hours = hoursData.map { Hours(it.key, it.value["open"] ?: "", it.value["close"] ?: "") }
+      val reviewsData = coffeeShopData["reviews"] as? List<Map<String, Any>> ?: emptyList()
+      val reviews =
+          reviewsData.map {
+            Review(
+                authorName = it["author"] as? String ?: "",
+                review = it["comment"] as? String ?: "",
+                rating = it["rating"] as? Double ?: 0.0)
           }
-      val originString = document.getString("coffeeOrigin") ?: return null
-      val coffeeOrigin = CoffeeOrigin.valueOf(originString)
-      val methodString = document.getString("brewingMethod") ?: return null
-      val brewingMethod = BrewingMethod.valueOf(methodString)
-      val tasteString = document.getString("coffeeTaste") ?: return null
-      val coffeeTaste = CoffeeTaste.valueOf(tasteString)
-      val rateString = document.getString("coffeeRate") ?: return null
-      val coffeeRate = CoffeeRate.valueOf(rateString)
+
+      val coffeeShop =
+          CoffeeShop(
+              id = coffeeShopData["id"] as? String ?: "",
+              coffeeShopName = coffeeShopData["coffeeShopName"] as? String ?: "",
+              location = location,
+              rating = coffeeShopData["rating"] as? Double ?: 0.0,
+              hours = hours,
+              reviews = reviews,
+              imagesUrls = coffeeShopData["imagesUrls"] as? List<String> ?: emptyList())
+      val coffeeOrigin = CoffeeOrigin.valueOf(document.getString("coffeeOrigin") ?: return null)
+      val brewingMethod = BrewingMethod.valueOf(document.getString("brewingMethod") ?: return null)
+      val coffeeTaste = CoffeeTaste.valueOf(document.getString("coffeeTaste") ?: return null)
+      val coffeeRate = CoffeeRate.valueOf(document.getString("coffeeRate") ?: return null)
       val date = document.getTimestamp("date") ?: return null
+
+      // Create Journey
       Journey(
           uid = uid,
           imageUrl = imageUrl,
           description = description,
-          location = location,
+          coffeeShop = coffeeShop,
           coffeeOrigin = coffeeOrigin,
           brewingMethod = brewingMethod,
           coffeeTaste = coffeeTaste,
@@ -294,10 +285,59 @@ class JourneysRepositoryFirestore(
       null
     }
   }
-
+  /**
+   * Retrieves the current logged-in user's UID.
+   *
+   * @return The UID of the logged-in user.
+   * @throws IllegalStateException If the user is not logged in.
+   */
   private fun getCurrentUserUid(): String {
     val user = firebaseAuth.currentUser ?: throw IllegalStateException("User not logged in")
     val uid = user.uid
     return uid
+  }
+
+  /**
+   * get all journeys of the specific user
+   *
+   * @param uid The uid of the user that you want to know
+   * @param onSuccess The callback to call with the list of journeys if the operation is successful.
+   * @param onFailure The callback to call if the operation fails.
+   */
+  private fun getJourneysOf(
+      uid: String,
+      onSuccess: (List<Journey>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(userPath).document(uid).addSnapshotListener { userSnapshot, userError ->
+      if (userError != null) {
+        Log.e("JourneysRepositoryFirestore", "Error listening to user snapshots", userError)
+        onFailure(userError)
+        return@addSnapshotListener
+      }
+
+      val journeyIds = userSnapshot?.get("journeys") as? List<String> ?: emptyList()
+      if (journeyIds.isEmpty()) {
+        onSuccess(emptyList())
+        return@addSnapshotListener
+      }
+
+      db.collection(collectionPath).whereIn("uid", journeyIds).addSnapshotListener {
+          journeySnapshot,
+          journeyError ->
+        if (journeyError != null) {
+          Log.e("JourneysRepositoryFirestore", "Error listening to journey snapshots", journeyError)
+          onFailure(journeyError)
+          return@addSnapshotListener
+        }
+
+        if (journeySnapshot != null && !journeySnapshot.isEmpty) {
+          val journeys = journeySnapshot.documents.mapNotNull { documentToJourney(it) }
+          onSuccess(journeys)
+        } else {
+          onSuccess(emptyList()) // Pass an empty list if there are no documents
+        }
+      }
+    }
   }
 }

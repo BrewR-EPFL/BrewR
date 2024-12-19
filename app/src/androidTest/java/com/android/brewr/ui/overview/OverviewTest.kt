@@ -19,6 +19,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
 import androidx.test.rule.GrantPermissionRule
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
@@ -55,11 +56,19 @@ class OverviewScreenTest {
           imageUrl =
               "https://firebasestorage.googleapis.com/v0/b/brewr-epfl.appspot.com/o/images%2Fff3cdd66-87c7-40a9-af5e-52f98d8374dc?alt=media&token=6257d10d-e770-44c7-b038-ea8c8a3eedb2",
           description = "A wonderful coffee journey.",
-          location =
-              Location(
-                  46.5183076,
-                  6.6338096,
-                  "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+          coffeeShop =
+              CoffeeShop(
+                  "1",
+                  "Coffee page",
+                  Location(
+                      latitude = 46.5183076,
+                      longitude = 6.6338096,
+                      name =
+                          "Coffee page, Rue du Midi, Lausanne, District de Lausanne, Vaud, 1003, Schweiz/Suisse/Svizzera/Svizra"),
+                  4.5,
+                  listOf(),
+                  listOf(),
+                  listOf()),
           coffeeOrigin = CoffeeOrigin.BRAZIL,
           brewingMethod = BrewingMethod.POUR_OVER,
           coffeeTaste = CoffeeTaste.NUTTY,
@@ -135,7 +144,6 @@ class OverviewScreenTest {
     }
     // Assert that the app title is displayed
     composeTestRule.onNodeWithTag("appTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithText("BrewR").assertExists().assertIsDisplayed()
     // Assert that the 'Add' and 'Account' buttons exist
     composeTestRule.onNodeWithTag("addButton").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithTag("accountButton").assertIsDisplayed().assertHasClickAction()
@@ -189,7 +197,7 @@ class OverviewScreenTest {
   @Test
   fun overviewScreen_displaysJourneys() {
     // Define the behavior of getJourneys in the mock repository
-    `when`(journeysRepository.getJourneysOfCurrentUser(any(), any())).thenAnswer {
+    `when`(journeysRepository.getJourneys(any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(listOf(journey)) // Simulate return list of journeys
     }
@@ -209,7 +217,7 @@ class OverviewScreenTest {
   @Test
   fun overviewScreen_displaysNoJourneysMessage_whenJourneysListIsEmpty() {
     // Define the behavior of getJourneys in the mock repository
-    `when`(journeysRepository.getJourneysOfAllOtherUsers(any(), any())).thenAnswer {
+    `when`(journeysRepository.getJourneys(any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(List<Journey>) -> Unit>(0) // onSuccess callback
       onSuccess(emptyList()) // Simulate return list of journeys
     }

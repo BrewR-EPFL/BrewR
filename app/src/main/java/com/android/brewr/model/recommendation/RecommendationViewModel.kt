@@ -2,7 +2,7 @@ package com.android.brewr.model.recommendation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.brewr.model.coffee.Coffee
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.utils.KNNHelper
@@ -25,8 +25,8 @@ class RecommendationViewModel(private val journeyRepository: JourneysRepository)
   val predictedUserId: LiveData<String>
     get() = _predictedUserId
 
-  private val recommendedCoffees_ = MutableStateFlow<List<Coffee>>(emptyList())
-  val recommendedCoffees: StateFlow<List<Coffee>> = recommendedCoffees_.asStateFlow()
+  private val recommendedCoffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
+  val recommendedCoffees: StateFlow<List<CoffeeShop>> = recommendedCoffees_.asStateFlow()
 
   private val knnHelper = KNNHelper()
 
@@ -45,15 +45,15 @@ class RecommendationViewModel(private val journeyRepository: JourneysRepository)
   fun predictUser(usersJourneys: List<Pair<List<Journey>, String>>, userJourneys: List<Double>) {
     val data = knnHelper.featuresPreProcessing(usersJourneys)
     val predictedUserId = knnHelper.predictKNN(data, userJourneys)
-    journeyRepository.getJourneysOfTheUser(
-        predictedUserId,
-        onSuccess = {
-          val journeys = it
-          // add new coffee shop into the coffee shop list
-          // recommendedCoffees_.value
-          TODO()
-        },
-        onFailure = {})
+    //    journeyRepository.getJourneysOfTheUser(
+    //        predictedUserId,
+    //        onSuccess = {
+    //          val journeys = it
+    //          // add new coffee shop into the coffee shop list
+    //          // recommendedCoffees_.value
+    //          TODO()
+    //        },
+    //        onFailure = {})
   }
 
   /**
@@ -63,8 +63,9 @@ class RecommendationViewModel(private val journeyRepository: JourneysRepository)
    * retrieved data is stored in corresponding mutable state variables.
    */
   fun prepareData() {
-    journeyRepository.getJourneysOfAllOtherUsers(onSuccess = { data_.value = it }, onFailure = {})
-    journeyRepository.getJourneysOfCurrentUser(onSuccess = { journeys_.value = it }, onFailure = {})
+    journeyRepository.retrieveJourneysOfAllOtherUsers(
+        onSuccess = { data_.value = it }, onFailure = {})
+    journeyRepository.getJourneys(onSuccess = { journeys_.value = it }, onFailure = {})
   }
 
   //  /**

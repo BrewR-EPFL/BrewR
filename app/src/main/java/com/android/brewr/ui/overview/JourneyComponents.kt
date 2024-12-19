@@ -1,7 +1,9 @@
 package com.android.brewr.ui.overview
 
+import android.content.Context
 import android.icu.util.GregorianCalendar
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,7 +46,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,21 +61,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.BrewingMethod
 import com.android.brewr.model.journey.CoffeeOrigin
 import com.android.brewr.model.journey.CoffeeRate
 import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.map.Location
-import com.android.brewr.model.map.LocationViewModel
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.Gold
 import com.android.brewr.ui.theme.LightBrown
+import com.android.brewr.utils.fetchCoffeeShopsByLocationQuery
+import com.android.brewr.utils.getCurrentLocation
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
+/**
+ * Displays an image box for selecting and previewing images.
+ *
+ * @param imageUri The URI of the selected image (if any).
+ * @param imageUrl The URL of the selected image (used for previews).
+ * @param onImageClick Callback when the image box is clicked.
+ * @param testTag A test tag for UI testing purposes.
+ */
 @Composable
 fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit, testTag: String) {
   Box(
@@ -93,6 +107,12 @@ fun JourneyImageBox(imageUri: Uri?, imageUrl: String?, onImageClick: () -> Unit,
       }
 }
 
+/**
+ * Displays a text field for entering a journey description.
+ *
+ * @param description The current description text.
+ * @param onDescriptionChange Callback when the description is updated.
+ */
 @Composable
 fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -> Unit) {
   OutlinedTextField(
@@ -103,28 +123,46 @@ fun JourneyDescriptionField(description: String, onDescriptionChange: (String) -
       modifier = Modifier.fillMaxWidth().height(150.dp).testTag("inputJourneyDescription"))
 }
 
+/**
+ * Displays a row for coffee shop check options and location selection.
+ *
+ * @param isYesSelected Whether the coffee shop option is selected.
+ * @param onCheckChange Callback when the checkbox state changes.
+ * @param coffeeShopExpanded Whether the dropdown menu is expanded.
+ * @param onSelectedCoffeeShopChange Callback when the location is updated.
+ */
 @Composable
 fun CoffeeShopCheckRow(
     isYesSelected: Boolean,
     onCheckChange: () -> Unit,
-    coffeeshopExpanded: Boolean,
-    onSelectedLocationChange: (Location) -> Unit
+    coffeeShopExpanded: Boolean,
+    onSelectedCoffeeShopChange: (CoffeeShop) -> Unit,
+    scope: CoroutineScope,
+    context: Context
 ) {
-  val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
-  val locationSuggestions by
-      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
-  val locationQuery by locationViewModel.query.collectAsState()
-
   CoffeeShopCheckboxRow(isYesSelected, onCheckChange)
 
-  if (coffeeshopExpanded) {
-    LocationDropdown(
-        locationSuggestions, locationQuery, onSelectedLocationChange, locationViewModel)
+  if (coffeeShopExpanded) {
+    LocationDropdown(onSelectedCoffeeShopChange, scope, context)
   } else if (!isYesSelected) {
-    onSelectedLocationChange(Location())
+    onSelectedCoffeeShopChange(
+        CoffeeShop(
+            id = "Unknown",
+            coffeeShopName = "Unknown Location",
+            location = Location(latitude = 0.0, longitude = 0.0, name = "Unknown Location"),
+            rating = 0.0,
+            hours = emptyList(),
+            reviews = emptyList(),
+            imagesUrls = emptyList()))
   }
 }
 
+/**
+ * Displays a row with a checkbox for selecting "At home" or "At a coffee shop".
+ *
+ * @param isYesSelected Whether the coffee shop option is selected.
+ * @param onCheckChange Callback when the checkbox state changes.
+ */
 @Composable
 fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
   Row(
@@ -143,66 +181,140 @@ fun CoffeeShopCheckboxRow(isYesSelected: Boolean, onCheckChange: () -> Unit) {
       }
 }
 
+/**
+ * Displays a dropdown menu for selecting a coffee shop location.
+ *
+ * Users can search for a coffee shop by typing a query. Matching location suggestions are displayed
+ * in a dropdown list. Selecting an option updates the selected location.
+ *
+ * @param locationSuggestions A list of [Location] suggestions based on the current query.
+ * @param locationQuery The current query text entered by the user.
+ * @param onSelectedLocationChange Callback to update the selected [Location].
+ * @param locationViewModel The [LocationViewModel] responsible for managing location suggestions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDropdown(
-    locationSuggestions: List<Location?>,
-    locationQuery: String,
-    onSelectedLocationChange: (Location) -> Unit,
-    locationViewModel: LocationViewModel
+    onSelectedLocationChange: (CoffeeShop) -> Unit,
+    coroutineScope: CoroutineScope,
+    context: Context
 ) {
+  var locationQuery by remember { mutableStateOf("") }
+  var userLocation by remember { mutableStateOf<LatLng?>(null) }
+  var coffeeShops by remember { mutableStateOf<List<CoffeeShop>>(emptyList()) }
   var showDropdown by remember { mutableStateOf(false) }
+
+  // Whenever locationQuery changes and is not blank, fetch coffee shops
+  LaunchedEffect(locationQuery) {
+    if (locationQuery.isNotBlank()) {
+      coroutineScope.launch {
+        getCurrentLocation(
+            context,
+            onSuccess = {
+              Log.e("UserLocation", "Current location: $it")
+              // Fetch coffee shops once
+              fetchCoffeeShopsByLocationQuery(coroutineScope, context, locationQuery, it) {
+                  fetchedShops ->
+                userLocation = it
+                coffeeShops = fetchedShops
+              }
+            })
+      }
+    } else {
+      coffeeShops = emptyList()
+    }
+  }
+
+  // Helper to select a coffee shop
+  fun selectCoffeeShop() {
+    fetchCoffeeShopsByLocationQuery(coroutineScope, context, locationQuery, userLocation) { shops ->
+      val selected =
+          if (shops.isNotEmpty()) {
+            shops.first()
+          } else {
+            // Fallback coffee shop if none found
+            CoffeeShop(
+                id = "Unknown",
+                coffeeShopName = locationQuery.ifBlank { "Unknown Location" },
+                location =
+                    Location(
+                        latitude = 0.0,
+                        longitude = 0.0,
+                        name = locationQuery.ifBlank { "Unknown Location" }),
+                rating = 0.0,
+                hours = emptyList(),
+                reviews = emptyList(),
+                imagesUrls = emptyList())
+          }
+      onSelectedLocationChange(selected)
+    }
+  }
+
   ExposedDropdownMenuBox(
-      expanded = showDropdown && locationSuggestions.isNotEmpty(),
-      onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility
+      expanded = showDropdown && coffeeShops.isNotEmpty(),
+      onExpandedChange = { showDropdown = it },
       modifier = Modifier.testTag("exposedDropdownMenuBox")) {
         OutlinedTextField(
             value = locationQuery,
-            onValueChange = {
-              locationViewModel.setQuery(it)
-              showDropdown = true // Show dropdown when user starts typing
+            onValueChange = { newQuery ->
+              locationQuery = newQuery
+              showDropdown = true
             },
             label = { Text("Coffeeshop") },
             placeholder = { Text("Enter the Coffeeshop") },
-            modifier =
-                Modifier.menuAnchor() // Anchor the dropdown to this text field
-                    .fillMaxWidth()
-                    .testTag("inputCoffeeshopLocation"),
-            singleLine = true)
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                      selectCoffeeShop()
+                      showDropdown = false
+                    }),
+            modifier = Modifier.menuAnchor().fillMaxWidth().testTag("inputCoffeeshopLocation"))
 
-        // Dropdown menu for location suggestions
+        // Dropdown menu for coffee shop suggestions
         ExposedDropdownMenu(
-            expanded = showDropdown && locationSuggestions.isNotEmpty(),
+            expanded = showDropdown && coffeeShops.isNotEmpty(),
             onDismissRequest = { showDropdown = false },
             modifier = Modifier.testTag("locationSuggestionsDropdown")) {
-              locationSuggestions.filterNotNull().take(3).forEach { location ->
+              coffeeShops.take(3).forEach { coffeeShop ->
                 DropdownMenuItem(
                     text = {
                       Text(
                           text =
-                              location.name.take(30) +
-                                  if (location.name.length > 30) "..." else "", // Limit name length
-                          maxLines = 1 // Ensure name doesn't overflow
-                          )
+                              coffeeShop.coffeeShopName.take(30) +
+                                  if (coffeeShop.coffeeShopName.length > 30) "..., "
+                                  else
+                                      ", " +
+                                          coffeeShop.location.name
+                                              .split(",", limit = 2)
+                                              .joinToString(", "),
+                          maxLines = 1)
                     },
                     onClick = {
-                      locationViewModel.setQuery(location.name)
-                      onSelectedLocationChange(location)
-                      showDropdown = false // Close dropdown on selection
+                      onSelectedLocationChange(coffeeShop)
+                      showDropdown = false
                     },
                     modifier = Modifier.padding(8.dp))
               }
 
-              if (locationSuggestions.size > 3) {
+              if (coffeeShops.size > 3) {
                 DropdownMenuItem(
                     text = { Text("More...") },
-                    onClick = { /* Optionally show more results */},
+                    onClick = {
+                      // Handle showing more results or pagination if needed
+                    },
                     modifier = Modifier.padding(8.dp))
               }
             }
       }
 }
 
+/**
+ * Displays a dropdown menu for selecting a coffee origin.
+ *
+ * @param coffeeOrigin The currently selected coffee origin.
+ * @param onCoffeeOriginChange Callback when the coffee origin is updated.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeOriginDropdownMenu(
@@ -262,6 +374,15 @@ fun CoffeeOriginDropdownMenu(
       }
 }
 
+/**
+ * Displays a selection field for choosing a brewing method.
+ *
+ * This function provides users with options to choose a brewing method using buttons. Selected
+ * options are displayed as filled buttons, while unselected options appear as outlined buttons.
+ *
+ * @param brewingMethod The currently selected brewing method as a [BrewingMethod] enum value.
+ * @param onBrewingMethodChange Callback to update the selected brewing method.
+ */
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 fun BrewingMethodField(
@@ -313,6 +434,15 @@ fun BrewingMethodField(
       }
 }
 
+/**
+ * Displays a selection field for choosing a coffee taste.
+ *
+ * This function allows users to choose a coffee taste using buttons. The selected option is
+ * highlighted for clarity, while unselected options are displayed as outlined buttons.
+ *
+ * @param coffeeTaste The currently selected coffee taste as a [CoffeeTaste] enum value.
+ * @param onCoffeeTasteChange Callback to update the selected coffee taste.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste) -> Unit) {
@@ -363,6 +493,12 @@ fun CoffeeTasteField(coffeeTaste: CoffeeTaste, onCoffeeTasteChange: (CoffeeTaste
       }
 }
 
+/**
+ * Displays a rating field for selecting a coffee rating using stars.
+ *
+ * @param coffeeRate The currently selected coffee rate.
+ * @param onCoffeeRateChange Callback when the coffee rate is updated.
+ */
 @Composable
 fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> Unit) {
   Column(
@@ -410,6 +546,12 @@ fun CoffeeRateField(coffeeRate: CoffeeRate, onCoffeeRateChange: (CoffeeRate) -> 
       }
 }
 
+/**
+ * Displays a date picker for selecting a date.
+ *
+ * @param date The currently selected date as a [Timestamp].
+ * @param onDateChange Callback when the date is updated.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(date: Timestamp, onDateChange: (Timestamp) -> Unit) {

@@ -191,14 +191,14 @@ fun JourneyDetails(journey: Journey) {
   // Coffee Shop Name
   journey.let {
     val nameAndAddress =
-        if (journey.location.name == "At home") {
+        if (journey.coffeeShop == null) {
           listOf("At Home", "")
         } else {
-          journey.location.name.split(",", limit = 2)
+          listOf(journey.coffeeShop.coffeeShopName, journey.coffeeShop.location.name)
         }
 
     val coffeeShopName = nameAndAddress[0]
-    val coffeeShopAddress = if (nameAndAddress.size > 1) nameAndAddress[1].trim() else ""
+    val coffeeShopAddress = nameAndAddress[1].trim()
 
     if (coffeeShopName.isNotEmpty()) {
       Column(
