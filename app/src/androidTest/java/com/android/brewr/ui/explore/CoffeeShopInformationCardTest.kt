@@ -82,8 +82,7 @@ class CoffeeShopInformationCardTest {
         .assertIsDisplayed()
         .assertTextEquals("Address: " + mockCoffeeShop.location.name)
     composeTestRule
-        .onNodeWithTag("coffeeShopHour${mockCoffeeShop.id}")
-        .performScrollTo()
+        .onNodeWithTag("coffeeShopHours:${mockCoffeeShop.id}")
         .assertIsDisplayed()
         .assertTextEquals(
             "Opening Hours: " +
