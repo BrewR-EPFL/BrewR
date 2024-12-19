@@ -48,13 +48,10 @@ class UserMainProfileScreenTest {
     composeTestRule.onNodeWithTag("User Email").assertTextEquals("Username@gmail.com")
     composeTestRule.onNodeWithTag("User Profile Photo").assertIsDisplayed()
 
-    // Test clicking unimplemented feature buttons
     composeTestRule.onNodeWithTag("Favorite button").performClick()
-    composeTestRule.onNodeWithTag("Notification button").performClick()
-    composeTestRule.onNodeWithTag("TBD button").performClick()
-    composeTestRule.onNodeWithTag("anything").performClick()
+    composeTestRule.onNodeWithTag("About us").performClick()
 
-    // Test clicking the "sign out" button
+    // Test clicking the buttons
     composeTestRule.onNodeWithTag("sign out").performClick()
 
     // Verify the AlertDialog is displayed
