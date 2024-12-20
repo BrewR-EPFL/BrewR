@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class RecommendationViewModel(private val journeysRepository: JourneysRepository) : ViewModel() {
+open class RecommendationViewModel(private val journeysRepository: JourneysRepository) :
+    ViewModel() {
 
   private val recommendedCoffees_ = MutableStateFlow<MutableSet<CoffeeShop>>(mutableSetOf())
   val recommendedCoffees: StateFlow<MutableSet<CoffeeShop>> = recommendedCoffees_.asStateFlow()

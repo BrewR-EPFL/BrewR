@@ -93,7 +93,7 @@ class OverviewScreenTest {
     journeysRepository = mock(JourneysRepository::class.java)
     listJourneysViewModel = spy(ListJourneysViewModel(journeysRepository))
     coffeesViewModel = spy(CoffeesViewModel::class.java)
-    recommendationViewModel = spy(recommendationViewModel::class.java)
+    recommendationViewModel = RecommendationViewModel(journeysRepository)
 
     // Start the OverviewScreen composable for testing
     `when`(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
