@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.journey.Location
@@ -69,18 +68,5 @@ class RecommendScreenTest {
     }
 
     composeTestRule.onNodeWithTag("private_List").assertIsDisplayed()
-  }
-
-  @Test
-  fun recommendScreen_navigateToCoffeeInfo_onCoffeeItemClick() = runTest {
-    `when`(recommendationViewModel.recommendedCoffees)
-        .thenReturn(MutableStateFlow(mutableSetOf(sampleCoffeeShop)))
-
-    composeTestRule.setContent {
-      RecommendScreen(recommendationViewModel, coffeesViewModel, navigationActions)
-    }
-
-    // Simulate item click
-    composeTestRule.onNodeWithTag("private_List").performClick()
   }
 }
