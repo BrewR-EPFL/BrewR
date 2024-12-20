@@ -36,7 +36,6 @@ class ExploreScreenComponentTest {
     composeTestRule
         .onNodeWithTag("noOpenCoffeeShopsMessage")
         .assertIsDisplayed()
-        .assertTextEquals(
-            "Everywhere is closed! I guess Coffee will disturb your sleep at this time")
+        .assertTextEquals("No coffee shops found!")
   }
 }
