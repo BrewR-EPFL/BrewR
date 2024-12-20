@@ -6,6 +6,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -14,7 +15,7 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
@@ -98,6 +99,7 @@ class CoffeeShopInformationScreenTest {
     composeTestRule
         .onNodeWithTag(
             "coffeeShopHour${LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}")
+        .performScrollTo()
         .assertIsDisplayed()
         .assertTextEquals(
             "${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].day}: ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].open} - ${mockCoffeeShop.hours[LocalDate.now().dayOfWeek.value - 1].close}")

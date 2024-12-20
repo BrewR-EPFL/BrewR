@@ -21,6 +21,7 @@ object Screen {
   const val USERPROFILE = "User Profile Screen"
   const val USER_PRIVATE_LIST = "User Private List Screen"
   const val USER_PRIVATE_LIST_INFOS = "User Private List Screen INFO"
+  const val INFO_ABOUT_US = "Information about us"
   const val JOURNEY_RECORD = "Journey Screen"
   const val EDIT_JOURNEY = "Edit Journey Screen"
   const val EXPLORE = "coffees explore screen"

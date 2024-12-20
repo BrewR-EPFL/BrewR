@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.FavoriteCoffeeShopsRepository
 import com.android.brewr.model.coffee.FavoriteCoffeeShopsViewModel
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.explore.FavoriteCoffeesButton
 import org.junit.Before
 import org.junit.Rule

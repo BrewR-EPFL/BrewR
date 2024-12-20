@@ -10,7 +10,7 @@ import com.android.brewr.BuildConfig
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.Hours
 import com.android.brewr.model.coffee.Review
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -162,7 +162,7 @@ fun fetchNearbyCoffeeShops(
   val request =
       SearchNearbyRequest.builder(circle, placeFields)
           .setIncludedTypes(type)
-          .setMaxResultCount(1)
+          .setMaxResultCount(20)
           .build()
   // Check if location permissions are granted
   if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -193,20 +193,21 @@ fun fetchNearbyCoffeeShops(
                               },
                           // use this image to avoid using API to fetch photos as it is very
                           // expensive
-                          imagesUrls =
-                              listOf(
-                                  "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
-                  // imagesUrls = fetchAllPhotoUris(place, placesClient)))
+                          //                          imagesUrls =
+                          //                              listOf(
+                          //
+                          // "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain")))
+                          imagesUrls = fetchAllPhotoUris(place, placesClient)))
                 }
-                if (coffeeShops.isNotEmpty()) {
-                  Log.d(
-                      "PlacesAPI",
-                      "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
-                } else {
-                  Log.d("PlacesAPI", "No coffee shops found.")
-                }
-                onSuccess(coffeeShops)
               }
+              if (coffeeShops.isNotEmpty()) {
+                Log.d(
+                    "PlacesAPI",
+                    "Coffee shops founded: ${coffeeShops.size} ${coffeeShops[0].coffeeShopName}")
+              } else {
+                Log.d("PlacesAPI", "No coffee shops found.")
+              }
+              onSuccess(coffeeShops)
             }
           }
           .addOnFailureListener { exception ->

@@ -27,7 +27,7 @@ import com.android.brewr.model.journey.CoffeeTaste
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
-import com.android.brewr.model.map.Location
+import com.android.brewr.model.journey.Location
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -371,5 +371,3 @@ class EditJourneyScreenTest {
     verify(navigationActions).goBack()
   }
 }
-
-private fun Unit.performTextInput(s: String) {}
