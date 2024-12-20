@@ -19,7 +19,7 @@ open class RecommendationViewModel(private val journeysRepository: JourneysRepos
     ViewModel() {
 
   private val recommendedCoffees_ = MutableStateFlow<MutableSet<CoffeeShop>>(mutableSetOf())
-  val recommendedCoffees: StateFlow<MutableSet<CoffeeShop>> = recommendedCoffees_.asStateFlow()
+  open val recommendedCoffees: StateFlow<MutableSet<CoffeeShop>> = recommendedCoffees_.asStateFlow()
 
   private val knnHelper = KNNHelper()
 
