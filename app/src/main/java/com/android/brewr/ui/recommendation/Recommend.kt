@@ -54,7 +54,10 @@ fun RecommendScreen(
             containerColor = CoffeeBrown, // Replace CoffeeBrown with your actual color
             contentColor = Color.White, // Icon color
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 8.dp)) {
-              Icon(imageVector = Icons.Default.Refresh, contentDescription = "Add Recommendation")
+              Icon(
+                  imageVector = Icons.Default.Refresh,
+                  contentDescription = "Add Recommendation",
+                  modifier = Modifier.testTag("refreshIcon"))
             }
       },
       content = { paddingValues ->
@@ -62,7 +65,7 @@ fun RecommendScreen(
           Column(
               modifier =
                   Modifier.fillMaxSize()
-                      .testTag("privateList")
+                      .testTag("private_List")
                       .padding(16.dp)
                       .padding(paddingValues),
               verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -76,12 +79,14 @@ fun RecommendScreen(
                 }
               }
         } else {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                modifier = Modifier.testTag("emptyJourneyPrompt").padding(horizontal = 16.dp),
-                text =
-                    "Discover personalized coffee recommendations by exploring and recording your journeys")
-          }
+          Box(
+              modifier = Modifier.fillMaxSize().testTag("emptyRecommendation"),
+              contentAlignment = Alignment.Center) {
+                Text(
+                    modifier = Modifier.testTag("emptyJourneyPrompt").padding(horizontal = 16.dp),
+                    text =
+                        "Discover personalized coffee recommendations by exploring and recording your journeys")
+              }
         }
       })
 }
