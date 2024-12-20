@@ -146,7 +146,7 @@ class E2ETest {
     coffeesViewModel = spy(CoffeesViewModel::class.java)
     coffeesViewModel.addCoffees(sampleCoffeeShops)
     privateCoffeesViewModel = spy(CoffeesViewModel::class.java)
-    recommendationViewModel = spy(RecommendationViewModel::class.java)
+    recommendationViewModel = RecommendationViewModel(journeyRepositoryMock)
 
     // Mock the behavior of `getJourneys` to simulate fetching journeys
     `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
