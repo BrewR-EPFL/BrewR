@@ -35,6 +35,7 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.recommendation.RecommendationViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
@@ -62,6 +63,8 @@ fun OverviewScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
     coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory),
+    recommendationViewModel: RecommendationViewModel =
+        viewModel(factory = RecommendationViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
@@ -159,7 +162,8 @@ fun OverviewScreen(
         when (currentSection) {
           "Gallery" -> GalleryScreen(listJourneysViewModel, pd, navigationActions)
           "Explore" -> ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
-          "Recommend" -> RecommendScreen(navigationActions)
+          "Recommend" ->
+              RecommendScreen(recommendationViewModel, coffeesViewModel, navigationActions)
         }
       })
 }

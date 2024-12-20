@@ -49,7 +49,10 @@ fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
         painter =
             rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
-                    .data(coffeeShop.imagesUrls[0])
+                    .data(
+                        coffeeShop.imagesUrls.getOrElse(0) {
+                          "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain"
+                        })
                     .apply(
                         block =
                             fun ImageRequest.Builder.() {

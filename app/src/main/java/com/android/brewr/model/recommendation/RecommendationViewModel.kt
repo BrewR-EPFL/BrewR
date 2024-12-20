@@ -1,108 +1,100 @@
 package com.android.brewr.model.recommendation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
+import com.android.brewr.model.journey.JourneysRepositoryFirestore
 import com.android.brewr.utils.KNNHelper
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class RecommendationViewModel(private val journeyRepository: JourneysRepository) {
+class RecommendationViewModel(private val journeysRepository: JourneysRepository) : ViewModel() {
 
-  private val data_ = MutableStateFlow<List<Pair<List<Journey>, String>>>(emptyList())
-  val data: StateFlow<List<Pair<List<Journey>, String>>> = data_.asStateFlow()
-
-  private val journeys_ = MutableStateFlow<List<Journey>>(emptyList())
-  val journeys: StateFlow<List<Journey>> = journeys_.asStateFlow()
-
-  private val usersJourneys_ = MutableStateFlow<List<Journey>>(emptyList())
-  val usersJourneys: StateFlow<List<Journey>> = journeys_.asStateFlow()
-
-  private val _predictedUserId = MutableLiveData<String>()
-  val predictedUserId: LiveData<String>
-    get() = _predictedUserId
-
-  private val recommendedCoffees_ = MutableStateFlow<List<CoffeeShop>>(emptyList())
-  val recommendedCoffees: StateFlow<List<CoffeeShop>> = recommendedCoffees_.asStateFlow()
+  private val recommendedCoffees_ = MutableStateFlow<MutableSet<CoffeeShop>>(mutableSetOf())
+  val recommendedCoffees: StateFlow<MutableSet<CoffeeShop>> = recommendedCoffees_.asStateFlow()
 
   private val knnHelper = KNNHelper()
 
   /**
-   * Predicts the user ID based on the provided user journeys and current user's journey features.
+   * Companion object providing a factory for creating instances of [RecommendationViewModel].
    *
-   * This function uses the K-Nearest Neighbors (KNN) algorithm to predict the user ID by processing
-   * the features of the journeys of all other users and comparing them with the feature vector of
-   * the current user's journeys. The prediction is then stored in a mutable state variable.
-   *
-   * @param usersJourneys A list of pairs, where each pair contains a list of Journey objects and a
-   *   user ID.
-   * @param userJourneys A list of doubles representing the feature vector of the current user's
-   *   journeys.
+   * This factory is useful when a ViewModel needs to be created programmatically or injected into a
+   * lifecycle owner (e.g., in Android's ViewModelProvider).
    */
-  fun predictUser(usersJourneys: List<Pair<List<Journey>, String>>, userJourneys: List<Double>) {
-    val data = knnHelper.featuresPreProcessing(usersJourneys)
-    val predictedUserId = knnHelper.predictKNN(data, userJourneys)
-    //    journeyRepository.getJourneysOfTheUser(
-    //        predictedUserId,
-    //        onSuccess = {
-    //          val journeys = it
-    //          // add new coffee shop into the coffee shop list
-    //          // recommendedCoffees_.value
-    //          TODO()
-    //        },
-    //        onFailure = {})
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(RecommendationViewModel::class.java)) {
+              return RecommendationViewModel(
+                  JourneysRepositoryFirestore(Firebase.firestore, FirebaseAuth.getInstance()))
+                  as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+          }
+        }
+  }
+  /**
+   * Initializes the `RecommendationViewModel`.
+   *
+   * This block is executed immediately upon creation of the ViewModel. It initializes the
+   * `journeysRepository` by invoking its `init` method with a callback to `addRecommends()`.
+   *
+   * The initialization ensures that recommendations are updated as soon as the ViewModel is
+   * created.
+   */
+  init {
+    journeysRepository.init { addRecommends() }
   }
 
   /**
-   * Prepares the data by retrieving the journeys of all users and the current user.
+   * Fetches and calculates coffee shop recommendations.
    *
-   * This function fetches journey data for all users and the current user from the repository. The
-   * retrieved data is stored in corresponding mutable state variables.
+   * This method retrieves journey data for the current user and other users, applies the K-Nearest
+   * Neighbors (KNN) algorithm to determine recommendations, and updates the `recommendedCoffees`
+   * state.
+   *
+   * The flow is as follows:
+   * 1. Fetches the current user's journey data using `journeysRepository.getJourneys`.
+   * 2. Fetches journey data of all other users using
+   *    `journeysRepository.retrieveJourneysOfAllOtherUsers`.
+   * 3. Applies the KNN algorithm to recommend coffee shops based on similarities between users.
+   * 4. Updates the `recommendedCoffees` state with the recommended coffee shops.
+   *
+   * Logs intermediate results for debugging:
+   * - Logs the current user's journey data.
+   * - Logs the other users' journey data.
+   * - Logs the generated recommendations.
    */
-  fun prepareData() {
-    journeyRepository.retrieveJourneysOfAllOtherUsers(
-        onSuccess = { data_.value = it }, onFailure = {})
-    journeyRepository.getJourneys(onSuccess = { journeys_.value = it }, onFailure = {})
+  fun addRecommends() {
+    var usersData: List<Pair<List<Journey>, String>>
+    var currentUserData: List<Journey>
+
+    journeysRepository.getJourneys(
+        onSuccess = {
+          currentUserData = it
+          Log.d("recommendation", it.toString())
+          journeysRepository.retrieveJourneysOfAllOtherUsers(
+              onSuccess = {
+                usersData = it
+                Log.d("recommendation", it.toString())
+
+                val recommendations =
+                    knnHelper.getRecommendation(
+                        recommendedCoffees.value, usersData, currentUserData)
+                Log.d("recommendation", recommendations.toString())
+                recommendedCoffees_.value = recommendations
+              },
+              onFailure = {})
+        },
+        onFailure = {})
   }
-
-  //  /**
-  //   * Gets recommended coffee shop locations based on the current location and the predicted user
-  // ID.
-  //   *
-  //   * This function fetches the journey data of the predicted user and selects relevant coffee
-  // shops
-  //   * that are within a threshold distance from the current location. The list of recommended
-  //   * locations is stored in a mutable state variable.
-  //   *
-  //   * @param currentLocation The current location from which the distance to coffee shop
-  // locations
-  //   *   will be calculated.
-  //   */
-  //  fun getRecommendedLocation(currentLocation: Location) {
-  //    predictedUserId.value?.let {
-  //      journeyRepository.getJourneysOfTheUser(
-  //          it, onSuccess = { usersJourneys_.value = it }, onFailure = {})
-  //    }
-  //    recommendedCoffees_.value =
-  //        knnHelper.selectRecordsOfUser(usersJourneys_.value, currentLocation, 0.1)
-  //  }
-
-  //    fun updateRecommendedJourneys(){
-  //        val uid = knnHelper.getKNNResult()
-  //        journeyRepository.getJourneysOfTheUser(uid,onSuccess = { recommendedJourneys_.value = it
-  // }, onFailure = {})
-  //    }
-  //    fun updateRecommendedCoffees(){
-  //        //get location of each, filter current location 20km
-  //    }
-  //    fun getRecommendedCoffee(){
-  //        //get the highest rated one
-  //    }
-  //    fun getNextRecommendedCoffee(){
-  //        //change the recommended to then next second of the list, if there is no more recommend,
-  // show"..."
-  //    }
 }
