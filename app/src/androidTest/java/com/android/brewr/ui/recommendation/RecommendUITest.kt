@@ -40,14 +40,17 @@ class RecommendScreenTest {
     coffeesViewModel = spy(CoffeesViewModel::class.java)
     recommendationViewModel = mock(RecommendationViewModel::class.java)
 
-    // Mock recommendedCoffees StateFlow
+    // Mock recommendedCoffees StateFlow with default empty set
     `when`(recommendationViewModel.recommendedCoffees).thenReturn(MutableStateFlow(mutableSetOf()))
   }
 
   @Test
   fun recommendScreen_displaysEmptyState_whenNoRecommendations() {
     composeTestRule.setContent {
-      RecommendScreen(recommendationViewModel, coffeesViewModel, navigationActions)
+      RecommendScreen(
+          recommendationViewModel = recommendationViewModel,
+          coffeesViewModel = coffeesViewModel,
+          navigationActions = navigationActions)
     }
 
     composeTestRule.onNodeWithTag("emptyRecommendation").assertIsDisplayed()
@@ -60,13 +63,20 @@ class RecommendScreenTest {
 
   @Test
   fun recommendScreen_displaysRecommendations() = runTest {
-    `when`(recommendationViewModel.recommendedCoffees)
-        .thenReturn(MutableStateFlow(mutableSetOf(sampleCoffeeShop)))
+    // Set up the mock to return a set containing the sample coffee shop
+    val recommendationsFlow = MutableStateFlow(mutableSetOf(sampleCoffeeShop))
+    `when`(recommendationViewModel.recommendedCoffees).thenReturn(recommendationsFlow)
 
     composeTestRule.setContent {
-      RecommendScreen(recommendationViewModel, coffeesViewModel, navigationActions)
+      RecommendScreen(
+          recommendationViewModel = recommendationViewModel,
+          coffeesViewModel = coffeesViewModel,
+          navigationActions = navigationActions)
     }
 
+    // Assert that the list is displayed
     composeTestRule.onNodeWithTag("private_List").assertIsDisplayed()
+
+    // No need for explicit verifications since we're using relaxed mocks
   }
 }
