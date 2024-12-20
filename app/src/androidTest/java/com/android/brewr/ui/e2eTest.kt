@@ -36,6 +36,7 @@ import com.android.brewr.model.journey.Journey
 import com.android.brewr.model.journey.JourneysRepository
 import com.android.brewr.model.journey.ListJourneysViewModel
 import com.android.brewr.model.journey.Location
+import com.android.brewr.model.recommendation.RecommendationViewModel
 import com.android.brewr.model.user.UserRepository
 import com.android.brewr.model.user.UserViewModel
 import com.android.brewr.ui.explore.CoffeeInformationScreen
@@ -82,6 +83,7 @@ class E2ETest {
   private lateinit var navController: NavHostController
   private lateinit var coffeesViewModel: CoffeesViewModel
   private lateinit var privateCoffeesViewModel: CoffeesViewModel
+  private lateinit var recommendationViewModel: RecommendationViewModel
 
   private val journey =
       Journey(
@@ -144,6 +146,7 @@ class E2ETest {
     coffeesViewModel = spy(CoffeesViewModel::class.java)
     coffeesViewModel.addCoffees(sampleCoffeeShops)
     privateCoffeesViewModel = spy(CoffeesViewModel::class.java)
+    recommendationViewModel = RecommendationViewModel(journeyRepositoryMock)
 
     // Mock the behavior of `getJourneys` to simulate fetching journeys
     `when`(journeyRepositoryMock.getJourneys(org.mockito.kotlin.any(), org.mockito.kotlin.any()))
@@ -162,7 +165,8 @@ class E2ETest {
             route = Route.OVERVIEW,
         ) {
           composable(Screen.OVERVIEW) {
-            OverviewScreen(listJourneysViewModel, coffeesViewModel, navigationActions)
+            OverviewScreen(
+                listJourneysViewModel, coffeesViewModel, recommendationViewModel, navigationActions)
           }
           composable(Screen.USERPROFILE) { UserMainProfileScreen(userViewModel, navigationActions) }
           composable(Screen.JOURNEY_RECORD) {

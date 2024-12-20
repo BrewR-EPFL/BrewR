@@ -40,7 +40,7 @@ import java.time.LocalDate
  *
  * The card is clickable and triggers a callback when clicked.
  *
- * @param coffee The [Coffee] object containing the data for the coffee shop.
+ * @param coffeeShop The [CoffeeShop] object containing the data for the coffee shop.
  * @param onClick The callback to invoke when the card is clicked.
  */
 @SuppressLint("DefaultLocale")
@@ -54,7 +54,10 @@ fun CoffeeInformationCardScreen(coffeeShop: CoffeeShop, onClick: () -> Unit) {
         painter =
             rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
-                    .data(coffeeShop.imagesUrls[0])
+                    .data(
+                        coffeeShop.imagesUrls.getOrElse(0) {
+                          "https://th.bing.com/th/id/OIP.gNiGdodNdn2Bck61_x18dAHaFi?rs=1&pid=ImgDetMain"
+                        })
                     .apply(
                         block =
                             fun ImageRequest.Builder.() {

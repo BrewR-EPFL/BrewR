@@ -35,9 +35,11 @@ import com.android.brewr.model.coffee.CoffeeShop
 import com.android.brewr.model.coffee.CoffeesViewModel
 import com.android.brewr.model.coffee.sortCoffeeShopsByRating
 import com.android.brewr.model.journey.ListJourneysViewModel
+import com.android.brewr.model.recommendation.RecommendationViewModel
 import com.android.brewr.ui.explore.ExploreScreen
 import com.android.brewr.ui.navigation.NavigationActions
 import com.android.brewr.ui.navigation.Screen
+import com.android.brewr.ui.recommendation.RecommendScreen
 import com.android.brewr.ui.theme.CoffeeBrown
 import com.android.brewr.ui.theme.LightBrown
 import com.android.brewr.utils.fetchNearbyCoffeeShops
@@ -61,6 +63,8 @@ fun OverviewScreen(
     listJourneysViewModel: ListJourneysViewModel =
         viewModel(factory = ListJourneysViewModel.Factory),
     coffeesViewModel: CoffeesViewModel = viewModel(factory = CoffeesViewModel.Factory),
+    recommendationViewModel: RecommendationViewModel =
+        viewModel(factory = RecommendationViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   // State to track whether we're in "Gallery" or "Explore" mode
@@ -155,10 +159,11 @@ fun OverviewScreen(
         }
       },
       content = { pd ->
-        if (currentSection == "Gallery") {
-          GalleryScreen(listJourneysViewModel, pd, navigationActions)
-        } else {
-          ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
+        when (currentSection) {
+          "Gallery" -> GalleryScreen(listJourneysViewModel, pd, navigationActions)
+          "Explore" -> ExploreScreen(coffeesViewModel, listJourneysViewModel, curatedCoffeeShops)
+          "Recommend" ->
+              RecommendScreen(recommendationViewModel, coffeesViewModel, navigationActions)
         }
       })
 }
@@ -177,6 +182,12 @@ fun SubNavigationBar(currentSection: String, onSectionChange: (String) -> Unit) 
         isSelected = currentSection == "Explore",
         onClick = { onSectionChange("Explore") },
         modifier = Modifier.testTag("Explore"))
+    Spacer(modifier = Modifier.width(6.dp))
+    SubNavigationButton(
+        text = "Recommend",
+        isSelected = currentSection == "Recommend",
+        onClick = { onSectionChange("Recommend") },
+        modifier = Modifier.testTag("Recommend"))
   }
 }
 
